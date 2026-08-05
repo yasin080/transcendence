@@ -48,6 +48,9 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
+    # Run as the (host-aligned) node user so nothing Vite writes into the
+    # bind mount or the node_modules volume ends up owned by root.
+    user: node
     env_file: .env
     volumes:
       - ./frontend:/app
