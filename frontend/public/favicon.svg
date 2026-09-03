@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#020617"/>
+  <!-- the worm: body segments trailing behind a head -->
+  <circle cx="9"  cy="22" r="3"   fill="#166534"/>
+  <circle cx="15" cy="21" r="3.4" fill="#15803d"/>
+  <circle cx="20" cy="17" r="3.8" fill="#16a34a"/>
+  <circle cx="22" cy="11" r="4.6" fill="#22c55e"/>
+  <circle cx="20.6" cy="9.6" r="1" fill="#020617"/>
+  <circle cx="23.6" cy="9.6" r="1" fill="#020617"/>
+</svg>
