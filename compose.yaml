@@ -28,8 +28,8 @@ services:
       context: .
       dockerfile: docker/nginx/Dockerfile
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "1443:443"
     environment:
       NGINX_MODE: ${NGINX_MODE:-dev}
     volumes:

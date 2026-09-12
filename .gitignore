@@ -29,3 +29,8 @@ yarn-error.log*
 .idea/
 .vscode/
 *.swp
+
+#cambios propios
+.gitignore
+/designs
+/info
