@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
 
 import { echo } from '../lib/echo'
 
@@ -63,7 +64,14 @@ export default function Home() {
           Bomberman jugado con un gusano. La infraestructura está en pie; el juego llega después.
         </p>
       </div>
-
+      <div className="flex gap-4 text-sm">
+        <Link to="/waiting-room/demo" className="text-rose-400 underline">
+          Sala de espera (propietario)
+        </Link>
+        <Link to="/waiting-room/demo?role=guest" className="text-rose-400 underline">
+          Sala de espera (invitado)
+        </Link>
+      </div>
       <section className="rounded-lg border border-slate-800 divide-y divide-slate-800">
         <h2 className="px-5 py-3 text-sm font-medium uppercase tracking-wide text-slate-400">
           Estado del stack

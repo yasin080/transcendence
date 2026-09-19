@@ -6,6 +6,8 @@ import App from './App.tsx'
 import Home from './pages/Home.tsx'
 import Privacy from './pages/Privacy.tsx'
 import Terms from './pages/Terms.tsx'
+import AppShell from './layouts/AppShell.tsx'
+import WaitingRoom from './pages/WaitingRoom.tsx'
 import './index.css'
 
 const root = document.getElementById('root')
@@ -19,6 +21,9 @@ createRoot(root).render(
           <Route index element={<Home />} />
           <Route path="privacy" element={<Privacy />} />
           <Route path="terms" element={<Terms />} />
+        </Route>
+        <Route element={<AppShell />}>
+            <Route path="waiting-room/:roomId" element={<WaitingRoom />} />
         </Route>
       </Routes>
     </BrowserRouter>

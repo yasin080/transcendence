@@ -1,0 +1,28 @@
+@theme {
+  --color-void: #07061a;
+  --color-surface-2: #120e2c;
+  --color-fuse-600: #ff2e5b;
+  --color-fuse-650: #ff5077;
+  --color-ember-300: #ffd76a;
+  --color-ember-450: #ffb45e;
+
+  /* Provisionales: falta mapearlos al sistema de diseño del grupo */
+  --color-gold: #ffb638;
+  --color-online: #45e07a;
+  --color-mint: #63e58f;
+
+  --font-display: 'Bungee', system-ui, sans-serif;
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+
+  --animate-breathe: breathe 3.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+}
