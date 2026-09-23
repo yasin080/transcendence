@@ -21,12 +21,8 @@ export default function BackstageBanner({ children }: BackstageBannerProps) {
       />
 
       <div className="pointer-events-none absolute bottom-8 left-7 max-w-105">
-        <div className="text-[11px] font-bold tracking-[.18em] text-ember-450 uppercase">
-          Backstage
-        </div>
-        <div className="mt-2 font-display text-[16px] leading-[1.15] uppercase">
-          Sit tight. The arena is still filling.
-        </div>
+        <div className="text-eyebrow">Backstage</div>
+        <div className="mt-2 display-stat-sm">Sit tight. The arena is still filling.</div>
       </div>
     </div>
   )

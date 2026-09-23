@@ -33,11 +33,9 @@ export default function MatchPanel({
       />
       <div className="relative flex flex-wrap items-center gap-x-8 gap-y-5 px-7 py-6.5">
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-bold tracking-[.18em] text-ember-450 uppercase">
-            Players in room
-          </div>
+          <div className="text-eyebrow">Players in room</div>
           <div className="mt-1.5 flex items-baseline gap-2.5">
-            <div className="flex-none font-display text-[54px] leading-none tracking-[-.01em] whitespace-nowrap">
+            <div className="flex-none display-stat-lg whitespace-nowrap">
               {playerCount} / {maxPlayers}
             </div>
           </div>
@@ -54,7 +52,7 @@ export default function MatchPanel({
               type="button"
               onClick={onStart}
               disabled={!canStart}
-              className="cursor-pointer rounded-[14px] bg-fuse-600 px-8.5 py-4.75 text-[15px] font-bold tracking-[.04em] text-white uppercase enabled:hover:bg-fuse-650 disabled:cursor-not-allowed disabled:opacity-40 motion-safe:enabled:animate-boom-pulse"
+              className="cursor-pointer rounded-[14px] bg-fuse-600 px-8.5 py-4.75 text-button-label text-white enabled:hover:bg-fuse-650 disabled:cursor-not-allowed disabled:opacity-40 motion-safe:enabled:animate-boom-pulse"
             >
               Start match
             </button>
@@ -62,7 +60,7 @@ export default function MatchPanel({
           <button
             type="button"
             onClick={onLeave}
-            className="cursor-pointer rounded-[14px] border border-white/40 bg-white/30 px-7 py-4.75 text-[15px] font-bold tracking-[.04em] text-white uppercase hover:bg-white/50"
+            className="cursor-pointer rounded-[14px] border border-white/40 bg-white/30 px-7 py-4.75 text-button-label text-white hover:bg-white/50"
           >
             Leave room
           </button>
@@ -75,7 +73,7 @@ export default function MatchPanel({
 function SettingChip({ label, value }: MatchSetting) {
   return (
     <div className="flex flex-col rounded-[10px] border border-white/10 bg-[#080718]/50 py-1.75 pr-3 pl-2.25 leading-[1.15]">
-      <span className="text-[9px] font-bold tracking-[.14em] text-white/40 uppercase">{label}</span>
+      <span className="text-micro-label font-bold text-white/40">{label}</span>
       <span className="text-xs font-semibold">{value}</span>
     </div>
   )

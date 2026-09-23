@@ -17,7 +17,7 @@ export default function PlayerGrid({ players, maxPlayers, isOwner, onKick }: Pla
   return (
     <section>
       <div className="mt-6.5 mb-3 flex items-center gap-3.5">
-        <h2 className="text-[13px] font-bold tracking-[.16em] text-white/62 uppercase">Players</h2>
+        <h2 className="text-section-title">Players</h2>
       </div>
 
       <div className={`grid gap-2.5 ${columns}`}>
@@ -36,7 +36,7 @@ function EmptySlot() {
   return (
     <div className="flex min-h-37.5 animate-breathe flex-col items-center justify-center gap-3 rounded-[14px] border border-dashed border-white/[.14] bg-white/[.012] p-4 motion-reduce:animate-none">
       <div className="size-13 rounded-2xl border border-dashed border-white/18" />
-      <div className="text-[10px] tracking-[.16em] text-white/32 uppercase">Waiting for player</div>
+      <div className="text-micro-label text-white/32">Waiting for player</div>
     </div>
   )
 }

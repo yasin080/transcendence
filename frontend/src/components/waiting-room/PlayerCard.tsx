@@ -44,10 +44,10 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
         )}
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-[7px]">
-            <div className="truncate text-[15px] font-bold">{player.name}</div>
+            <div className="truncate text-card-title">{player.name}</div>
             {player.isOwner && <CrownIcon />}
           </div>
-          <div className={`mt-[3px] text-[11px] font-semibold tracking-[.12em] uppercase ${roleColor}`}>
+          <div className={`mt-[3px] text-micro-label font-semibold ${roleColor}`}>
             {roleLabel}
           </div>
         </div>
@@ -68,7 +68,7 @@ function Avatar({ name, background, color }: { name: string; background: string;
 
   return (
     <div
-      className="grid size-[52px] flex-none place-items-center rounded-2xl font-display text-[15px] tracking-[.02em]"
+      className="grid size-[52px] flex-none place-items-center rounded-2xl display-stat-sm"
       style={{ background, color }}
     >
       {initials}
@@ -87,8 +87,8 @@ function BotAvatar() {
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="rounded-[10px] bg-white/5 px-[11px] py-[9px]">
-      <div className="font-display text-[17px] leading-none">{value}</div>
-      <div className="mt-1 text-[10px] tracking-[.12em] text-white/45 uppercase">{label}</div>
+      <div className="display-stat-sm">{value}</div>
+      <div className="mt-1 text-micro-label text-white/45">{label}</div>
     </div>
   )
 }

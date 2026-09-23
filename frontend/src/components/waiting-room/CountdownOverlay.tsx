@@ -24,8 +24,8 @@ export default function CountdownOverlay({ from, onDone }: CountdownOverlayProps
         className="absolute size-130 rounded-full bg-[radial-gradient(circle,rgba(255,155,47,.3)_0%,rgba(255,46,91,.12)_45%,rgba(7,6,26,0)_70%)]"
       />
       <div className="relative flex flex-col items-center gap-1.5 text-center text-white">
-        <div className="text-xs font-bold tracking-[.22em] text-ember-450 uppercase">Match starts in</div>
-        <div className="font-display text-[220px] leading-[.86] tracking-[-.02em] [text-shadow:0_0_46px_rgba(255,46,91,.55)]">
+        <div className="text-eyebrow">Match starts in</div>
+        <div className="display-hero text-[220px] [text-shadow:0_0_46px_rgba(255,46,91,.55)]">
           {n}
         </div>
       </div>
