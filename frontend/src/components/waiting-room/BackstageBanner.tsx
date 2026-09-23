@@ -8,7 +8,7 @@ interface BackstageBannerProps {
 
 export default function BackstageBanner({ children }: BackstageBannerProps) {
   return (
-    <div className="relative mt-[26px] -mx-7 -mb-8 h-[280px] min-h-[180px] overflow-hidden">
+    <div className="relative mt-6.5 -mx-7 -mb-8 h-70 min-h-45 overflow-hidden">
       <div className="absolute inset-0">{children}</div>
 
       <div
@@ -20,7 +20,7 @@ export default function BackstageBanner({ children }: BackstageBannerProps) {
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(7,6,26,.9)_0%,rgba(7,6,26,.45)_42%,rgba(7,6,26,0)_72%)]"
       />
 
-      <div className="pointer-events-none absolute bottom-8 left-7 max-w-[420px]">
+      <div className="pointer-events-none absolute bottom-8 left-7 max-w-105">
         <div className="text-[11px] font-bold tracking-[.18em] text-ember-450 uppercase">
           Backstage
         </div>

@@ -64,12 +64,21 @@ export default function Home() {
           Bomberman jugado con un gusano. La infraestructura está en pie; el juego llega después.
         </p>
       </div>
-      <div className="flex gap-4 text-sm">
+      <div className="flex flex-wrap gap-4 text-sm">
         <Link to="/waiting-room/demo" className="text-rose-400 underline">
           Sala de espera (propietario)
         </Link>
         <Link to="/waiting-room/demo?role=guest" className="text-rose-400 underline">
           Sala de espera (invitado)
+        </Link>
+        <Link to="/waiting-room/demo?preview=countdown" className="text-rose-400 underline">
+          Modal: cuenta atrás
+        </Link>
+        <Link to="/waiting-room/demo?preview=closed" className="text-rose-400 underline">
+          Modal: sala cerrada
+        </Link>
+        <Link to="/waiting-room/demo?preview=kicked" className="text-rose-400 underline">
+          Modal: expulsado
         </Link>
       </div>
       <section className="rounded-lg border border-slate-800 divide-y divide-slate-800">
