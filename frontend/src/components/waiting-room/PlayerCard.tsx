@@ -21,7 +21,7 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
   return (
     <div
       className={`relative flex flex-col gap-3.5 rounded-[14px] border p-4 ${
-        player.isBot ? 'border-mint/[.22] bg-online/5' : 'border-white/[.08] bg-white/[.035]'
+        player.isBot ? 'border-mint/22 bg-online/5' : 'border-white/8 bg-white/[.035]'
       }`}
     >
       {onKick && (
@@ -36,18 +36,18 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
         </button>
       )}
 
-      <div className="flex min-w-0 items-center gap-3 pr-[26px]">
+      <div className="flex min-w-0 items-center gap-3 pr-6.5">
         {player.isBot ? (
           <BotAvatar />
         ) : (
           <Avatar name={player.name} background={player.background} color={player.color} />
         )}
         <div className="min-w-0">
-          <div className="flex min-w-0 items-center gap-[7px]">
+          <div className="flex min-w-0 items-center gap-1.75">
             <div className="truncate text-card-title">{player.name}</div>
             {player.isOwner && <CrownIcon />}
           </div>
-          <div className={`mt-[3px] text-micro-label font-semibold ${roleColor}`}>
+          <div className={`mt-0.75 text-micro-label ${roleColor}`}>
             {roleLabel}
           </div>
         </div>
@@ -68,7 +68,7 @@ function Avatar({ name, background, color }: { name: string; background: string;
 
   return (
     <div
-      className="grid size-[52px] flex-none place-items-center rounded-2xl display-stat-sm"
+      className="grid size-13 flex-none place-items-center rounded-2xl display-stat-sm"
       style={{ background, color }}
     >
       {initials}
@@ -78,15 +78,15 @@ function Avatar({ name, background, color }: { name: string; background: string;
 
 function BotAvatar() {
   return (
-    <div className="grid size-[52px] flex-none place-items-center rounded-2xl border border-mint/[.35] bg-[linear-gradient(150deg,rgba(69,224,122,.22),rgba(20,80,44,.5))]">
-      <BotIcon className="size-[27px] text-mint" />
+    <div className="grid size-13 flex-none place-items-center rounded-2xl border border-mint/35 bg-[linear-gradient(150deg,rgba(69,224,122,.22),rgba(20,80,44,.5))]">
+      <BotIcon className="size-6.75 text-mint" />
     </div>
   )
 }
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-[10px] bg-white/5 px-[11px] py-[9px]">
+    <div className="rounded-[10px] bg-white/5 px-2.75 py-2.25">
       <div className="display-stat-sm">{value}</div>
       <div className="mt-1 text-micro-label text-white/45">{label}</div>
     </div>

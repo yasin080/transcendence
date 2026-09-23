@@ -73,8 +73,8 @@ export default function MatchPanel({
 function SettingChip({ label, value }: MatchSetting) {
   return (
     <div className="flex flex-col rounded-[10px] border border-white/10 bg-[#080718]/50 py-1.75 pr-3 pl-2.25 leading-[1.15]">
-      <span className="text-micro-label font-bold text-white/40">{label}</span>
-      <span className="text-xs font-semibold">{value}</span>
+      <span className="text-micro-label text-white/40">{label}</span>
+      <span className="text-meta">{value}</span>
     </div>
   )
 }
