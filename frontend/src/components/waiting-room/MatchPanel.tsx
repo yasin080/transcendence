@@ -1,5 +1,6 @@
 import type { MatchSetting } from './types.ts'
 import arena from '../../assets/arena.png'
+import Button from '../ui/Button.tsx'
 
 interface MatchPanelProps {
   isOwner: boolean
@@ -21,7 +22,7 @@ export default function MatchPanel({
   onLeave,
 }: MatchPanelProps) {
   return (
-    <div className="relative overflow-hidden rounded-[20px] border border-line bg-surface">
+    <div className="relative overflow-hidden rounded-3x1 border border-line bg-surface">
       <div
        aria-hidden="true"
        className="absolute inset-0 bg-cover bg-center opacity-70"
@@ -48,22 +49,17 @@ export default function MatchPanel({
 
         <div className="flex flex-none items-center gap-3">
           {isOwner && (
-            <button
-              type="button"
+            <Button
               onClick={onStart}
               disabled={!canStart}
-              className="cursor-pointer rounded-[14px] bg-fuse-600 px-8.5 py-4.75 text-button-label text-white enabled:hover:bg-fuse-650 disabled:cursor-not-allowed disabled:opacity-40 motion-safe:enabled:animate-boom-pulse"
+              className="motion-safe:enabled:animate-boom-pulse"
             >
               Start match
-            </button>
+            </Button>
           )}
-          <button
-            type="button"
-            onClick={onLeave}
-            className="cursor-pointer rounded-[14px] border border-white/40 bg-white/30 px-7 py-4.75 text-button-label text-white hover:bg-fill-strong0"
-          >
-            Leave room
-          </button>
+            <Button variant="secondary" onClick={onLeave}>
+              Leave room
+            </Button>
         </div>
       </div>
     </div>
@@ -72,7 +68,7 @@ export default function MatchPanel({
 
 function SettingChip({ label, value }: MatchSetting) {
   return (
-    <div className="flex flex-col rounded-[10px] border border-line bg-void/50 py-1.75 pr-3 pl-2.25 leading-[1.15]">
+    <div className="flex flex-col rounded-x1 border border-line bg-void/50 py-1.75 pr-3 pl-2.25 leading-[1.15]">
       <span className="text-micro-label text-fg-muted">{label}</span>
       <span className="text-meta">{value}</span>
     </div>

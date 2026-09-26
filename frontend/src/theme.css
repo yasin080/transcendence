@@ -1,4 +1,10 @@
 @theme {
+
+  /* Paleta base
+    void    = fondo de la página
+    surface = paneles y modales sobre void
+    fuse    = acción principal y peligro (600 reposo, 650 hover)
+    ember   = acentos cálidos (300 espera; 450 eyebrows, gold) */
   --color-void: #07061a;
   --color-surface: #120e2c;
   --color-fuse-600: #ff2e5b;
@@ -10,22 +16,30 @@
     gold   = propietario de sala, insignias, recompensas
     online = indicadores de conexión
     mint   = todo lo relacionado con bots (bordes: /25 contenedor,
-              /35 interactivo, /65 hover; fondos: /5, /10, /20)*/
+              /35 interactivo, /65 hover; fondos: /5, /10, /20) */
   --color-gold: var(--color-ember-450);
   --color-online: #45e07a;
   --color-mint: #63e58f;
+  
   /* Grises de texto: blanco con transparencia, de más a menos visible */
   --color-fg-secondary: rgb(255 255 255 / 60%);
   --color-fg-muted: rgb(255 255 255 / 45%);
   --color-fg-faint: rgb(255 255 255 / 32%);
+  
   /* Bordes: blanco con transparencia */
   --color-line: rgb(255 255 255 / 10%);
   --color-line-strong: rgb(255 255 255 / 15%);
+  
   /* Rellenos: blanco con transparencia, para capas sobre surface/void.
      Cristal oscuro sobre imágenes o paneles: usar bg-void/50. */
   --color-fill-subtle: rgb(255 255 255 / 1.2%);
   --color-fill: rgb(255 255 255 / 3.5%);
   --color-fill-strong: rgb(255 255 255 / 5%);
+
+  /* Radios (escala de Tailwind, sin tokens propios):
+     lg = controles pequeños · xl = chips y cajas internas
+     2xl = tarjetas, botones grandes, avatares, modales
+     3xl = paneles grandes · full = píldoras y círculos */
 
   --font-display: 'Bungee', system-ui, sans-serif;
   --font-body: 'Space Grotesk', system-ui, sans-serif;

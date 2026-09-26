@@ -20,7 +20,7 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
 
   return (
     <div
-      className={`relative flex flex-col gap-3.5 rounded-[14px] border p-4 ${
+      className={`relative flex flex-col gap-3.5 rounded-2x1 border p-4 ${
         player.isBot ? 'border-mint/25 bg-mint/5' : 'border-line bg-fill'
       }`}
     >
@@ -86,7 +86,7 @@ function BotAvatar() {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-[10px] bg-fill-strong px-2.75 py-2.25">
+    <div className="rounded-x1 bg-fill-strong px-2.75 py-2.25">
       <div className="display-stat-sm">{value}</div>
       <div className="mt-1 text-micro-label text-fg-muted">{label}</div>
     </div>
