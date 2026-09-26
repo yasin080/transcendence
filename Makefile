@@ -8,7 +8,7 @@ COMPOSE := docker compose
 
 ## Start the whole stack (the "one command" the subject asks for)
 up: .env
-	$(COMPOSE) up -d --build
+	$(COMPOSE) up -d
 	@echo ""
 	@echo "  https://localhost              → app"
 	@echo "  https://localhost/api/health   → backend health"
@@ -16,17 +16,23 @@ up: .env
 	@echo "  The browser will warn about the self-signed certificate. Expected."
 
 down:
-	$(COMPOSE) down
+	$(COMPOSE) down --remove-orphans
 
-build: .env
-	$(COMPOSE) build
-
-re: down up
+re: down
+	@$(MAKE) up
 
 ## Production mode: nginx serves the static build instead of the Vite dev server
 prod: .env
 	$(COMPOSE) run --rm frontend npm run build
 	NGINX_MODE=prod $(COMPOSE) up -d --build
+
+# --- Images -------------------------------------------------------------
+
+rebuild: .env
+	$(COMPOSE) up -d --build
+
+build: .env
+	$(COMPOSE) build
 
 # --- Inspection -------------------------------------------------------------
 
@@ -43,7 +49,7 @@ shell-front:
 	$(COMPOSE) exec frontend sh
 
 shell-db:
-	$(COMPOSE) exec mariadb mariadb -u$${DB_USERNAME} -p$${DB_PASSWORD} $${DB_DATABASE}
+	$(COMPOSE) exec mariadb sh -c 'mariadb -u"$$DB_USERNAME" -p"$$DB_PASSWORD" "$$DB_DATABASE"'
 
 # --- Laravel ----------------------------------------------------------------
 
@@ -60,8 +66,7 @@ test:
 # --- Cleanup ----------------------------------------------------------------
 
 ## Remove containers, keep the database
-clean:
-	$(COMPOSE) down --remove-orphans
+clean: down
 
 ## Remove containers, volumes and images — wipes the database and the certs
 fclean:
