@@ -16,7 +16,7 @@ export default function WaitingRoomHeader({
       <h1 className="min-w-0 display-heading">Waiting room</h1>
 
       <div className="ml-auto flex items-center gap-2.5">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#080718]/50 px-3.5 py-2 text-meta">
+                <span className="inline-flex items-center gap-2 rounded-full border border-line bg-void/50 px-3.5 py-2 text-meta">
           <span
             aria-hidden="true"
             className={`size-2 rounded-full ${isOwner ? 'bg-online' : 'bg-ember-300'}`}
@@ -29,7 +29,7 @@ export default function WaitingRoomHeader({
             type="button"
             onClick={onAddBot}
             title="Fill the next free seat with a bot"
-            className="flex cursor-pointer items-center gap-2 rounded-full border border-mint/32 bg-online/10 py-2.25 pr-3.75 pl-2.75 text-bot-action hover:border-mint/65 hover:bg-online/20"
+            className="flex cursor-pointer items-center gap-2 rounded-full border border-mint/35 bg-mint/10 py-2.25 pr-3.75 pl-2.75 text-bot-action hover:border-mint/65 hover:bg-mint/20"
           >
             <BotIcon />
             <span>Add bot</span>

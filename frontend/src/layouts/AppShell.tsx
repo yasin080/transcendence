@@ -6,8 +6,8 @@ import { Outlet } from 'react-router'
  */
 export default function AppShell() {
   return (
-    <div className="grid h-screen min-w-[1180px] grid-cols-[268px_minmax(560px,1fr)_340px] bg-[#07061a] text-white">
-      <aside className="border-r border-white/15 bg-[#120e2c] p-4 text-xs text-slate-400">
+    <div className="grid h-screen min-w-295 grid-cols-[268px_minmax(560px,1fr)_340px] bg-void text-white">
+      <aside className="border-r border-line-strong bg-surface p-4 text-xs text-slate-400">
         Columna izquierda (268px)
       </aside>
 
@@ -15,7 +15,7 @@ export default function AppShell() {
         <Outlet />
       </main>
 
-      <aside className="border-l border-white/15 bg-[#120e2c] p-4 text-xs text-slate-400">
+      <aside className="border-l border-line-strong bg-surface p-4 text-xs text-slate-400">
         Columna derecha (340px)
       </aside>
     </div>

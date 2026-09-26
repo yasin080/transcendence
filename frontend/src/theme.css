@@ -1,15 +1,31 @@
 @theme {
   --color-void: #07061a;
-  --color-surface-2: #120e2c;
+  --color-surface: #120e2c;
   --color-fuse-600: #ff2e5b;
   --color-fuse-650: #ff5077;
   --color-ember-300: #ffd76a;
   --color-ember-450: #ffb45e;
 
-  /* Provisionales: falta mapearlos al sistema de diseño del grupo */
-  --color-gold: #ffb638;
+  /* Colores con significado propio:
+    gold   = propietario de sala, insignias, recompensas
+    online = indicadores de conexión
+    mint   = todo lo relacionado con bots (bordes: /25 contenedor,
+              /35 interactivo, /65 hover; fondos: /5, /10, /20)*/
+  --color-gold: var(--color-ember-450);
   --color-online: #45e07a;
   --color-mint: #63e58f;
+  /* Grises de texto: blanco con transparencia, de más a menos visible */
+  --color-fg-secondary: rgb(255 255 255 / 60%);
+  --color-fg-muted: rgb(255 255 255 / 45%);
+  --color-fg-faint: rgb(255 255 255 / 32%);
+  /* Bordes: blanco con transparencia */
+  --color-line: rgb(255 255 255 / 10%);
+  --color-line-strong: rgb(255 255 255 / 15%);
+  /* Rellenos: blanco con transparencia, para capas sobre surface/void.
+     Cristal oscuro sobre imágenes o paneles: usar bg-void/50. */
+  --color-fill-subtle: rgb(255 255 255 / 1.2%);
+  --color-fill: rgb(255 255 255 / 3.5%);
+  --color-fill-strong: rgb(255 255 255 / 5%);
 
   --font-display: 'Bungee', system-ui, sans-serif;
   --font-body: 'Space Grotesk', system-ui, sans-serif;
@@ -44,13 +60,13 @@
   0%,
   100% {
     box-shadow:
-      0 14px 40px rgba(255, 46, 91, 0.45),
-      0 0 0 0 rgba(255, 46, 91, 0.55);
+      0 14px 40px color-mix(in srgb, var(--color-fuse-600) 45%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--color-fuse-600) 45%, transparent);
   }
   55% {
     box-shadow:
-      0 14px 46px rgba(255, 46, 91, 0.6),
-      0 0 0 22px rgba(255, 46, 91, 0);
+      0 14px 46px color-mix(in srgb, var(--color-fuse-600) 45%, transparent),
+      0 0 0 22px color-mix(in srgb, var(--color-fuse-600) 0%, transparent);
   }
 }
 
@@ -78,7 +94,7 @@
 @utility display-hero {
   font-family: var(--font-display);
   line-height: 0.86;
-  letter-spacing: var(--tracking-tight);;
+  letter-spacing: var(--tracking-tight);
 }
 
 @utility display-stat-lg {
@@ -108,7 +124,7 @@
   font-weight: var(--font-weight-bold);
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-caps);
-  color: rgb(255 255 255 / 62%);
+  color: var(--color-fg-secondary);
 }
 
 @utility text-micro-label {
@@ -140,7 +156,7 @@
 @utility text-body-muted {
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
-  color: rgb(255 255 255 / 55%);
+  color: var(--color-fg-secondary);
 }
 
 @utility text-bot-action {
