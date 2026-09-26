@@ -22,7 +22,7 @@ export default function MatchPanel({
   onLeave,
 }: MatchPanelProps) {
   return (
-    <div className="relative overflow-hidden rounded-3x1 border border-line bg-surface">
+    <div className="relative overflow-hidden rounded-3xl border border-line bg-surface">
       <div
        aria-hidden="true"
        className="absolute inset-0 bg-cover bg-center opacity-70"
@@ -49,17 +49,17 @@ export default function MatchPanel({
 
         <div className="flex flex-none items-center gap-3">
           {isOwner && (
-            <Button
-              onClick={onStart}
-              disabled={!canStart}
-              className="motion-safe:enabled:animate-boom-pulse"
-            >
-              Start match
-            </Button>
+          <Button
+            onClick={onStart}
+            disabled={!canStart}
+            className="motion-safe:enabled:animate-boom-pulse"
+          >
+            Start match
+          </Button>
           )}
-            <Button variant="secondary" onClick={onLeave}>
-              Leave room
-            </Button>
+          <Button variant="secondary" onClick={onLeave}>
+            Leave room
+          </Button>
         </div>
       </div>
     </div>
@@ -68,7 +68,7 @@ export default function MatchPanel({
 
 function SettingChip({ label, value }: MatchSetting) {
   return (
-    <div className="flex flex-col rounded-x1 border border-line bg-void/50 py-1.75 pr-3 pl-2.25 leading-[1.15]">
+    <div className="flex flex-col rounded-xl border border-line bg-void/50 py-1.75 pr-3 pl-2.25 leading-[1.15]">
       <span className="text-micro-label text-fg-muted">{label}</span>
       <span className="text-meta">{value}</span>
     </div>

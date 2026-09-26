@@ -16,7 +16,7 @@ export default function WaitingRoomHeader({
       <h1 className="min-w-0 display-heading">Waiting room</h1>
 
       <div className="ml-auto flex items-center gap-2.5">
-                <span className="inline-flex items-center gap-2 rounded-full border border-line bg-void/50 px-3.5 py-2 text-meta">
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-void/50 px-3.5 py-2 text-meta">
           <span
             aria-hidden="true"
             className={`size-2 rounded-full ${isOwner ? 'bg-online' : 'bg-ember-300'}`}

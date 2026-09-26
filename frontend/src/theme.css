@@ -75,11 +75,11 @@
   100% {
     box-shadow:
       0 14px 40px color-mix(in srgb, var(--color-fuse-600) 45%, transparent),
-      0 0 0 0 color-mix(in srgb, var(--color-fuse-600) 45%, transparent);
+      0 0 0 0 color-mix(in srgb, var(--color-fuse-600) 55%, transparent);
   }
   55% {
     box-shadow:
-      0 14px 46px color-mix(in srgb, var(--color-fuse-600) 45%, transparent),
+      0 14px 46px color-mix(in srgb, var(--color-fuse-600) 60%, transparent),
       0 0 0 22px color-mix(in srgb, var(--color-fuse-600) 0%, transparent);
   }
 }
