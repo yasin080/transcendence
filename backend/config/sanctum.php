@@ -49,7 +49,7 @@ return [
     | "expires_at" attribute, but first-party sessions are not affected.
     |
     */
-
+    # RETOMAR si implementamos api pública
     'expiration' => null,
 
     /*
@@ -65,8 +65,7 @@ return [
     |
     */
 
-    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
-
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', 'transcendence_'),
     /*
     |--------------------------------------------------------------------------
     | Sanctum Middleware

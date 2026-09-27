@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\RotatesSession;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
@@ -13,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use RotatesSession;
+
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create($request->validated());
@@ -25,7 +28,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        if (! Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
@@ -45,16 +48,5 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->noContent();
-    }
-
-    private function rotateSession(Request $request): void
-    {
-        $this->requireSession($request);
-        $request->session()->regenerate();
-    }
-
-    private function requireSession(Request $request): void
-    {
-        abort_unless($request->hasSession(), 419, 'This API authenticates with the frontend session.');
     }
 }
