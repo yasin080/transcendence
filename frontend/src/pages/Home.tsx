@@ -1,108 +1,57 @@
-import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 
-import { echo } from '../lib/echo'
 
-type Health = {
-  status: string
-  database: string
-  redis: string
-  laravel: string
-}
-
-type Probe =
-  | { state: 'loading' }
-  | { state: 'ok'; health: Health }
-  | { state: 'error'; message: string }
+import StackStatus from '../components/StackStatus'
+import { useAuth } from '../auth/useAuth'
 
 export default function Home() {
-  const [api, setApi] = useState<Probe>({ state: 'loading' })
-  const [socket, setSocket] = useState('connecting')
-
-  useEffect(() => {
-    let cancelled = false
-
-    fetch('/api/health')
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json() as Promise<Health>
-      })
-      .then((health) => {
-        if (!cancelled) setApi({ state: 'ok', health })
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) {
-          setApi({
-            state: 'error',
-            message: error instanceof Error ? error.message : 'unknown error',
-          })
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  useEffect(() => {
-    const connection = echo.connector.pusher.connection
-    const onChange = (states: { current: string }) => setSocket(states.current)
-
-    connection.bind('state_change', onChange)
-    setSocket(connection.state)
-
-    return () => {
-      connection.unbind('state_change', onChange)
-    }
-  }, [])
+  const { user, status } = useAuth()
+  const navigate = useNavigate()
+  const canPlay = status === 'authenticated' && !!user
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Transcendence</h1>
-        <p className="mt-2 text-slate-400">
-          Bomberman jugado con un gusano. La infraestructura está en pie; el juego llega después.
+    <div className="flex flex-col gap-8">
+      <section className="flex flex-col gap-2">
+        <span
+          className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
+            canPlay
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+              : 'border-white/10 bg-white/5 text-slate-400'
+          }`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${canPlay ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+          {canPlay ? 'Sesión iniciada' : 'Sin sesión'}
+        </span>
+
+        <h1 className="text-3xl font-black tracking-tight">
+          {canPlay ? `Hola, ${user.name}` : 'Bienvenido'}
+        </h1>
+        <p className="text-slate-400">
+          {canPlay
+            ? 'Listo para jugar cuando quieras.'
+            : 'Inicia sesión desde la cabecera para empezar a jugar.'}
         </p>
-      </div>
-
-      <section className="rounded-lg border border-slate-800 divide-y divide-slate-800">
-        <h2 className="px-5 py-3 text-sm font-medium uppercase tracking-wide text-slate-400">
-          Estado del stack
-        </h2>
-
-        <StatusRow
-          label="API (Laravel)"
-          value={
-            api.state === 'loading'
-              ? 'comprobando…'
-              : api.state === 'error'
-                ? `error: ${api.message}`
-                : api.health.status
-          }
-          ok={api.state === 'ok' && api.health.status === 'ok'}
-        />
-        <StatusRow
-          label="Base de datos (MariaDB)"
-          value={api.state === 'ok' ? api.health.database : '—'}
-          ok={api.state === 'ok' && api.health.database === 'ok'}
-        />
-        <StatusRow
-          label="Redis"
-          value={api.state === 'ok' ? api.health.redis : '—'}
-          ok={api.state === 'ok' && api.health.redis === 'ok'}
-        />
-        <StatusRow label="WebSocket (Reverb)" value={socket} ok={socket === 'connected'} />
       </section>
-    </div>
-  )
-}
 
-function StatusRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
-  return (
-    <div className="flex items-center justify-between px-5 py-3">
-      <span className="text-slate-300">{label}</span>
-      <span className={ok ? 'font-mono text-emerald-400' : 'font-mono text-amber-400'}>
-        {value}
-      </span>
+      <section className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          disabled={!canPlay}
+          onClick={() => canPlay && navigate('/profile')}
+          className="rounded-full bg-red-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-slate-500"
+        >
+          Jugar ahora
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate('/profile')}
+          className="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-slate-200 transition hover:border-white/20 hover:bg-white/5"
+        >
+          Ver perfil
+        </button>
+      </section>
+     
+      <StackStatus />
     </div>
   )
 }
