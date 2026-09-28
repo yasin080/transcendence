@@ -24,6 +24,8 @@ yarn-error.log*
 # TLS certificates generated at runtime
 /docker/nginx/certs/
 
+/diario.md
+
 # Editors and OS
 .DS_Store
 .idea/
