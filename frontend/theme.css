@@ -1,0 +1,182 @@
+@theme {
+
+  /* Paleta base
+    void    = fondo de la página
+    surface = paneles y modales sobre void
+    fuse    = acción principal y peligro (600 reposo, 650 hover)
+    ember   = acentos cálidos (300 espera; 450 eyebrows, gold) */
+  --color-void: #07061a;
+  --color-surface: #120e2c;
+  --color-fuse-600: #ff2e5b;
+  --color-fuse-650: #ff5077;
+  --color-ember-300: #ffd76a;
+  --color-ember-450: #ffb45e;
+
+  /* Colores con significado propio:
+    gold   = propietario de sala, insignias, recompensas
+    online = indicadores de conexión
+    mint   = todo lo relacionado con bots (bordes: /25 contenedor,
+              /35 interactivo, /65 hover; fondos: /5, /10, /20) */
+  --color-gold: var(--color-ember-450);
+  --color-online: #45e07a;
+  --color-mint: #63e58f;
+  
+  /* Grises de texto: blanco con transparencia, de más a menos visible */
+  --color-fg-secondary: rgb(255 255 255 / 60%);
+  --color-fg-muted: rgb(255 255 255 / 45%);
+  --color-fg-faint: rgb(255 255 255 / 32%);
+  
+  /* Bordes: blanco con transparencia */
+  --color-line: rgb(255 255 255 / 10%);
+  --color-line-strong: rgb(255 255 255 / 15%);
+  
+  /* Rellenos: blanco con transparencia, para capas sobre surface/void.
+     Cristal oscuro sobre imágenes o paneles: usar bg-void/50. */
+  --color-fill-subtle: rgb(255 255 255 / 1.2%);
+  --color-fill: rgb(255 255 255 / 3.5%);
+  --color-fill-strong: rgb(255 255 255 / 5%);
+
+  /* Radios (escala de Tailwind, sin tokens propios):
+     lg = controles pequeños · xl = chips y cajas internas
+     2xl = tarjetas, botones grandes, avatares, modales
+     3xl = paneles grandes · full = píldoras y círculos */
+
+  --font-display: 'Bungee', system-ui, sans-serif;
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  /* Sobrescribe la fuente base de Tailwind: el preflight aplica --font-sans
+  al <html>, así todo el texto hereda la fuente de cuerpo sin clases. */
+  --font-sans: var(--font-body);
+    
+  /* Escalón extra bajo la escala de Tailwind, para etiquetas en mayúsculas */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-2xs--line-height: calc(1 / 0.6875); /* 16px */
+
+  /* Tracking para texto pequeño en mayúsculas (etiquetas, eyebrows).
+  Tailwind no trae nada por encima de widest (0.1em). */
+  --tracking-caps: 0.15em;
+
+
+  --animate-breathe: breathe 3.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  --animate-boom-pulse: boom-pulse 2.8s ease-in-out infinite;
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+}
+
+@keyframes boom-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 14px 40px color-mix(in srgb, var(--color-fuse-600) 45%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--color-fuse-600) 55%, transparent);
+  }
+  55% {
+    box-shadow:
+      0 14px 46px color-mix(in srgb, var(--color-fuse-600) 60%, transparent),
+      0 0 0 22px color-mix(in srgb, var(--color-fuse-600) 0%, transparent);
+  }
+}
+
+/*
+ * Roles tipográficos del proyecto.
+ *
+ * Prefijos: display-* para Bungee, text-* para la fuente de cuerpo.
+ * Valores: tamaño, tracking, peso e interlineado salen de tokens (@theme
+ *   o los de serie de Tailwind); un literal solo si no hay token y se comenta.
+ * Color: un rol lo fija solo si es el mismo en todos sus usos. Si depende
+ *   del contexto, lo pone el componente. No sobrescribir el color de un rol
+ *   que ya lo trae.
+ */
+
+@utility display-heading {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-size: var(--text-2xl);
+  line-height: var(--leading-none);
+  letter-spacing: var(--tracking-normal);
+}
+
+/* Sin font-size a propósito: el tamaño lo pone cada uso (ej. text-[220px]
+   en la cuenta atrás), porque depende del espacio disponible. */
+@utility display-hero {
+  font-family: var(--font-display);
+  line-height: 0.86;
+  letter-spacing: var(--tracking-tight);
+}
+
+@utility display-stat-lg {
+  font-family: var(--font-display);
+  font-size: var(--text-6xl);
+  line-height: var(--leading-none);
+  letter-spacing: var(--tracking-tight);
+}
+
+@utility display-stat-sm {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  line-height: var(--leading-none);
+  letter-spacing: var(--tracking-normal);
+}
+
+@utility text-eyebrow {
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-ember-450);
+}
+
+@utility text-section-title {
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-fg-secondary);
+}
+
+@utility text-micro-label {
+  text-transform: uppercase;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-caps);
+}
+
+/* Texto pequeño de metadatos: estados, valores de chips. Sin mayúsculas. */
+@utility text-meta {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-semibold);
+}
+
+@utility text-card-title {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-base);
+}
+
+@utility text-button-label {
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  font-size: var(--text-base);
+  letter-spacing: var(--tracking-wider);
+}
+
+@utility text-body-muted {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-fg-secondary);
+}
+
+@utility text-bot-action {
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-mint);
+}
