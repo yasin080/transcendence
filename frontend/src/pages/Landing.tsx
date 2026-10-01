@@ -45,7 +45,7 @@ export default function Landing() {
 
   function playNow() {
     if (status === 'authenticated' && user) {
-      void navigate('/home')
+      void navigate('/dashboard')
       return
     }
     setModalOpen(true)

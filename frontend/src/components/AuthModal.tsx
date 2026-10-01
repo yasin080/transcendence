@@ -128,7 +128,7 @@ export default function AuthModal({
     }
 
     onClose()
-    void navigate('/home')
+    void navigate('/dashboard')
   }
 
   return (
@@ -142,7 +142,7 @@ export default function AuthModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-sm rounded-2xl border border-white/10 bg-brand-navy p-6 text-brand-ink shadow-[0_25px_60px_rgba(0,0,0,.55)] font-[Inter,ui-sans-serif,system-ui,sans-serif]"
+        className="w-full max-w-sm rounded-2xl border border-white/10 bg-surface-2 p-6 text-white shadow-[0_25px_60px_rgba(0,0,0,.55)] font-sans"
       >
         <div className="flex items-start justify-between">
           <h2 id={titleId} className="text-2xl font-black uppercase tracking-tight">
@@ -152,7 +152,7 @@ export default function AuthModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="-mr-1 -mt-1 rounded px-2 py-1 text-brand-sky/70 transition hover:text-brand-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink"
+            className="-mr-1 -mt-1 rounded px-2 py-1 text-white/70 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-fuse-600"
           >
             ×
           </button>
@@ -166,8 +166,8 @@ export default function AuthModal({
               onClick={() => switchTo(tab)}
               className={`rounded-md px-3 py-1.5 font-semibold uppercase tracking-wide transition ${
                 mode === tab
-                  ? 'bg-brand-pink text-white shadow-[0_6px_18px_rgba(246,57,119,.45)]'
-                  : 'text-brand-sky/70 hover:text-brand-ink'
+                  ? 'bg-fuse-600 text-white shadow-[0_6px_18px_rgba(255,46,91,.45)]'
+                  : 'text-white/70 hover:text-white'
               }`}
             >
               {tab === 'login' ? 'Log in' : 'Sign up'}
@@ -177,13 +177,13 @@ export default function AuthModal({
 
         <a
           href="/auth/google/redirect"
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm font-semibold text-brand-ink transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuse-600"
         >
           <GoogleIcon />
           Continue with Google
         </a>
 
-        <div className="mt-5 flex items-center gap-3 text-xs uppercase tracking-wide text-brand-sky/50">
+        <div className="mt-5 flex items-center gap-3 text-xs uppercase tracking-wide text-white/50">
           <span className="h-px flex-1 bg-white/10" />
           or
           <span className="h-px flex-1 bg-white/10" />
@@ -224,12 +224,12 @@ export default function AuthModal({
           />
 
           {mode === 'login' && (
-            <label className="flex items-center gap-2 text-sm text-brand-sky/80">
+            <label className="flex items-center gap-2 text-sm text-white/80">
               <input
                 type="checkbox"
                 checked={values.remember}
                 onChange={(event) => setRemember(event.target.checked)}
-                className="h-4 w-4 rounded border-white/20 bg-black/30 text-brand-pink focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink"
+                className="h-4 w-4 rounded border-white/20 bg-black/30 text-fuse-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuse-600"
               />
               Remember me
             </label>
@@ -248,7 +248,7 @@ export default function AuthModal({
           )}
 
           {message && (
-            <p role="alert" className="text-sm text-brand-pink">
+            <p role="alert" className="text-sm text-fuse-600">
               {message}
             </p>
           )}
@@ -256,7 +256,7 @@ export default function AuthModal({
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-xl border border-white/25 bg-gradient-to-br from-[#ff4b86] to-brand-pink-dark px-4 py-3 text-sm font-black uppercase tracking-wide text-white shadow-[0_12px_35px_rgba(240,30,100,.35)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(240,30,100,.55)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="w-full rounded-xl border border-white/25 bg-gradient-to-br from-fuse-500 to-fuse-700 px-4 py-3 text-sm font-black uppercase tracking-wide text-white shadow-[0_12px_35px_rgba(255,46,91,.35)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(255,46,91,.55)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             {busy ? 'One moment…' : mode === 'login' ? 'Log in' : 'Create account'}
           </button>
@@ -314,7 +314,7 @@ function Field({
 
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-semibold uppercase tracking-wide text-brand-sky/80">
+      <label htmlFor={id} className="block text-sm font-semibold uppercase tracking-wide text-white/80">
         {label}
       </label>
       <input
@@ -327,14 +327,14 @@ function Field({
         onChange={(event) => onChange(event.target.value)}
         aria-invalid={invalid || undefined}
         aria-describedby={invalid ? errorId : undefined}
-        className={`mt-1 w-full rounded-lg border bg-black/30 px-3 py-2 text-brand-ink placeholder:text-brand-sky/40 focus:outline-none focus-visible:ring-2 ${
+        className={`mt-1 w-full rounded-lg border bg-black/30 px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-2 ${
           invalid
-            ? 'border-brand-pink focus-visible:ring-brand-pink'
-            : 'border-white/15 focus-visible:ring-brand-pink'
+            ? 'border-fuse-600 focus-visible:ring-fuse-600'
+            : 'border-white/15 focus-visible:ring-fuse-600'
         }`}
       />
       {invalid && (
-        <p id={errorId} className="mt-1 text-sm text-brand-pink">
+        <p id={errorId} className="mt-1 text-sm text-fuse-600">
           {errors?.[0]}
         </p>
       )}
