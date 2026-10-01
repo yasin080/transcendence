@@ -1,0 +1,156 @@
+.landing {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  color: #fff;
+  background: #050817;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.landing__backdrop,
+.landing__backdrop > div { position: absolute; inset: 0; pointer-events: none; }
+
+.landing__backdrop { z-index: -1; overflow: hidden; background: #050817; }
+
+.landing__arena {
+  background: url('/assets/background.png') center center / cover no-repeat;
+  filter: brightness(.8) saturate(1.04) contrast(1.04);
+  transform: translate3d(calc(var(--pointer-x) * .025), calc(var(--pointer-y) * .018), 0) scale(1.035);
+}
+
+.landing__shade {
+  background:
+    linear-gradient(90deg, rgba(3, 7, 22, .73) 0%, rgba(4, 9, 28, .48) 30%, rgba(4, 8, 25, .1) 61%, rgba(2, 5, 17, .19) 100%),
+    linear-gradient(0deg, rgba(2, 5, 18, .3) 0%, transparent 40%);
+}
+
+.landing__atmosphere {
+  background: radial-gradient(ellipse 32% 38% at 70% 53%, rgba(86, 152, 255, .12), transparent 73%);
+  transform: translate3d(calc(var(--pointer-x) * .09), calc(var(--pointer-y) * .06), 0);
+}
+
+.landing__hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(17rem, .86fr) minmax(28rem, 1.14fr);
+  align-items: center;
+  min-height: 100svh;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: clamp(2rem, 7vw, 8rem);
+}
+
+.landing__copy h1 {
+    margin: 0;
+
+    font-size: clamp(2rem, 3.5vw, 4rem);
+    line-height: .9;
+
+    letter-spacing: -.06em;
+    text-transform: uppercase;
+}
+
+
+.landing h1 {
+  margin: 0;
+  font-size: clamp(4.25rem, 8.2vw, 9.8rem);
+  font-weight: 950;
+  line-height: .78;
+  letter-spacing: -.09em;
+  text-transform: uppercase;
+  text-shadow: 0 .35rem 2.5rem rgba(0, 0, 0, .52);
+}
+
+.landing h1 span { display: block; }
+
+.landing h1 span:last-child {
+  color: #fa3e7b;
+  text-shadow: 0 0 1.8rem rgba(255, 43, 115, .37), 0 .35rem 2.5rem rgba(0, 0, 0, .52);
+}
+
+.landing__worm-stage {
+  position: relative;
+  z-index: 1;
+  height: min(53vw, 43rem);
+  min-height: 29rem;
+  transform: translate3d(calc(var(--pointer-x) * .13), calc(var(--pointer-y) * .1), 0);
+}
+
+.landing__worm-aura {
+  position: absolute;
+  top: 22%;
+  right: 3%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(102, 185, 255, .18), rgba(52, 101, 231, .07) 43%, transparent 70%);
+  filter: blur(18px);
+  animation: landing-breathe 5s ease-in-out infinite;
+}
+
+.landing__play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    margin-top: 42px;
+
+    padding: 18px 38px;
+
+    border: 1px solid rgba(255, 255, 255, .25);
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff4b86,
+            #d91f5d
+        );
+
+    color: white;
+
+    font-size: clamp(1rem, 1.3vw, 1.25rem);
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 12px 35px rgba(240, 30, 100, .35),
+        0 0 0 1px rgba(255, 255, 255, .08) inset;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.landing__play:hover {
+    transform: translateY(-4px) scale(1.03);
+
+    box-shadow:
+        0 18px 45px rgba(240, 30, 100, .55),
+        0 0 0 1px rgba(255, 255, 255, .15) inset;
+}
+.landing__play:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+
+@keyframes landing-breathe {
+  0%, 100% { opacity: .6; transform: scale(.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@media (max-width: 800px) {
+  .landing__arena { background-position: 61% center; }
+  .landing__shade { background: linear-gradient(180deg, rgba(3, 7, 22, .48) 0%, rgba(3, 7, 22, .2) 38%, rgba(3, 7, 22, .58) 100%); }
+  .landing__hero { display: flex; flex-direction: column; justify-content: space-between; min-height: 100svh; padding: clamp(2rem, 9vw, 4rem) clamp(1.3rem, 7vw, 3rem) 2.25rem; }
+  .landing__copy { align-self: flex-start; padding: 0; }
+  .landing h1 { font-size: clamp(3.7rem, 16vw, 7rem); }
+  .landing__worm-stage { align-self: stretch; height: min(92vw, 35rem); min-height: 20rem; margin-top: -1.5rem; }
+  .landing__play { position: relative; right: auto; bottom: auto; align-self: center; margin-top: -4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing *, .landing *::before, .landing *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

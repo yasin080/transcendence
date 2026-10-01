@@ -44,7 +44,7 @@ export default function WaitingRoom() {
   const [phase, setPhase] = useState<'waiting' | 'countdown' | 'closed' | 'kicked'>(initialPhase)
 
   return (
-    <div className="h-full overflow-y-auto px-7 pt-6 pb-8 font-body">
+    <div className="h-full flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8 font-body">
       <WaitingRoomHeader
         isOwner={isOwner}
         hasFreeSeat={hasFreeSeat}
@@ -57,7 +57,7 @@ export default function WaitingRoom() {
         settings={MOCK_SETTINGS}
         canStart={canStart}
         onStart={() => setPhase('countdown')}
-        onLeave={() => navigate('/')}
+        onLeave={() => navigate('/dashboard')}
       />
       <PlayerGrid
         players={MOCK_PLAYERS}
@@ -77,7 +77,7 @@ export default function WaitingRoom() {
           title="The host closed the room"
           message="The room creator disconnected, so the match was cancelled for everyone. Nothing counted towards your rank."
           buttonLabel="Back to home"
-          onAction={() => navigate('/')}
+          onAction={() => navigate('/dashboard')}
         />
       )}
       {phase === 'kicked' && (
@@ -86,7 +86,7 @@ export default function WaitingRoom() {
           title="The host removed you from this room"
           message="You can join another room or start your own match whenever you're ready."
           buttonLabel="Back to home"
-          onAction={() => navigate('/')}
+          onAction={() => navigate('/dashboard')}
         />
       )}
     </div>

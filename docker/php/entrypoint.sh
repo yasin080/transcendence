@@ -25,9 +25,10 @@ until php -r '
 done
 echo "[entrypoint] database is up"
 
-if [ ! -d vendor ]; then
+if [ ! -d vendor ] || ! cmp -s composer.lock vendor/.composer.lock.installed 2>/dev/null; then
     echo "[entrypoint] installing composer dependencies..."
     composer install --no-interaction --prefer-dist --no-progress
+    cp composer.lock vendor/.composer.lock.installed
 fi
 
 if [ ! -f .env ]; then

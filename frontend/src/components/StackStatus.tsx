@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
 
 import { echo } from '../lib/echo'
 
@@ -15,7 +14,7 @@ type Probe =
   | { state: 'ok'; health: Health }
   | { state: 'error'; message: string }
 
-export default function Home() {
+export default function StackStatus() {
   const [api, setApi] = useState<Probe>({ state: 'loading' })
   const [socket, setSocket] = useState('connecting')
 
@@ -57,40 +56,17 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Transcendence</h1>
-        <p className="mt-2 text-slate-400">
-          Bomberman jugado con un gusano. La infraestructura está en pie; el juego llega después.
-        </p>
-      </div>
-      <div className="flex flex-wrap gap-4 text-sm">
-        <Link to="/waiting-room/demo" className="text-rose-400 underline">
-          Sala de espera (propietario)
-        </Link>
-        <Link to="/waiting-room/demo?role=guest" className="text-rose-400 underline">
-          Sala de espera (invitado)
-        </Link>
-        <Link to="/waiting-room/demo?preview=countdown" className="text-rose-400 underline">
-          Modal: cuenta atrás
-        </Link>
-        <Link to="/waiting-room/demo?preview=closed" className="text-rose-400 underline">
-          Modal: sala cerrada
-        </Link>
-        <Link to="/waiting-room/demo?preview=kicked" className="text-rose-400 underline">
-          Modal: expulsado
-        </Link>
-      </div>
-      <section className="rounded-lg border border-slate-800 divide-y divide-slate-800">
-        <h2 className="px-5 py-3 text-sm font-medium uppercase tracking-wide text-slate-400">
-          Estado del stack
-        </h2>
+    <details className="group rounded-lg border border-slate-800 text-sm">
+      <summary className="cursor-pointer select-none px-4 py-2 text-slate-500 hover:text-slate-300">
+        Stack status
+      </summary>
 
+      <div className="divide-y divide-slate-800 border-t border-slate-800">
         <StatusRow
           label="API (Laravel)"
           value={
             api.state === 'loading'
-              ? 'comprobando…'
+              ? 'checking…'
               : api.state === 'error'
                 ? `error: ${api.message}`
                 : api.health.status
@@ -98,7 +74,7 @@ export default function Home() {
           ok={api.state === 'ok' && api.health.status === 'ok'}
         />
         <StatusRow
-          label="Base de datos (MariaDB)"
+          label="Database (MariaDB)"
           value={api.state === 'ok' ? api.health.database : '—'}
           ok={api.state === 'ok' && api.health.database === 'ok'}
         />
@@ -108,15 +84,15 @@ export default function Home() {
           ok={api.state === 'ok' && api.health.redis === 'ok'}
         />
         <StatusRow label="WebSocket (Reverb)" value={socket} ok={socket === 'connected'} />
-      </section>
-    </div>
+      </div>
+    </details>
   )
 }
 
 function StatusRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
   return (
-    <div className="flex items-center justify-between px-5 py-3">
-      <span className="text-slate-300">{label}</span>
+    <div className="flex items-center justify-between px-4 py-2">
+      <span className="text-slate-400">{label}</span>
       <span className={ok ? 'font-mono text-emerald-400' : 'font-mono text-amber-400'}>
         {value}
       </span>
