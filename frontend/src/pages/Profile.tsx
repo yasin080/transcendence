@@ -1,22 +1,16 @@
-import { Navigate } from 'react-router'
-
 import { useAuth } from '../auth/useAuth'
 
 const joined = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' })
 
+// Vive bajo RequireAuth: aquí siempre hay sesión.
+// PENDIENTE: estilos antiguos (slate/emerald); sumar historial de partidas y ajustes.
 export default function Profile() {
-  const { user, status } = useAuth()
+  const { user } = useAuth()
 
-  if (status === 'loading') {
-    return <p className="text-slate-400">Loading…</p>
-  }
-
-  if (!user) {
-    return <Navigate to="/" replace />
-  }
+  if (!user) return null
 
   return (
-    <div className="space-y-8">
+    <div className="flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8 space-y-8">
       <div className="flex items-center gap-4">
         <span
           aria-hidden="true"
