@@ -1,9 +1,3 @@
-/**
- * Lobby — página por defecto de la columna central del dashboard.
- *
- * Solo maquetación: textos y salas de prueba escritos a mano, sin estado.
- * Secciones: 1. cabecera · 2. partida rápida · 3. salas abiertas · 4. crear partida
- */
 export default function Lobby() {
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8">
@@ -41,13 +35,13 @@ export default function Lobby() {
         <div className="absolute inset-0 bg-[url(/arena.webp)] bg-cover bg-position-[58%_62%] opacity-55" />
         <div className="absolute inset-0 bg-linear-95 from-void/96 via-void/80 via-44% to-void/15" />
 
-        {/* Contenido: lleva `relative` para quedar por encima de las capas */}
+        {/* Contenido */}
         <div className="relative flex flex-wrap items-center gap-x-7 gap-y-5 px-7 py-[26px]">
           <div className="flex-1 min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[.18em] text-ember-450">Quick match</p>
             <h2 className="mt-2 font-display text-[30px] leading-[1.05]">Drop into a live arena</h2>
 
-            {/* Modos: el primero aparece seleccionado */}
+            {/* Modos */}
             <div className="mt-4 flex flex-wrap gap-2">
               <button className="px-4 py-[9px] rounded-full border border-fuse-600 bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Chaos</button>
               <button className="px-4 py-[9px] rounded-full border border-white/14 bg-white/6 text-[13px] font-bold tracking-[.04em] text-white/70 cursor-pointer">Duos</button>
@@ -75,8 +69,8 @@ export default function Lobby() {
           <div className="flex items-center gap-3 min-w-0">
             <span className="size-2.5 flex-none rounded-full bg-signal-500 shadow-[0_0_10px_2px_rgba(69,224,122,.45)]" />
             <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold">Neon Grid #14</div>
-              <div className="text-xs text-white/45">hosted by Kiro_TNT</div>
+              <div className="truncate text-[15px] font-bold">Neon Grid</div>
+              <div className="text-xs text-white/45">hosted by ex0</div>
             </div>
           </div>
           <div className="text-[13px] text-white/72">Free-for-all</div>
@@ -127,7 +121,7 @@ export default function Lobby() {
             <span className="size-2.5 flex-none rounded-full bg-signal-500 shadow-[0_0_10px_2px_rgba(69,224,122,.45)]" />
             <div className="min-w-0">
               <div className="truncate text-[15px] font-bold">Rookie Sandbox</div>
-              <div className="text-xs text-white/45">no bombs first 30s</div>
+              <div className="text-xs text-white/45">hosted by ex99</div>
             </div>
           </div>
           <div className="text-[13px] text-white/72">Free-for-all</div>
@@ -161,7 +155,7 @@ export default function Lobby() {
             <span className="size-2.5 flex-none rounded-full bg-ember-600 shadow-[0_0_10px_2px_rgba(255,155,47,.5)]" />
             <div className="min-w-0">
               <div className="truncate text-[15px] font-bold">Midnight Bricks</div>
-              <div className="text-xs text-white/45">ranked · Gold+</div>
+              <div className="text-xs text-white/45">ranked Gold+</div>
             </div>
           </div>
           <div className="text-[13px] text-white/72">Teams 3v3</div>
@@ -198,15 +192,13 @@ export default function Lobby() {
       <div className="mt-[26px] px-6 py-[22px] rounded-[18px] border border-white/10 bg-linear-160 from-[rgba(58,38,110,.45)] to-[rgba(16,13,40,.7)]">
         <div className="flex items-baseline gap-3">
           <h3 className="font-display text-xl">Create custom match</h3>
-          <span className="text-[13px] text-white/50">Your rules, your friends, your chaos.</span>
         </div>
 
-        {/* Campos en rejilla de 2 columnas */}
         <div className="grid grid-cols-2 gap-4 mt-[18px]">
           <label>
             <span className="block mb-[7px] text-[11px] font-bold uppercase tracking-[.14em] text-white/45">Room name</span>
             <input
-              defaultValue="Boomer's arena"
+              defaultValue="serpientitas"
               className="w-full px-3.5 py-3 rounded-[11px] border border-white/14 bg-surface-input text-sm text-white outline-none"
             />
           </label>
