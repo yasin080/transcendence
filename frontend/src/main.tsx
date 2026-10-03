@@ -7,6 +7,7 @@ import Lobby from './pages/Lobby.tsx'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './auth/AuthProvider.tsx'
+import RequireAuth from './auth/RequireAuth.tsx'
 import Health from './pages/Health.tsx'
 import Landing from './pages/Landing.tsx'
 import Privacy from './pages/Privacy.tsx'
@@ -31,9 +32,11 @@ createRoot(root).render(
             <Route path="terms" element={<Terms />} />
           </Route>
 
-          {/* MARCO 2 — dashboard */}
-          <Route path="dashboard" element={<DashboardLayout />}>
-            <Route index element={<Lobby />} />
+          {/* MARCO 2 — dashboard (solo usuarios autenticados) */}
+          <Route element={<RequireAuth />}>
+            <Route path="dashboard" element={<DashboardLayout />}>
+              <Route index element={<Lobby />} />
+            </Route>
           </Route>
 
           {/* MARCO 3 — juego a pantalla completa */}
