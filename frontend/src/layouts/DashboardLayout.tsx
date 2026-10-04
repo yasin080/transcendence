@@ -1,5 +1,7 @@
 import { Outlet } from 'react-router'
 
+import DashboardSidebar from '../components/sidebar/DashboardSidebar'
+
 /**
  * Marco 2 — chasis de 3 columnas del dashboard.
  *
@@ -13,7 +15,7 @@ export default function DashboardLayout() {
   return (
     <div className="flex h-screen min-w-[1180px] bg-void text-white">
       <aside className="w-[268px] flex-none border-r border-white/8 bg-surface-1">
-        {/* sidebar */}
+        <DashboardSidebar />
       </aside>
 
       <div className="flex flex-1 min-w-[560px] min-h-0">
