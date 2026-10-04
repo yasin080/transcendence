@@ -1,35 +1,5 @@
 @import 'tailwindcss';
 @import './theme.css';
-@theme {
-	/* Superficies y Fondos */
-	--color-void: #07061a;             /* Fondo de toda la página */
-	--color-surface-2: #120e2c;        /* Cuerpo de la card del hero */
-	--color-surface-1: rgba(10, 9, 30, 0.72);   /* Rails laterales / paneles */
-	--color-surface-input: rgba(8, 7, 24, 0.6); /* Inputs de texto */
-
-	/* Rojo Principal */
-	--color-fuse-100: #ffd7e0;         /* Tinte muy suave para fondos o tags */
-	--color-fuse-300: #ff89a5;         /* Bordes suaves o estados inactivos */
-	--color-fuse-400: #ff5f7a;         /* Acentos claros */
-	--color-fuse-500: #ff4a6f;         /* Hover del botón principal */
-	--color-fuse-600: #ff2e5b;         /* EL rojo de marca principal (botones, focos) */
-	--color-fuse-650: #ff5077;         /* Tono intermedio de brillo */
-	--color-fuse-700: #e01446;         /* Click / estado activo / contraste oscuro */
-	--color-fuse-900: #9c0a2e;         /* Fondos oscuros o bordes con contraste */
-
-	/* Acentos */
-	--color-ember-400: #ffc06a;        /* Alertas leves, acentos cálidos claros */
-	--color-ember-450: #ffb45e;        /* Tono medio para detalles o badges */
-	--color-ember-600: #ff9b2f;        /* Naranja energético / avisos importantes */
-
-	/* Estados */
-	--color-signal-400: #63e58f;       /* Estado activo / online claro */
-	--color-signal-500: #45e07a;       /* Estado de éxito / conectado / confirmación */
-
-	/* Tipografías */
-	--font-display: 'Bungee', system-ui, sans-serif;
-	--font-sans: 'Space Grotesk', system-ui, sans-serif;
-}
 
 body {
 	background: #07061a;

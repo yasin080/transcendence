@@ -18,6 +18,10 @@ const items: NavItem[] = [
 // Solo se muestran en desarrollo; quitar cada uno cuando el Lobby lo enlace.
 const devItems: NavItem[] = [
   { to: '/dashboard/waiting-room/demo', label: 'Waiting room' },
+  { to: '/dashboard/waiting-room/demo?role=guest', label: 'Waiting room (guest)' },
+  { to: '/dashboard/waiting-room/demo?preview=countdown', label: 'Modal: countdown' },
+  { to: '/dashboard/waiting-room/demo?preview=closed', label: 'Modal: room closed' },
+  { to: '/dashboard/waiting-room/demo?preview=kicked', label: 'Modal: kicked' },
   { to: '/game/demo', label: 'Game' },
 ]
 
