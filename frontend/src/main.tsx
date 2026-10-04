@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 
 import DashboardLayout from './layouts/DashboardLayout.tsx'
 import Lobby from './pages/Lobby.tsx'
+import WaitingRoom from './pages/WaitingRoom.tsx'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './auth/AuthProvider.tsx'
@@ -32,8 +33,9 @@ createRoot(root).render(
           </Route>
 
           {/* MARCO 2 — dashboard */}
-          <Route path="dashboard" element={<DashboardLayout />}>
-            <Route index element={<Lobby />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="dashboard" element={<Lobby />} />
+            <Route path="waiting-room/:roomId" element={<WaitingRoom />} />
           </Route>
 
           {/* MARCO 3 — juego a pantalla completa */}
