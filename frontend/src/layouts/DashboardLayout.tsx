@@ -1,5 +1,7 @@
 import { Outlet } from 'react-router'
 
+import DashboardSidebar from '../components/sidebar/DashboardSidebar'
+
 /**
  * Marco 2 — chasis de 3 columnas del dashboard.
  *
@@ -13,12 +15,12 @@ export default function DashboardLayout() {
   return (
     <div className="flex h-screen min-w-[1180px] bg-void text-white">
       <aside className="w-[268px] flex-none border-r border-white/8 bg-surface-1">
-        {/* sidebar */}
+        <DashboardSidebar />
       </aside>
 
-      <div className="relative flex flex-1 min-w-[560px] min-h-0">
-        {/* La página de turno (Lobby...). El `relative` de arriba es el ancla
-            del modal de sala de espera: se superpone solo a esta columna. */}
+      <div className="flex flex-1 min-w-[560px] min-h-0">
+        {/* La página de turno (Lobby, sala de espera...). La sala de espera
+            no es un modal: sustituye al Lobby en este hueco. */}
         <Outlet />
       </div>
 
