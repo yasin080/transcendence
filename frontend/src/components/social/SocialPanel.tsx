@@ -4,8 +4,8 @@ export default function SocialPanel() {
 
       {/* 1. Cabecera: título + online + Add */}
       <div className="flex items-center gap-2.5 px-[18px] pt-5 pb-3.5">
-        <h3 className="text-[13px] font-bold uppercase tracking-[.16em] text-white/60">Friends</h3>
-        <span className="px-2 py-0.5 rounded-full bg-signal-500/14 text-[11px] font-bold text-signal-400">3 online</span>
+        <h3 className="text-[13px] font-bold uppercase tracking-[.16em] text-fg-secondary">Friends</h3>
+        <span className="px-2 py-0.5 rounded-full bg-online/14 text-[11px] font-bold text-signal-400">3 online</span>
         <button className="ml-auto px-3 py-1.5 rounded-lg border border-white/14 text-xs font-semibold text-white/70 cursor-pointer hover:bg-white/8 hover:text-white">
           Add Friend
         </button>
@@ -28,7 +28,7 @@ export default function SocialPanel() {
         <div className="flex items-center gap-[11px] px-2.5 py-[9px] rounded-[11px] hover:bg-white/6">
           <div className="relative grid place-items-center size-[34px] flex-none rounded-[11px] bg-linear-150 from-[#ff6f9c] to-[#8c1f47] text-[13px] font-bold">
             L
-            <span className="absolute -right-0.5 -bottom-0.5 size-[11px] rounded-full border-2 border-[#0c0a24] bg-signal-500" />
+            <span className="absolute -right-0.5 -bottom-0.5 size-[11px] rounded-full border-2 border-[#0c0a24] bg-online" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="truncate text-sm font-semibold">lunaBoom</div>
@@ -40,7 +40,7 @@ export default function SocialPanel() {
         <div className="flex items-center gap-[11px] px-2.5 py-[9px] rounded-[11px] hover:bg-white/6">
           <div className="relative grid place-items-center size-[34px] flex-none rounded-[11px] bg-linear-150 from-[#3bb0d8] to-[#153c56] text-[13px] font-bold">
             8
-            <span className="absolute -right-0.5 -bottom-0.5 size-[11px] rounded-full border-2 border-[#0c0a24] bg-[#ffd76a]" />
+            <span className="absolute -right-0.5 -bottom-0.5 size-[11px] rounded-full border-2 border-[#0c0a24] bg-ember-300" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="truncate text-sm font-semibold">8bitVega</div>
@@ -55,10 +55,10 @@ export default function SocialPanel() {
             <span className="absolute -right-0.5 -bottom-0.5 size-[11px] rounded-full border-2 border-[#0c0a24] bg-[#5a5a72]" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="truncate text-sm font-semibold text-white/45">PixelMarbles</div>
+            <div className="truncate text-sm font-semibold text-fg-muted">PixelMarbles</div>
             <div className="truncate text-xs text-white/42">Offline · 2 h ago</div>
           </div>
-          <button className="px-[11px] py-1.5 rounded-lg bg-white/6 text-[11px] font-bold uppercase tracking-[.06em] text-white/45 cursor-pointer">Offline</button>
+          <button className="px-[11px] py-1.5 rounded-lg bg-white/6 text-[11px] font-bold uppercase tracking-[.06em] text-fg-muted cursor-pointer">Offline</button>
         </div>
 
         <div className="flex items-center gap-[11px] px-2.5 py-[9px] rounded-[11px] hover:bg-white/6">
@@ -67,24 +67,24 @@ export default function SocialPanel() {
             <span className="absolute -right-0.5 -bottom-0.5 size-[11px] rounded-full border-2 border-[#0c0a24] bg-[#5a5a72]" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="truncate text-sm font-semibold text-white/45">ZeroFuse</div>
+            <div className="truncate text-sm font-semibold text-fg-muted">ZeroFuse</div>
             <div className="truncate text-xs text-white/42">Offline · yesterday</div>
           </div>
-          <button className="px-[11px] py-1.5 rounded-lg bg-white/6 text-[11px] font-bold uppercase tracking-[.06em] text-white/45 cursor-pointer">Offline</button>
+          <button className="px-[11px] py-1.5 rounded-lg bg-white/6 text-[11px] font-bold uppercase tracking-[.06em] text-fg-muted cursor-pointer">Offline</button>
         </div>
       </div>
 
       {/* 3. Chat */}
       <div className="flex flex-col flex-1 min-h-0 border-t border-white/8">
         <div className="px-[18px] pt-4">
-          <h3 className="text-[13px] font-bold uppercase tracking-[.16em] text-white/60">Messages</h3>
+          <h3 className="text-[13px] font-bold uppercase tracking-[.16em] text-fg-secondary">Messages</h3>
         </div>
 
         {/* Pestañas: Global */}
         <div className="flex gap-1.5 px-4 pt-3 pb-2.5">
           <button className="px-3.5 py-[7px] rounded-full bg-fuse-600/90 text-xs font-bold uppercase tracking-[.06em] text-white cursor-pointer">Global</button>
-          <button className="px-3.5 py-[7px] rounded-full bg-white/6 text-xs font-bold uppercase tracking-[.06em] text-white/60 cursor-pointer">Party</button>
-          <button className="px-3.5 py-[7px] rounded-full bg-white/6 text-xs font-bold uppercase tracking-[.06em] text-white/60 cursor-pointer">Clan</button>
+          <button className="px-3.5 py-[7px] rounded-full bg-white/6 text-xs font-bold uppercase tracking-[.06em] text-fg-secondary cursor-pointer">Party</button>
+          <button className="px-3.5 py-[7px] rounded-full bg-white/6 text-xs font-bold uppercase tracking-[.06em] text-fg-secondary cursor-pointer">Clan</button>
         </div>
 
         {/* Mensajes: scroll propio */}
@@ -92,7 +92,7 @@ export default function SocialPanel() {
           <div className="flex gap-[9px]">
             <div className="grid place-items-center size-[26px] flex-none rounded-lg bg-linear-150 from-[#6b3bd8] to-[#2a1b56] text-[11px] font-bold">K</div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-fuse-300">Kiro_TNT <span className="font-normal text-white/32">20:41</span></div>
+              <div className="text-xs font-bold text-fuse-300">Kiro_TNT <span className="font-normal text-fg-faint">20:41</span></div>
               <div className="mt-0.5 text-[13px] leading-[1.45] text-white/78 wrap-break-word">anyone up for 4v4? need two more</div>
             </div>
           </div>
@@ -100,7 +100,7 @@ export default function SocialPanel() {
           <div className="flex gap-[9px]">
             <div className="grid place-items-center size-[26px] flex-none rounded-lg bg-linear-150 from-[#ff6f9c] to-[#8c1f47] text-[11px] font-bold">L</div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-ember-450">lunaBoom <span className="font-normal text-white/32">20:42</span></div>
+              <div className="text-xs font-bold text-ember-450">lunaBoom <span className="font-normal text-fg-faint">20:42</span></div>
               <div className="mt-0.5 text-[13px] leading-[1.45] text-white/78 wrap-break-word">Emerald Sprint has 2 slots, come</div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function SocialPanel() {
           <div className="flex gap-[9px]">
             <div className="grid place-items-center size-[26px] flex-none rounded-lg bg-signal-500/20 text-[11px] font-bold">S</div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-signal-400">SYSTEM <span className="font-normal text-white/32">20:43</span></div>
+              <div className="text-xs font-bold text-signal-400">SYSTEM <span className="font-normal text-fg-faint">20:43</span></div>
               <div className="mt-0.5 text-[13px] leading-[1.45] text-white/78 wrap-break-word">Season 1 rewards reset in 6d 4h.</div>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function SocialPanel() {
           <div className="flex gap-[9px]">
             <div className="grid place-items-center size-[26px] flex-none rounded-lg bg-linear-150 from-[#3bb0d8] to-[#153c56] text-[11px] font-bold">8</div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-[#7fd4ff]">8bitVega <span className="font-normal text-white/32">20:44</span></div>
+              <div className="text-xs font-bold text-[#7fd4ff]">8bitVega <span className="font-normal text-fg-faint">20:44</span></div>
               <div className="mt-0.5 text-[13px] leading-[1.45] text-white/78 wrap-break-word">hit a 212 tail last round and still lost to a chain bomb</div>
             </div>
           </div>
