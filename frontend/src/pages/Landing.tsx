@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router'
 
 import AnimatedWorm from '../components/AnimatedWorm'
 import AuthModal from '../components/AuthModal'
+import Button from '../components/ui/Button'
 import { useAuth } from '../auth/useAuth'
 import './landing.css'
 
@@ -62,19 +63,18 @@ export default function Landing() {
       <main className="landing__hero">
         <section className="landing__copy" aria-labelledby="landing-title">
 
-          <h1 id="landing-title">
+          <h1
+            id="landing-title"
+            className="display-hero uppercase text-[clamp(3rem,6.5vw,7.5rem)] max-[800px]:text-[clamp(2.75rem,13vw,5.5rem)]"
+          >
             <span>Small worm.</span>
             <span>Big boom.</span>
           </h1>
 
-          <button
-            className="landing__play"
-            type="button"
-            onClick={playNow}
-          >
-            <span aria-hidden="true">▶</span>
+          <Button className="mt-10 animate-boom-pulse max-[800px]:-mt-16" onClick={playNow}>
+            <span aria-hidden="true" className="mr-3">▶</span>
             Play now
-          </button>
+          </Button>
 
         </section>
 

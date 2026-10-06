@@ -31,11 +31,12 @@ export default function AnimatedWorm({ variant = 'compact' }: AnimatedWormProps)
               {
                 '--segment-index': index,
                 '--segment-delay': `${index * -0.17}s`,
-                '--segment-left': `${index * 12}%`,
-                '--segment-top': `${index * 5.5}%`,
+                '--segment-left': `${index * 14 - index * index * .6}%`,
+                '--segment-top': `${-(index * 3 + index * index)}%`,
+                '--segment-angle': `${index * -6}deg`,
                 '--segment-lift': `${-6 + index * 1.25}%`,
                 '--segment-tilt': `${3 - index * .65}deg`,
-                '--segment-scale': `${(1 - index * .075).toFixed(2)}`,
+                '--segment-scale': `${(1 - index * .1).toFixed(2)}`,
                 '--segment-z': SEGMENTS - index,
               } as CSSProperties
             }
