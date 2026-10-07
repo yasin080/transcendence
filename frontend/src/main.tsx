@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router'
 
@@ -15,7 +15,8 @@ import Privacy from './pages/Privacy.tsx'
 import Profile from './pages/Profile.tsx'
 import Terms from './pages/Terms.tsx'
 import Leaderboard from './pages/Leaderboard.tsx'
-import DevPlaceholder from './pages/dev/DevPlaceholder.tsx'
+
+const Game = lazy(() => import('./pages/Game.tsx'))
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Root element not found')
@@ -44,13 +45,12 @@ createRoot(root).render(
             </Route>
 
             {/* MARCO 3 — juego a pantalla completa */}
-            {/* TEMPORAL: sustituir por la página real del juego */}
             <Route
               path="game/:gameId"
               element={
-                <div className="flex h-screen bg-void text-white">
-                  <DevPlaceholder title="Game" />
-                </div>
+                <Suspense fallback={<div className="h-screen bg-void" />}>
+                  <Game />
+                </Suspense>
               }
             />
           </Route>
