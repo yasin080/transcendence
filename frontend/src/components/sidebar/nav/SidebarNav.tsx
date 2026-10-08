@@ -12,6 +12,8 @@ const items: NavItem[] = [
   { to: '/dashboard', label: 'Lobby', end: true },
   { to: '/dashboard/leaderboard', label: 'Leaderboard' },
   { to: '/dashboard/profile', label: 'Profile' },
+  { to: '/dashboard/custom-match', label: 'Custom Match' },
+
 ]
 
 // [RETOMAR] TEMPORAL: accesos a pantallas de flujo que aún no se alcanzan desde el Lobby.
