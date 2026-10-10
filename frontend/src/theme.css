@@ -100,6 +100,16 @@
   }
 }
 
+/* Pulso de brillo para botones destacados. Solo si está activo y el usuario
+no pide reducir movimiento. */
+@utility glow-pulse {
+  @media (prefers-reduced-motion: no-preference) {
+    &:enabled {
+      animation: var(--animate-boom-pulse);
+    }
+  }
+}
+
 /*
  * Roles tipográficos del proyecto.
  *

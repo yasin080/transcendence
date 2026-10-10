@@ -36,7 +36,7 @@ export default function QuickMatchHero<M extends string>({
           </div>
         </div>
 
-        <Button variant="arcade" size="xl" className="flex-none" onClick={onPlay}>
+        <Button variant="arcade" size="xl" pulse className="flex-none" onClick={onPlay}>
           Play now
         </Button>
       </div>
