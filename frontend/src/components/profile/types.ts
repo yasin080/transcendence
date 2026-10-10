@@ -4,9 +4,6 @@
 
 export type OnlineStatus = 'online' | 'offline'
 
-// Relación entre quien mira y el perfil ajeno (botón de amistad)
-export type FriendState = 'none' | 'sent' | 'received' | 'friends'
-
 export interface ProfileStats {
   played: number
   won: number

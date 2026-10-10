@@ -1,4 +1,4 @@
-import defaultAvatar from '../../../public/avatar/blue-worm.png'
+const defaultAvatar = '/avatar/blue-worm.png'
 
 export type AvatarStatus = 'online' | 'offline' | 'none'
 
