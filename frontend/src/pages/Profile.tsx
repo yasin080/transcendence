@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import FriendButton from '../components/friends/FriendButton'
 import type { FriendState, FriendSummary } from '../components/friends/types'
 import FriendTile from '../components/profile/FriendTile'
 import { PencilIcon } from '../components/profile/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
+import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
 import type { ProfileUser } from '../components/profile/types'
 import Button from '../components/ui/Button'
@@ -49,6 +50,7 @@ function isFriendState(value: string | null): value is FriendState {
 export default function Profile() {
   const { user } = useAuth()
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
 
   // Provisional: ?friend=received (etc.) fija el estado inicial de amistad
   const friendParam = searchParams.get('friend')
@@ -102,7 +104,11 @@ export default function Profile() {
         </div>
       </div>
 
-            {/* Solo en el perfil ajeno: sus amigos */}
+      {/* Solo en el perfil propio: invitación a jugar */}
+      {/* Provisional: lleva al Lobby hasta que exista la partida rápida */}
+      {isOwn && <QuickMatchBanner onPlay={() => void navigate('/dashboard')} />}
+
+      {/* Solo en el perfil ajeno: sus amigos */}
       {!isOwn && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3.5">
