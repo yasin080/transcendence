@@ -17,7 +17,7 @@ export default function BackstageBanner({ children }: BackstageBannerProps) {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(7,6,26,.9)_0%,rgba(7,6,26,.45)_42%,rgba(7,6,26,0)_72%)]"
+        className="pointer-events-none absolute inset-0 bg-linear-to-r from-void/90 via-void/45 via-42% to-void/0 to-72%"
       />
 
       <div className="pointer-events-none absolute bottom-8 left-7 max-w-105">
