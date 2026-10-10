@@ -7,13 +7,13 @@ import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import type { Mesh } from '@babylonjs/core/Meshes/mesh'
 import type { Scene } from '@babylonjs/core/scene'
 
-import type { Board } from '../board'
-import type { Point, Worm } from '../worms'
+import type { Board } from '../logic/board'
+import type { Point, Worm } from '../logic/worms'
 import { toWorld } from './grid'
 
 const BALL = 1.12
 
-export type WormView = { head: Mesh; update: (from: Point[], to: Point[], t: number) => void }
+export type WormUpdate = (from: Point[], to: Point[], t: number) => void
 
 async function loadModel(scene: Scene, file: string) {
   const { meshes } = await ImportMeshAsync(file, scene)
@@ -34,7 +34,7 @@ function createSkin(scene: Scene, colour: Color3, alpha: number) {
   return material
 }
 
-async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormView> {
+async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormUpdate> {
   const colour = Color3.FromHexString(worm.colour)
 
   const head = await loadModel(scene, '/models/head.glb')
@@ -47,11 +47,18 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormV
   linkSkin.specularPower = 48
   for (const link of segment.getChildMeshes()) link.material = linkSkin
 
-  const balls = worm.body.map((_, i) => (i === 0 ? head : segment.clone('segment')))
-  segment.dispose()
+  segment.setEnabled(false)
+
+  const balls: Mesh[] = [head]
+  function addSegment() {
+    const clone = segment.clone('segment')
+    clone.setEnabled(true)
+    balls.push(clone)
+  }
 
   function update(from: Point[], to: Point[], t: number) {
-    const points = to.map((cell, i) => Vector3.Lerp(toWorld(board, from[i]), toWorld(board, cell), t))
+    while (balls.length < to.length) addSegment()
+    const points = to.map((cell, i) => Vector3.Lerp(toWorld(board, from[i] ?? cell), toWorld(board, cell), t))
     points.forEach((p, i) => {
       const facing = i === 0 ? p.subtract(points[1]) : points[i - 1].subtract(p)
       balls[i].position.set(p.x, BALL / 2, p.z)
@@ -60,7 +67,7 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormV
   }
 
   update(worm.body, worm.body, 1)
-  return { head, update }
+  return update
 }
 
 export function createWorms(scene: Scene, board: Board, worms: Worm[]) {

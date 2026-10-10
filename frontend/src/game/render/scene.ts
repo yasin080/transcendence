@@ -7,26 +7,31 @@ import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { DefaultRenderingPipeline } from '@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline'
 import { Scene } from '@babylonjs/core/scene'
 
-import type { Board } from '../board'
-import { listenToArrows } from '../keyboard'
-import { moveWorm, turnWorm, type Worm } from '../worms'
+import type { Game } from '../logic/game'
 import { createFloor } from './floor'
 import { toWorld } from './grid'
+import { createFood } from './food'
 import { createWalls } from './walls'
-import { createWorms, type WormView } from './worms'
+import { createWorms, type WormUpdate } from './worms'
 
-const TICK = 250
+export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
+  const { board, worms } = game
 
-export function createGameScene(canvas: HTMLCanvasElement, board: Board, worms: Worm[]) {
   const engine = new Engine(canvas, true, { stencil: false }, true)
   const scene = new Scene(engine)
   scene.clearColor = new Color4(0.045, 0.04, 0.085, 1)
 
-  const cam = new ArcRotateCamera('cam', -Math.PI / 2, 0.62, 40, toWorld(board, worms[0].body[0]), scene)
+  const cam = new ArcRotateCamera('cam', -Math.PI / 2, 0.62, 1, Vector3.Zero(), scene)
   cam.attachControl(canvas, true)
-  cam.fov = 0.38 
-  cam.lowerRadiusLimit = 30
-  cam.upperRadiusLimit = 110
+  cam.fov = 0.38
+  const follow = game.settings.camera === 'follow'
+  function fitBoard() {
+    const narrow = Math.min(1, engine.getAspectRatio(cam))
+    cam.radius = follow ? 40 : (Math.max(board.width, board.height) * 0.6) / (Math.tan(cam.fov / 2) * narrow)
+    cam.lowerRadiusLimit = cam.radius / 2
+    cam.upperRadiusLimit = cam.radius * 1.5
+  }
+  fitBoard()
   cam.lowerBetaLimit = 0.05
   cam.upperBetaLimit = 0.8
   cam.wheelPrecision = 6
@@ -47,38 +52,40 @@ export function createGameScene(canvas: HTMLCanvasElement, board: Board, worms: 
 
   createFloor(scene, board.width + 100, board.height + 100)
   void createWalls(scene, board)
-  let views: WormView[] = []
-  void createWorms(scene, board, worms).then((loaded) => (views = loaded))
+  let updateWorms: WormUpdate[] = []
+  void createWorms(scene, board, worms).then((loaded) => (updateWorms = loaded))
+  const updateFood = createFood(scene, board, game.food)
 
-  const player = worms[0]
-  let wanted = player.dir
-  const stopListening = listenToArrows((dir) => (wanted = dir))
-
-  let previous = worms.map((worm) => worm.body)
+  let current = worms.map((worm) => worm.body)
+  let previous = current
   let elapsed = 0
 
   scene.onBeforeRenderObservable.add(() => {
     elapsed += engine.getDeltaTime()
-    if (elapsed >= TICK) {
-      elapsed %= TICK
-      previous = worms.map((worm) => worm.body)
-      turnWorm(player, wanted)
-      moveWorm(player, board, worms)
+    const t = Math.min(elapsed / game.settings.tickMs, 1)
+    updateWorms.forEach((update, i) => update(previous[i], current[i], t))
+    updateFood(game.food)
+    if (follow) {
+      const head = Vector3.Lerp(toWorld(board, previous[0][0]), toWorld(board, current[0][0]), t)
+      Vector3.LerpToRef(cam.target, head, 0.1, cam.target)
     }
-
-    const t = elapsed / TICK
-    views.forEach((view, i) => view.update(previous[i], worms[i].body, t))
-    if (views[0]) Vector3.LerpToRef(cam.target, views[0].head.position, 0.1, cam.target)
   })
 
   engine.runRenderLoop(() => scene.render())
 
-  const resize = new ResizeObserver(() => engine.resize())
+  const resize = new ResizeObserver(() => {
+    engine.resize()
+    fitBoard()
+  })
   resize.observe(canvas)
 
   return {
+    onTick() {
+      previous = current
+      current = worms.map((worm) => worm.body)
+      elapsed = 0
+    },
     dispose() {
-      stopListening()
       resize.disconnect()
       engine.stopRenderLoop()
       scene.dispose()

@@ -1,19 +1,23 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 
-import { generateBoard } from '../game/board'
+import MessageModal from '../components/ui/MessageModal'
+import { createGame } from '../game/logic/game'
 import GameCanvas from '../game/GameCanvas'
-import { spawnWorms } from '../game/worms'
+import { SNAKE } from '../game/logic/settings'
 
 export default function Game() {
-  const [game] = useState(() => {
-    const board = generateBoard()
-    return { board, worms: spawnWorms(board) }
-  })
+  const [game, setGame] = useState(() => createGame(SNAKE))
+  const [over, setOver] = useState(false)
+
+  function playAgain() {
+    setGame(createGame(SNAKE))
+    setOver(false)
+  }
 
   return (
     <div className="relative h-screen overflow-hidden bg-void text-white">
-      <GameCanvas board={game.board} worms={game.worms} />
+      <GameCanvas game={game} onGameOver={() => setOver(true)} />
 
       <Link
         to="/dashboard"
@@ -21,6 +25,16 @@ export default function Game() {
       >
         ← Back to lobby
       </Link>
+
+      {over && (
+        <MessageModal
+          kicker="Game over"
+          title={`Length ${game.worms[0].body.length}`}
+          message="You crashed. Try again and grow a longer worm."
+          buttonLabel="Play again"
+          onAction={playAgain}
+        />
+      )}
     </div>
   )
 }

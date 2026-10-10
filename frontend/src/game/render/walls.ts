@@ -8,7 +8,7 @@ import { Color3 } from '@babylonjs/core/Maths/math.color'
 import type { Mesh } from '@babylonjs/core/Meshes/mesh'
 import type { Scene } from '@babylonjs/core/scene'
 
-import { type Board, Cell, cellAt } from '../board'
+import { type Board, Cell, cellAt } from '../logic/board'
 import { toWorld } from './grid'
 
 const HEIGHT = 0.85
