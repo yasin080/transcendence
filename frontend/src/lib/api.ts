@@ -31,10 +31,11 @@ let csrfRequest: Promise<Response> | null = null
 /**
  * Sanctum's cookie flow: one call to /sanctum/csrf-cookie plants XSRF-TOKEN,
  * which every write then echoes back in a header. Concurrent callers share the
- * same in-flight request instead of racing for the cookie.
+ * same in-flight request instead of racing for the cookie. `force` refetches
+ * even when a (possibly stale) cookie is present; the response overwrites it.
  */
-async function ensureCsrfCookie(): Promise<void> {
-  if (readCookie('XSRF-TOKEN')) return
+async function ensureCsrfCookie(force = false): Promise<void> {
+  if (!force && readCookie('XSRF-TOKEN')) return
 
   csrfRequest ??= fetch('/sanctum/csrf-cookie', { credentials: 'include' })
 
@@ -81,8 +82,9 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
   // A stale CSRF token is worth one silent retry with a fresh cookie; anything
   // more would loop on a genuinely broken session.
   if (response.status === 419 && retry) {
-    document.cookie = 'XSRF-TOKEN=; Max-Age=0; path=/'
-    await ensureCsrfCookie()
+    // Clearing the cookie from JS is unreliable (it is scoped to SESSION_DOMAIN),
+    // so let the server overwrite it instead.
+    await ensureCsrfCookie(true)
 
     return request<T>(method, path, body, false)
   }

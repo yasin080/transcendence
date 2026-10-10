@@ -37,28 +37,30 @@
 
 .animated-worm__body {
   position: absolute;
-  top: 25%;
+  top: 14%;
   left: 19%;
   width: 64%;
   height: 50%;
 }
 
 .animated-worm__segment {
+  width: 46%;
   top: var(--segment-top);
   left: var(--segment-left);
   z-index: var(--segment-z);
   scale: var(--segment-scale);
+  transform: rotate(var(--segment-angle));
   transform-origin: 50% 50%;
   animation: worm-segment 3.1s ease-in-out infinite;
   animation-delay: var(--segment-delay);
 }
 
 .animated-worm__tail {
-
-  top: 33%;
-  right: 11.5%;
+  width: 15.5%;
+  top: 8%;
+  left: 60%;
   z-index: 0;
-  scale: .48;
+  transform: rotate(-32deg);
 
   transform-origin: 20% 40%;
   animation: worm-tail 3.1s ease-in-out infinite;

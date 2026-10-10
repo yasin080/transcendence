@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router'
+import SocialPanel from '../components/social/SocialPanel'
 
-import DashboardSidebar from '../components/sidebar/DashboardSidebar'
+import DashboardSidebar from '../components/left-sidebar/DashboardSidebar'
 
 /**
  * Marco 2 — chasis de 3 columnas del dashboard.
@@ -25,7 +26,7 @@ export default function DashboardLayout() {
       </div>
 
       <aside className="w-[340px] flex-none border-l border-white/8 bg-surface-1">
-        {/* amigos + chat */}
+        <SocialPanel />
       </aside>
     </div>
   )
