@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import Avatar from '../ui/Avatar.tsx'
 import { CalendarIcon, UsersIcon } from './icons.tsx'
-import type { OnlineStatus, ProfileUser } from './types.ts'
+import type { OnlineStatus } from '../friends/types.ts'
+import type { ProfileUser } from './types.ts'
 
 const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' })
 

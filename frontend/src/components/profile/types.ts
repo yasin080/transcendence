@@ -2,8 +2,6 @@
 // Es del frontend: no copia la tabla de la BD. Cuando exista la API,
 // una función adaptadora traducirá su JSON a estos tipos.
 
-export type OnlineStatus = 'online' | 'offline'
-
 export interface ProfileStats {
   played: number
   won: number

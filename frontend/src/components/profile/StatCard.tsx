@@ -33,7 +33,7 @@ export default function StatCard({ kind, value }: StatCardProps) {
         >
           {icon}
         </span>
-        <span className="min-w-0 flex-1 truncate text-micro-label text-fg-secondary">{label}</span>
+        <span className="min-w-0 flex-1 text-micro-label text-fg-secondary">{label}</span>
       </div>
 
       <div className="display-stat-lg">{value.toLocaleString('en-US')}</div>
