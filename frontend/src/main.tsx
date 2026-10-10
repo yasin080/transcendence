@@ -13,7 +13,6 @@ import Health from './pages/Health.tsx'
 import Landing from './pages/Landing.tsx'
 import Privacy from './pages/Privacy.tsx'
 import Profile from './pages/Profile.tsx'
-import CustomMatch from './pages/CustomMatch.tsx'
 import Terms from './pages/Terms.tsx'
 import Leaderboard from './pages/Leaderboard.tsx'
 
@@ -43,7 +42,6 @@ createRoot(root).render(
               <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="profile" element={<Profile />} />
               <Route path="waiting-room/:roomId" element={<WaitingRoom />} />
-              <Route path="custom-match" element={<CustomMatch />} />
             </Route>
 
             {/* MARCO 3 — juego a pantalla completa */}
