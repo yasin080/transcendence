@@ -6,6 +6,7 @@ type Size = 'md' | 'lg' | 'xl'
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
   size?: Size
+  pulse?: boolean
 }
 
 const base = 'cursor-pointer disabled:cursor-not-allowed disabled:opacity-40'
@@ -29,6 +30,7 @@ const sizes: Record<Size, string> = {
 export default function Button({
   variant = 'primary',
   size = 'lg',
+  pulse = false,
   type = 'button',
   className = '',
   ...rest
@@ -36,7 +38,7 @@ export default function Button({
   return (
     <button
       type={type}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${pulse ? 'glow-pulse' : ''} ${className}`}
       {...rest}
     />
   )
