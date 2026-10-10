@@ -98,4 +98,25 @@ class RoomTest extends TestCase
         $this->postJson("/api/rooms/{$room->code}/games")->assertConflict();
         $this->assertDatabaseCount('games', 1);
     }
+
+    public function test_a_player_can_load_their_match(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->getJson("/api/games/{$gameId}")
+            ->assertOk()
+            ->assertJsonPath('id', $gameId)
+            ->assertJsonPath('room.code', $room->code)
+            ->assertJsonPath('room.settings.tickMs', 150);
+    }
+
+    public function test_a_stranger_cannot_load_a_match(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+        $this->actingAs(User::factory()->create());
+
+        $this->getJson("/api/games/{$gameId}")->assertForbidden();
+    }
 }
