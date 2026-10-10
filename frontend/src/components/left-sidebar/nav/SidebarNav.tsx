@@ -12,8 +12,6 @@ const items: NavItem[] = [
   { to: '/dashboard', label: 'Lobby', end: true },
   { to: '/dashboard/leaderboard', label: 'Leaderboard' },
   { to: '/dashboard/profile', label: 'Profile' },
-  { to: '/dashboard/custom-match', label: 'Custom Match' },
-
 ]
 
 // [RETOMAR] TEMPORAL: accesos a pantallas de flujo que aún no se alcanzan desde el Lobby.
@@ -21,7 +19,6 @@ const items: NavItem[] = [
 const devItems: NavItem[] = [
   { to: '/dashboard/waiting-room/demo', label: 'Waiting room' },
   { to: '/dashboard/waiting-room/demo?role=guest', label: 'Waiting room (guest)' },
-  { to: '/dashboard/waiting-room/demo?preview=countdown', label: 'Modal: countdown' },
   { to: '/dashboard/waiting-room/demo?preview=closed', label: 'Modal: room closed' },
   { to: '/dashboard/waiting-room/demo?preview=kicked', label: 'Modal: kicked' },
   { to: '/dashboard/profile', label: 'Profile (own)' },

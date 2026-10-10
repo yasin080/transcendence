@@ -60,8 +60,6 @@ export default function Lobby() {
           onDone={() => navigate(`/game/${crypto.randomUUID()}?mode=${selectedMode.toLowerCase()}`)}
         />
       )}
-          />
-        )}
 
       {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
       <div className="flex items-center gap-3.5 mt-[26px] mb-3">
