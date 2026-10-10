@@ -164,4 +164,140 @@ class AuthTest extends TestCase
     {
         $this->postJson('/api/logout')->assertUnauthorized();
     }
+
+    public function test_login_without_remember_does_not_set_a_persistent_cookie(): void
+    {
+        User::factory()->create([
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ])->assertOk();
+
+        $remember = collect($response->headers->getCookies())
+            ->first(fn ($cookie) => str_starts_with($cookie->getName(), 'remember_web_'));
+
+        $this->assertNull($remember, 'No remember-me cookie should be issued without the "remember" flag.');
+    }
+
+    public function test_login_with_remember_sets_a_persistent_cookie(): void
+    {
+        User::factory()->create([
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+            'remember' => true,
+        ])->assertOk();
+
+        $remember = collect($response->headers->getCookies())
+            ->first(fn ($cookie) => str_starts_with($cookie->getName(), 'remember_web_'));
+
+        $this->assertNotNull($remember, 'A remember-me cookie should be issued when "remember" is true.');
+        $this->assertGreaterThan(time() + 3600, $remember->getExpiresTime());
+    }
+
+    public function test_login_rotates_the_session_id(): void
+    {
+        User::factory()->create([
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ]);
+
+        // Establish a guest session first, the way a browser would after
+        // loading the SPA and fetching the CSRF cookie.
+        $this->getJson('/api/user')->assertOk();
+        $guestSessionId = $this->app['session']->getId();
+
+        $this->postJson('/api/login', [
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ])->assertOk();
+        $authedSessionId = $this->app['session']->getId();
+
+        // The whole point of rotateSession(): a session an attacker seeded
+        // before login must not still be valid after login (fixation).
+        $this->assertNotSame($guestSessionId, $authedSessionId);
+    }
+
+    public function test_registration_rotates_the_session_id(): void
+    {
+        $this->getJson('/api/user')->assertOk();
+        $guestSessionId = $this->app['session']->getId();
+
+        $this->postJson('/api/register', [
+            'name' => 'Gusano',
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+            'password_confirmation' => 'secret-worm',
+        ])->assertCreated();
+        $registeredSessionId = $this->app['session']->getId();
+
+        $this->assertNotSame($guestSessionId, $registeredSessionId);
+    }
+
+    public function test_logout_invalidates_the_session_id(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->getJson('/api/user')->assertOk();
+        $beforeSessionId = $this->app['session']->getId();
+
+        $this->actingAs($user)->postJson('/api/logout')->assertNoContent();
+        $afterSessionId = $this->app['session']->getId();
+
+        $this->assertNotSame($beforeSessionId, $afterSessionId);
+    }
+
+    public function test_repeated_login_attempts_are_rate_limited(): void
+    {
+        User::factory()->create([
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ]);
+
+        for ($i = 0; $i < 6; $i++) {
+            $this->postJson('/api/login', [
+                'email' => 'gusano@example.com',
+                'password' => 'wrong-password',
+            ])->assertStatus(422);
+        }
+
+        // The 6 failed attempts already used the whole per-minute budget for
+        // this email+IP pair (config/auth's `login` limiter), even with the
+        // right password now.
+        $this->postJson('/api/login', [
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ])->assertStatus(429);
+    }
+
+    public function test_registration_is_rate_limited(): void
+    {
+        // /register shares the `login` limiter (throttle:login in
+        // routes/api.php), which keys on email+IP — a fresh email per attempt
+        // still shares the IP, but the limiter is keyed by email too, so use
+        // the same email to hit the same bucket deterministically.
+        for ($i = 0; $i < 6; $i++) {
+            $this->postJson('/api/register', [
+                'name' => 'Gusano',
+                'email' => 'gusano@example.com',
+                'password' => 'secret-worm',
+                'password_confirmation' => 'secret-worm',
+            ]);
+        }
+
+        $this->postJson('/api/register', [
+            'name' => 'Gusano',
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+            'password_confirmation' => 'secret-worm',
+        ])->assertStatus(429);
+    }
 }

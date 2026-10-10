@@ -1,30 +1,29 @@
 export default function Privacy() {
   return (
     <article className="prose-invert max-w-none space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Política de privacidad</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Privacy Policy</h1>
       <p className="text-slate-400">
-        Documento provisional. Debe completarse con el tratamiento real de datos antes de la
-        evaluación: el enunciado verifica esta página y su ausencia o insuficiencia rechaza el
-        proyecto.
+        Placeholder document. It must be completed with how we actually handle data before the
+        evaluation: the subject checks this page, and a missing or inadequate one fails the
+        project.
       </p>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Datos que recogemos</h2>
+        <h2 className="text-xl font-semibold">What we collect</h2>
         <p className="text-slate-300">
-          Pendiente de redactar: correo electrónico, nombre de usuario, avatar, estadísticas de
-          partidas y datos de sesión.
+          To be written: email address, display name, avatar, match statistics and session data.
         </p>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Para qué los usamos</h2>
-        <p className="text-slate-300">Pendiente de redactar.</p>
+        <h2 className="text-xl font-semibold">What we use it for</h2>
+        <p className="text-slate-300">To be written.</p>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Tus derechos</h2>
+        <h2 className="text-xl font-semibold">Your rights</h2>
         <p className="text-slate-300">
-          Pendiente de redactar: acceso, rectificación, exportación y borrado de la cuenta.
+          To be written: access, correction, export and deletion of your account.
         </p>
       </section>
     </article>
