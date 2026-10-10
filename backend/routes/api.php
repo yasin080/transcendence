@@ -17,4 +17,5 @@ Route::get('/user', fn (Request $request) => response()->json(['user' => $reques
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rooms', [RoomController::class, 'store']);
     Route::post('/rooms/{room:code}/games', [GameController::class, 'store']);
+    Route::get('/games/{game}', [GameController::class, 'show']);
 });

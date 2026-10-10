@@ -5,6 +5,7 @@ import CountdownOverlay from '../components/game/CountdownOverlay.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
 import GameRow from '../components/lobby/GameRow.tsx'
 import { MOCK_GAMES } from '../components/lobby/mockGames.ts'
+import { startQuickMatch } from '../game/api.ts'
 
 const GAME_MODES = ['Bomberman', 'Snake', 'Other'] as const
 type GameMode = (typeof GAME_MODES)[number]
@@ -14,9 +15,17 @@ const PAGE_SIZE = 6
 export default function Lobby() {
   const [selectedMode, setSelectedMode] = useState<GameMode>(GAME_MODES[0])
   const navigate = useNavigate()
-  const [countingDown, setCountingDown] = useState(false)
+  const [gameId, setGameId] = useState<number | null>(null)
+  const [playError, setPlayError] = useState(false)
   const [creatingRoom, setCreatingRoom] = useState(false)
   const [page, setPage] = useState(1)
+
+  async function playNow() {
+    setPlayError(false)
+    const id = await startQuickMatch()
+    if (id) setGameId(id)
+    else setPlayError(true)
+  }
 
   // [RETOMAR] Con API, el filtro y la paginación los hará el servidor.
   const openGames = MOCK_GAMES.filter((g) => g.status !== 'finished')
@@ -60,19 +69,14 @@ export default function Lobby() {
         selectedMode={selectedMode}
         onSelectMode={setSelectedMode}
         canPlay={selectedMode !== 'Other'}
-        onPlay={() => setCountingDown(true)}
+        onPlay={playNow}
       />
+      {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
 
-      {/* [RETOMAR] Provisional sin backend: el gameId se inventa aquí y la cuenta
-          es local. Con matchmaking, el servidor enviará {gameId, startsAt} y la
+      {/* [RETOMAR] Con matchmaking, el servidor enviará {gameId, startsAt} y la
           cuenta atrás se calculará desde startsAt para que todos los jugadores
           empiecen a la vez. */}
-      {countingDown && (
-        <CountdownOverlay
-          from={3}
-          onDone={() => navigate(`/game/${crypto.randomUUID()}?mode=${selectedMode.toLowerCase()}`)}
-        />
-      )}
+      {gameId && <CountdownOverlay from={3} onDone={() => navigate(`/game/${gameId}`)} />}
 
       {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
       <div className="flex items-center gap-3.5 mt-[26px] mb-3">
