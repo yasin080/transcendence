@@ -16,12 +16,12 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
     ? 'text-gold'
     : player.isBot
       ? 'text-mint'
-      : 'text-white/45'
+      : 'text-fg-muted'
 
   return (
     <div
-      className={`relative flex flex-col gap-3.5 rounded-[14px] border p-4 ${
-        player.isBot ? 'border-mint/22 bg-online/5' : 'border-white/8 bg-white/[.035]'
+      className={`relative flex flex-col gap-3.5 rounded-2xl border p-4 ${
+        player.isBot ? 'border-mint/25 bg-mint/5' : 'border-line bg-fill'
       }`}
     >
       {onKick && (
@@ -30,7 +30,7 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
           onClick={() => onKick(player.id)}
           title={`Kick ${player.name}`}
           aria-label={`Kick ${player.name}`}
-          className="absolute top-2.5 right-2.5 grid size-6 cursor-pointer place-items-center rounded-lg border border-white/[.12] bg-[#080718]/60 p-0 hover:border-fuse-600 hover:bg-fuse-600"
+          className="absolute top-2.5 right-2.5 grid size-6 cursor-pointer place-items-center rounded-lg border border-line-strong bg-void/50 p-0 hover:border-fuse-600 hover:bg-fuse-600"
         >
           <XIcon />
         </button>
@@ -78,7 +78,7 @@ function Avatar({ name, background, color }: { name: string; background: string;
 
 function BotAvatar() {
   return (
-    <div className="grid size-13 flex-none place-items-center rounded-2xl border border-mint/35 bg-[linear-gradient(150deg,rgba(69,224,122,.22),rgba(20,80,44,.5))]">
+    <div className="grid size-13 flex-none place-items-center rounded-2xl border border-mint/35 bg-linear-150 from-mint/22 to-[#14502c]/50">
       <BotIcon className="size-6.75 text-mint" />
     </div>
   )
@@ -86,9 +86,9 @@ function BotAvatar() {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-[10px] bg-white/5 px-2.75 py-2.25">
+    <div className="rounded-xl bg-fill-strong px-2.75 py-2.25">
       <div className="display-stat-sm">{value}</div>
-      <div className="mt-1 text-micro-label text-white/45">{label}</div>
+      <div className="mt-1 text-micro-label text-fg-muted">{label}</div>
     </div>
   )
 }

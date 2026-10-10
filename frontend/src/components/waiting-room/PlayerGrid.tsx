@@ -34,9 +34,9 @@ export default function PlayerGrid({ players, maxPlayers, isOwner, onKick }: Pla
 
 function EmptySlot() {
   return (
-    <div className="flex min-h-37.5 animate-breathe flex-col items-center justify-center gap-3 rounded-[14px] border border-dashed border-white/[.14] bg-white/[.012] p-4 motion-reduce:animate-none">
-      <div className="size-13 rounded-2xl border border-dashed border-white/18" />
-      <div className="text-micro-label text-white/32">Waiting for player</div>
+    <div className="flex min-h-37.5 animate-breathe flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line-strong bg-fill-subtle p-4 motion-reduce:animate-none">
+      <div className="size-13 rounded-2xl border border-dashed border-line-strong" />
+      <div className="text-micro-label text-fg-faint">Waiting for player</div>
     </div>
   )
 }
