@@ -21,6 +21,8 @@ const devItems: NavItem[] = [
   { to: '/dashboard/waiting-room/demo?role=guest', label: 'Waiting room (guest)' },
   { to: '/dashboard/waiting-room/demo?preview=closed', label: 'Modal: room closed' },
   { to: '/dashboard/waiting-room/demo?preview=kicked', label: 'Modal: kicked' },
+  { to: '/dashboard/profile', label: 'Profile (own)' },
+  { to: '/dashboard/profile?view=other', label: 'Profile (other)' },
   { to: '/game/demo', label: 'Game' },
 ]
 
