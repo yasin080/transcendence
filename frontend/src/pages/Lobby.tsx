@@ -1,4 +1,16 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
+import CountdownOverlay from '../components/game/CountdownOverlay.tsx'
+
+const GAME_MODES = ['Bomberman', 'Snake', 'Other'] as const
+type GameMode = (typeof GAME_MODES)[number]
+
 export default function Lobby() {
+  const [selectedMode, setSelectedMode] = useState<GameMode>(GAME_MODES[0])
+  const navigate = useNavigate()
+  const [countingDown, setCountingDown] = useState(false)
+
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8">
 
@@ -29,31 +41,27 @@ export default function Lobby() {
         </div>
       </div>
 
-      {/* ─── 2. Partida rápida (hero) ─── */}
-      <div className="relative overflow-hidden rounded-[20px] border border-white/10 bg-surface-2">
-        {/* Capas de fondo: la imagen y un degradado para que el texto se lea */}
-        <div className="absolute inset-0 bg-[url(/arena.webp)] bg-cover bg-position-[58%_62%] opacity-55" />
-        <div className="absolute inset-0 bg-linear-95 from-void/96 via-void/80 via-44% to-void/15" />
+      {/* ─── 2. Partida rápida (hero): Play now → cuenta atrás → /game ─── */}
+      <QuickMatchHero
+        modes={GAME_MODES}
+        selectedMode={selectedMode}
+        onSelectMode={setSelectedMode}
+        canPlay={selectedMode !== 'Other'}
+        onPlay={() => setCountingDown(true)}
+      />
 
-        {/* Contenido */}
-        <div className="relative flex flex-wrap items-center gap-x-7 gap-y-5 px-7 py-[26px]">
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-bold uppercase tracking-[.18em] text-ember-450">Quick match</p>
-            <h2 className="mt-2 font-display text-[30px] leading-[1.05]">Drop into a live arena</h2>
-
-            {/* Modos */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button className="px-4 py-[9px] rounded-full border border-fuse-600 bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Chaos</button>
-              <button className="px-4 py-[9px] rounded-full border border-white/14 bg-white/6 text-[13px] font-bold tracking-[.04em] text-white/70 cursor-pointer">Duos</button>
-              <button className="px-4 py-[9px] rounded-full border border-white/14 bg-white/6 text-[13px] font-bold tracking-[.04em] text-white/70 cursor-pointer">Teams 4v4</button>
-            </div>
-          </div>
-
-          <button className="flex-none px-[38px] py-5 rounded-2xl border-b-4 border-fuse-900 bg-linear-to-b from-fuse-500 via-fuse-600 via-55% to-fuse-700 font-display text-xl uppercase cursor-pointer hover:-translate-y-0.5 active:translate-y-0.5">
-            Play now
-          </button>
-        </div>
-      </div>
+      {/* [RETOMAR] Provisional sin backend: el gameId se inventa aquí y la cuenta
+          es local. Con matchmaking, el servidor enviará {gameId, startsAt} y la
+          cuenta atrás se calculará desde startsAt para que todos los jugadores
+          empiecen a la vez. */}
+      {countingDown && (
+        <CountdownOverlay
+          from={3}
+          onDone={() => navigate(`/game/${crypto.randomUUID()}?mode=${selectedMode.toLowerCase()}`)}
+        />
+      )}
+          />
+        )}
 
       {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
       <div className="flex items-center gap-3.5 mt-[26px] mb-3">
@@ -188,67 +196,7 @@ export default function Lobby() {
         </div>
       </div>
 
-      {/* ─── 4. Crear partida ─── */}
-      <div className="mt-[26px] px-6 py-[22px] rounded-[18px] border border-white/10 bg-linear-160 from-[rgba(58,38,110,.45)] to-[rgba(16,13,40,.7)]">
-        <div className="flex items-baseline gap-3">
-          <h3 className="font-display text-xl">Create custom match</h3>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-[18px]">
-          <label>
-            <span className="block mb-[7px] text-[11px] font-bold uppercase tracking-[.14em] text-white/45">Room name</span>
-            <input
-              defaultValue="serpientitas"
-              className="w-full px-3.5 py-3 rounded-[11px] border border-white/14 bg-surface-input text-sm text-white outline-none"
-            />
-          </label>
-
-          <div>
-            <span className="block mb-[7px] text-[11px] font-bold uppercase tracking-[.14em] text-white/45">Map</span>
-            <div className="flex gap-2">
-              <button className="flex-1 px-1.5 py-3 rounded-[11px] border border-fuse-600 bg-fuse-600 text-[13px] font-bold text-white cursor-pointer">Neon Grid</button>
-              <button className="flex-1 px-1.5 py-3 rounded-[11px] border border-white/14 bg-white/6 text-[13px] font-bold text-white/70 cursor-pointer">Emerald</button>
-              <button className="flex-1 px-1.5 py-3 rounded-[11px] border border-white/14 bg-white/6 text-[13px] font-bold text-white/70 cursor-pointer">Brick Yard</button>
-            </div>
-          </div>
-
-          <label>
-            <span className="block mb-[7px] text-[11px] font-bold uppercase tracking-[.14em] text-white/45">Max players — 12</span>
-            <input type="range" min={4} max={24} step={2} defaultValue={12} className="w-full accent-fuse-600" />
-          </label>
-
-          <label>
-            <span className="block mb-[7px] text-[11px] font-bold uppercase tracking-[.14em] text-white/45">Blast radius — 3</span>
-            <input type="range" min={1} max={6} step={1} defaultValue={3} className="w-full accent-ember-600" />
-          </label>
-        </div>
-
-        {/* Interruptores + botón de crear */}
-        <div className="flex flex-wrap items-center gap-2.5 mt-[18px]">
-          <button className="inline-flex items-center gap-[9px] px-4 py-2.5 rounded-full border border-white/12 bg-white/5 text-[13px] font-semibold text-white/60 cursor-pointer">
-            <span className="relative w-[30px] h-[17px] flex-none rounded-full bg-white/20">
-              <span className="absolute top-0.5 left-0.5 size-[13px] rounded-full bg-white" />
-            </span>
-            Friendly fire
-          </button>
-          <button className="inline-flex items-center gap-[9px] px-4 py-2.5 rounded-full border border-fuse-600/50 bg-fuse-600/16 text-[13px] font-semibold text-white cursor-pointer">
-            <span className="relative w-[30px] h-[17px] flex-none rounded-full bg-fuse-600">
-              <span className="absolute top-0.5 left-[15px] size-[13px] rounded-full bg-white" />
-            </span>
-            Power-ups
-          </button>
-          <button className="inline-flex items-center gap-[9px] px-4 py-2.5 rounded-full border border-white/12 bg-white/5 text-[13px] font-semibold text-white/60 cursor-pointer">
-            <span className="relative w-[30px] h-[17px] flex-none rounded-full bg-white/20">
-              <span className="absolute top-0.5 left-0.5 size-[13px] rounded-full bg-white" />
-            </span>
-            Private room
-          </button>
-
-          <button className="ml-auto px-[30px] py-3.5 rounded-xl bg-white font-display text-[15px] uppercase text-[#12102b] cursor-pointer hover:bg-fuse-100">
-            Create room
-          </button>
-        </div>
-      </div>
 
     </section>
   )

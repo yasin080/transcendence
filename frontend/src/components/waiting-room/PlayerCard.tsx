@@ -1,4 +1,4 @@
-import { BotIcon, CrownIcon, XIcon } from './icons.tsx'
+import { BotIcon, CrownIcon, XIcon } from '../sidebar/ui/Icons.tsx'
 import type { Player } from './types.ts'
 
 interface PlayerCardProps {

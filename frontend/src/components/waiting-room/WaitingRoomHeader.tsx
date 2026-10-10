@@ -1,4 +1,4 @@
-import { BotIcon } from './icons.tsx'
+import { BotIcon } from '../sidebar/ui/Icons.tsx'
 
 interface WaitingRoomHeaderProps {
   isOwner: boolean
