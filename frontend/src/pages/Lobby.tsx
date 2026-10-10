@@ -2,14 +2,27 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
 import CountdownOverlay from '../components/game/CountdownOverlay.tsx'
+import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
+import GameRow from '../components/lobby/GameRow.tsx'
+import { MOCK_GAMES } from '../components/lobby/mockGames.ts'
 
 const GAME_MODES = ['Bomberman', 'Snake', 'Other'] as const
 type GameMode = (typeof GAME_MODES)[number]
+
+const PAGE_SIZE = 6
 
 export default function Lobby() {
   const [selectedMode, setSelectedMode] = useState<GameMode>(GAME_MODES[0])
   const navigate = useNavigate()
   const [countingDown, setCountingDown] = useState(false)
+  const [creatingRoom, setCreatingRoom] = useState(false)
+  const [page, setPage] = useState(1)
+
+  // [RETOMAR] Con API, el filtro y la paginación los hará el servidor.
+  const openGames = MOCK_GAMES.filter((g) => g.status !== 'finished')
+  const pageCount = Math.max(1, Math.ceil(openGames.length / PAGE_SIZE))
+  const firstIndex = (page - 1) * PAGE_SIZE
+  const pageGames = openGames.slice(firstIndex, firstIndex + PAGE_SIZE)
 
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8">
@@ -65,128 +78,64 @@ export default function Lobby() {
       <div className="flex items-center gap-3.5 mt-[26px] mb-3">
         <h3 className="text-sm font-bold uppercase tracking-[.16em] text-white/60">Open rooms</h3>
         <span className="h-px flex-1 bg-white/10" />
-        <span className="text-xs text-white/40">11 rooms</span>
+        <span className="text-xs text-white/40">{openGames.length} rooms</span>
+        <button
+          type="button"
+          onClick={() => setCreatingRoom(true)}
+          className="px-4 py-2 rounded-[10px] border border-white/12 bg-white/5 text-[13px] font-bold text-white cursor-pointer hover:bg-white/12"
+        >
+          + Create room
+        </button>
       </div>
 
-      {/* Cada fila: nombre · modo · mapa · plazas · ping + botón.
-          Punto verde = libre, naranja = en partida (Spectate). */}
+      {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
+
       <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_auto] items-center gap-4 px-[18px] py-3.5 rounded-[14px] border border-white/8 bg-white/4 hover:border-fuse-600/40 hover:bg-white/8">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="size-2.5 flex-none rounded-full bg-signal-500 shadow-[0_0_10px_2px_rgba(69,224,122,.45)]" />
-            <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold">Neon Grid</div>
-              <div className="text-xs text-white/45">hosted by ex0</div>
-            </div>
-          </div>
-          <div className="text-[13px] text-white/72">Free-for-all</div>
-          <div className="text-[13px] text-white/72">Neon Grid</div>
-          <div className="text-[13px] font-bold text-signal-500">9 / 12</div>
-          <div className="flex items-center gap-3.5">
-            <span className="text-xs text-white/40">24 ms</span>
-            <button className="px-5 py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Join</button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_auto] items-center gap-4 px-[18px] py-3.5 rounded-[14px] border border-white/8 bg-white/4 hover:border-fuse-600/40 hover:bg-white/8">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="size-2.5 flex-none rounded-full bg-ember-600 shadow-[0_0_10px_2px_rgba(255,155,47,.5)]" />
-            <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold">Emerald Sprint</div>
-              <div className="text-xs text-white/45">hosted by ex1</div>
-            </div>
-          </div>
-          <div className="text-[13px] text-white/72">Teams 4v4</div>
-          <div className="text-[13px] text-white/72">Emerald Grid</div>
-          <div className="text-[13px] font-bold text-ember-600">8 / 8</div>
-          <div className="flex items-center gap-3.5">
-            <span className="text-xs text-white/40">38 ms</span>
-            <button className="px-5 py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Spectate</button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_auto] items-center gap-4 px-[18px] py-3.5 rounded-[14px] border border-white/8 bg-white/4 hover:border-fuse-600/40 hover:bg-white/8">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="size-2.5 flex-none rounded-full bg-signal-500 shadow-[0_0_10px_2px_rgba(69,224,122,.45)]" />
-            <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold">Chaos Cellar</div>
-              <div className="text-xs text-white/45">hosted by ex2</div>
-            </div>
-          </div>
-          <div className="text-[13px] text-white/72">Chaos</div>
-          <div className="text-[13px] text-white/72">Cellar</div>
-          <div className="text-[13px] font-bold text-signal-500">5 / 16</div>
-          <div className="flex items-center gap-3.5">
-            <span className="text-xs text-white/40">61 ms</span>
-            <button className="px-5 py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Join</button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_auto] items-center gap-4 px-[18px] py-3.5 rounded-[14px] border border-white/8 bg-white/4 hover:border-fuse-600/40 hover:bg-white/8">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="size-2.5 flex-none rounded-full bg-signal-500 shadow-[0_0_10px_2px_rgba(69,224,122,.45)]" />
-            <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold">Rookie Sandbox</div>
-              <div className="text-xs text-white/45">hosted by ex99</div>
-            </div>
-          </div>
-          <div className="text-[13px] text-white/72">Free-for-all</div>
-          <div className="text-[13px] text-white/72">Neon Grid</div>
-          <div className="text-[13px] font-bold text-signal-500">3 / 12</div>
-          <div className="flex items-center gap-3.5">
-            <span className="text-xs text-white/40">19 ms</span>
-            <button className="px-5 py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Join</button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_auto] items-center gap-4 px-[18px] py-3.5 rounded-[14px] border border-white/8 bg-white/4 hover:border-fuse-600/40 hover:bg-white/8">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="size-2.5 flex-none rounded-full bg-signal-500 shadow-[0_0_10px_2px_rgba(69,224,122,.45)]" />
-            <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold">Tail Hunters</div>
-              <div className="text-xs text-white/45">hosted by ex3</div>
-            </div>
-          </div>
-          <div className="text-[13px] text-white/72">Duos</div>
-          <div className="text-[13px] text-white/72">Brick Yard</div>
-          <div className="text-[13px] font-bold text-signal-500">10 / 12</div>
-          <div className="flex items-center gap-3.5">
-            <span className="text-xs text-white/40">44 ms</span>
-            <button className="px-5 py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Join</button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_auto] items-center gap-4 px-[18px] py-3.5 rounded-[14px] border border-white/8 bg-white/4 hover:border-fuse-600/40 hover:bg-white/8">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="size-2.5 flex-none rounded-full bg-ember-600 shadow-[0_0_10px_2px_rgba(255,155,47,.5)]" />
-            <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold">Midnight Bricks</div>
-              <div className="text-xs text-white/45">ranked Gold+</div>
-            </div>
-          </div>
-          <div className="text-[13px] text-white/72">Teams 3v3</div>
-          <div className="text-[13px] text-white/72">Brick Yard</div>
-          <div className="text-[13px] font-bold text-ember-600">6 / 6</div>
-          <div className="flex items-center gap-3.5">
-            <span className="text-xs text-white/40">52 ms</span>
-            <button className="px-5 py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer">Spectate</button>
-          </div>
-        </div>
+        {pageGames.map((game) => (
+          <GameRow
+            key={game.id}
+            game={game}
+            onJoin={(g) => navigate(`/dashboard/waiting-room/${g.id}`)}
+            onSpectate={(g) => navigate(`/game/${g.id}`)}
+          />
+        ))}
       </div>
 
-      {/* Paginador: página 1 activa */}
+      {/* Paginador */}
       <div className="flex items-center gap-2.5 mt-3.5">
-        <span className="text-xs text-white/40">Showing 1–6 of 11</span>
+        <span className="text-xs text-white/40">
+          Showing {firstIndex + 1}–{firstIndex + pageGames.length} of {openGames.length}
+        </span>
 
         <div className="ml-auto flex items-center gap-1.5">
-          <button className="grid place-items-center size-[34px] rounded-[10px] border border-white/12 bg-white/5 text-white/25 cursor-pointer hover:bg-white/12">
+          <button
+            type="button"
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="grid place-items-center size-[34px] rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
               <path d="M15 5l-7 7 7 7" />
             </svg>
           </button>
-          <button className="min-w-[34px] h-[34px] px-2.5 rounded-[10px] border border-fuse-600 bg-fuse-600 text-[13px] font-bold text-white cursor-pointer">1</button>
-          <button className="min-w-[34px] h-[34px] px-2.5 rounded-[10px] border border-white/12 bg-white/5 text-[13px] font-bold text-white/60 cursor-pointer">2</button>
-          <button className="grid place-items-center size-[34px] rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer hover:bg-white/12">
+          {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setPage(n)}
+              className={`min-w-[34px] h-[34px] px-2.5 rounded-[10px] border text-[13px] font-bold cursor-pointer ${
+                n === page ? 'border-fuse-600 bg-fuse-600 text-white' : 'border-white/12 bg-white/5 text-white/60'
+              }`}
+            >
+              {n}
+            </button>
+          ))}
+          <button
+            type="button"
+            disabled={page === pageCount}
+            onClick={() => setPage(page + 1)}
+            className="grid place-items-center size-[34px] rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
               <path d="M9 5l7 7-7 7" />
             </svg>
