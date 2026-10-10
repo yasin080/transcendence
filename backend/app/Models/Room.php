@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['code', 'name', 'host_id', 'status', 'settings'])]
 class Room extends Model
 {
+    protected $attributes = ['status' => 'open'];
+
     public function host(): BelongsTo
     {
         return $this->belongsTo(User::class, 'host_id');
