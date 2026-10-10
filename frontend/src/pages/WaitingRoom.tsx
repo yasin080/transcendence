@@ -4,7 +4,6 @@ import WaitingRoomHeader from '../components/waiting-room/WaitingRoomHeader.tsx'
 import MatchPanel from '../components/waiting-room/MatchPanel.tsx'
 import PlayerGrid from '../components/waiting-room/PlayerGrid.tsx'
 import BackstageBanner from '../components/waiting-room/BackstageBanner.tsx'
-import CountdownOverlay from '../components/waiting-room/CountdownOverlay.tsx'
 import MessageModal from '../components/ui/MessageModal.tsx'
 import backstage from '../assets/salon.jpg'
 import type { MatchSetting, Player } from '../components/waiting-room/types.ts'
@@ -68,9 +67,7 @@ export default function WaitingRoom() {
       <BackstageBanner>
          <img src={backstage} alt="" className="size-full object-cover" />
       </BackstageBanner>
-      {phase === 'countdown' && (
-        <CountdownOverlay from={5} onDone={() => setPhase('waiting')} />
-      )}
+
       {phase === 'closed' && (
         <MessageModal
           kicker="Room closed"

@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router'
 import SocialPanel from '../components/social/SocialPanel'
 
-import DashboardSidebar from '../components/sidebar/DashboardSidebar'
+import DashboardSidebar from '../components/left-sidebar/DashboardSidebar'
 
 /**
  * Marco 2 — chasis de 3 columnas del dashboard.

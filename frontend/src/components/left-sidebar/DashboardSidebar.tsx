@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 
 import LogoutButton from './auth/LogoutButton'
 import SidebarNav from './nav/SidebarNav'
-import Sidebar from './ui/Sidebar'
+import Sidebar from '../ui/Sidebar'
 
 /**
  * Sidebar izquierdo del dashboard: compone las piezas dentro de la carcasa genérica.
