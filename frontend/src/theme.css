@@ -19,6 +19,7 @@
               /35 interactivo, /65 hover; fondos: /5, /10, /20) */
   --color-gold: var(--color-ember-450);
   --color-online: #45e07a;
+  --color-offline: #6c6982;
   --color-mint: #63e58f;
   
   /* Grises de texto: blanco con transparencia, de más a menos visible */
