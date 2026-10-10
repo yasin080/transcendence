@@ -9,13 +9,14 @@ declare global {
 
 window.Pusher = Pusher
 
-// The browser reaches Reverb through nginx on 443, not on Reverb's own port.
+// Reverb sits behind the same nginx that serves the page, so it is reached on
+// the page's own host, port and protocol — from localhost or from the LAN alike.
 export const echo = new Echo({
   broadcaster: 'reverb',
   key: import.meta.env.VITE_REVERB_APP_KEY,
-  wsHost: import.meta.env.VITE_REVERB_HOST,
-  wsPort: Number(import.meta.env.VITE_REVERB_PORT),
-  wssPort: Number(import.meta.env.VITE_REVERB_PORT),
-  forceTLS: import.meta.env.VITE_REVERB_SCHEME === 'https',
+  wsHost: window.location.hostname,
+  wsPort: Number(window.location.port) || 443,
+  wssPort: Number(window.location.port) || 443,
+  forceTLS: window.location.protocol === 'https:',
   enabledTransports: ['ws', 'wss'],
 })
