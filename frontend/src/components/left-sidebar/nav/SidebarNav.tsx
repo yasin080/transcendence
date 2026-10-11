@@ -22,7 +22,9 @@ const devItems: NavItem[] = [
   { to: '/dashboard/waiting-room/demo?preview=closed', label: 'Modal: room closed' },
   { to: '/dashboard/waiting-room/demo?preview=kicked', label: 'Modal: kicked' },
   { to: '/dashboard/profile', label: 'Profile (own)' },
-  { to: '/dashboard/profile?view=other', label: 'Profile (other)' },
+  { to: '/dashboard/profile/9001', label: 'Profile: Kiro (none)' },
+  { to: '/dashboard/profile/9002', label: 'Profile: Bomba (received)' },
+  { to: '/dashboard/profile/9999', label: 'Profile: not found' },
   { to: '/game/demo', label: 'Game' },
 ]
 
