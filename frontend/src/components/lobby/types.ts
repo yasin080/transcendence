@@ -6,7 +6,7 @@ export interface Room {
   code: string
   name: string
   host_id: number
-  status: 'open' | 'playing' | 'finished'
+  status: 'open' | 'playing' | 'finished' | 'closed' 
   settings: Settings
   players: RoomPlayer[]
 }
@@ -20,7 +20,9 @@ export type RoomSummary = Omit<Room, 'players'> & {
 export interface RoomPlayer {
   id: number
   room_id: number
-  user_id: number | null // null cuando el asiento es de un bot
+  user_id: number | null
   seat: number
   bot_difficulty: 'easy' | 'medium' | 'hard' | null
+  user?: { id: number; name: string } | null  // solo viene en GET /api/rooms/{code}
 }
+
