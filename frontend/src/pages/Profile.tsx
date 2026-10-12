@@ -8,8 +8,9 @@ import { PencilIcon } from '../components/profile/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
-import type { ProfileUser } from '../components/profile/types'
+import type { ProfileEdits, ProfileUser } from '../components/profile/types'
 import Button from '../components/ui/Button'
+import EditProfileModal from '../components/profile/EditProfileModal'
 
 // DATOS FALSOS (MOCK) — sustituir por la API cuando exista
 
@@ -17,6 +18,7 @@ import Button from '../components/ui/Button'
 const MOCK_ME: ProfileUser = {
   id: '',
   username: '',
+  name: 'Luna García',
   avatarUrl: null,
   bio: 'texto puesto por el usuario',
   memberSince: '',
@@ -80,6 +82,9 @@ export default function Profile() {
   // Provisional: estado de amistad cambiado en esta sesión, por id de jugador.
   // Con la API, cada cambio será una petición y el backend devolverá la relación.
   const [relations, setRelations] = useState<Record<string, FriendState>>({})
+  const [editOpen, setEditOpen] = useState(false)
+  // Provisional: lo guardado desde Edit profile (sin API todavía)
+  const [ownEdits, setOwnEdits] = useState<ProfileEdits | null>(null)
 
   if (!user) return null
 
@@ -98,10 +103,17 @@ export default function Profile() {
 
   const friends = player?.friends ?? []
 
-  const profile: ProfileUser = player
-    ? { ...player.profile, friendCount: friends.length }
-    : { ...MOCK_ME, id: String(user.id), username: user.name, memberSince: user.created_at }
-
+  const me: ProfileUser = {
+    ...MOCK_ME,
+    id: String(user.id),
+    username: ownEdits?.username ?? user.name,
+    name: ownEdits?.name ?? MOCK_ME.name,
+    bio: ownEdits?.bio ?? MOCK_ME.bio,
+    avatarUrl: ownEdits ? ownEdits.avatarUrl : MOCK_ME.avatarUrl,
+    memberSince: user.created_at,
+  }
+  
+  const profile: ProfileUser = player ? { ...player.profile, friendCount: friends.length } : me
   const friendState: FriendState = player ? (relations[player.profile.id] ?? player.relation) : 'none'
 
   function setFriendState(state: FriendState) {
@@ -110,14 +122,14 @@ export default function Profile() {
   }
 
   return (
-      <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8 *:shrink-0">
+    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8 *:shrink-0">
       <ProfileHeader
         user={profile}
         isOwn={isOwn}
         status={player?.status}
         action={
           isOwn ? (
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => setEditOpen(true)}>
               <PencilIcon className="size-3.5" />
               Edit profile
             </Button>
@@ -172,6 +184,14 @@ export default function Profile() {
             </p>
           )}
         </div>
+      )}
+      {editOpen && (
+        <EditProfileModal
+          profile={profile}
+          email={ownEdits?.email ?? user.email}
+          onSave={setOwnEdits}
+          onClose={() => setEditOpen(false)}
+        />
       )}
     </section>
   )
