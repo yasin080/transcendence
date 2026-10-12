@@ -33,7 +33,7 @@ export default function Modal({ children, onClose, size = 'sm' }: ModalProps) {
         if (onClose && e.target === e.currentTarget) onClose()
       }}
     >
-      <div className={`w-full ${SIZES[size]} rounded-[18px] border border-white/10 bg-surface-2 px-8 pt-7.5 pb-7 font-body text-white`}>
+      <div className={`max-h-full w-full overflow-y-auto ${SIZES[size]} rounded-[18px] border border-white/10 bg-surface-2 px-8 pt-7.5 pb-7 font-body text-white`}>
         {children}
       </div>
     </div>

@@ -37,9 +37,13 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
       <div className="relative -mt-15.5 flex items-end gap-5.5 px-7">
         <Avatar size={124} src={user.avatarUrl} status={status ?? 'none'} ring="surface" ringWidth={5} />
 
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
-          <h1 className="truncate display-title">{user.username}</h1>
-          {status && <StatusPill status={status} />}
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <h1 className="truncate display-title">{user.username}</h1>
+            {status && <StatusPill status={status} />}
+          </div>
+          {/* Nombre real: discreto y solo para su dueño */}
+          {isOwn && user.name && <p className="mt-1.5 truncate text-meta text-fg-muted">{user.name}</p>}
         </div>
 
         {action && <div className="flex-none">{action}</div>}
