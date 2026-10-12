@@ -6,7 +6,7 @@ export interface Room {
   code: string
   name: string
   host_id: number
-  status: 'open' | 'playing' | 'finished' | 'closed' 
+  status: 'open' | 'playing' | 'finished' | 'closed'
   settings: Settings
   players: RoomPlayer[]
 }
@@ -23,6 +23,5 @@ export interface RoomPlayer {
   user_id: number | null
   seat: number
   bot_difficulty: 'easy' | 'medium' | 'hard' | null
-  user?: { id: number; name: string } | null  // solo viene en GET /api/rooms/{code}
+  user?: { id: number; name: string } | null
 }
-

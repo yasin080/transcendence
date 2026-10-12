@@ -79,8 +79,6 @@ export default function WaitingRoom() {
       },
 )
 
-
-  // Provisional: /waiting-room/demo?role=guest muestra la vista de invitado.
   const isOwner = room.host_id === user?.id
   const playerCount = room.players.length
   const maxPlayers = room.settings.players
