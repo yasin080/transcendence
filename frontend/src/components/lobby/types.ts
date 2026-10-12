@@ -1,14 +1,26 @@
-export type GameStatus = 'waiting' | 'playing' | 'finished'
+import type { Settings } from '../../game/logic/settings.ts'
 
-// Partida tal como la mostrará el lobby. [RETOMAR] Ajustar al JSON real de la API
-// cuando el backend fije la ruta; mode y variant son provisionales.
-export interface GameSummary {
+// Sala tal como la devuelve POST /api/rooms (con sus players cargados)
+export interface Room {
   id: number
+  code: string
   name: string
-  hostName: string
-  mode: string
-  variant: string
-  players: number
-  maxPlayers: number
-  status: GameStatus
+  host_id: number
+  status: 'open' | 'playing' | 'finished'
+  settings: Settings
+  players: RoomPlayer[]
+}
+
+// Sala tal como la devuelve GET /api/rooms
+export type RoomSummary = Omit<Room, 'players'> & {
+  host: { id: number; name: string }
+  players_count: number
+}
+
+export interface RoomPlayer {
+  id: number
+  room_id: number
+  user_id: number | null // null cuando el asiento es de un bot
+  seat: number
+  bot_difficulty: 'easy' | 'medium' | 'hard' | null
 }

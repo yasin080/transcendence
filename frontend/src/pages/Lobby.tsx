@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
 import CountdownOverlay from '../components/game/CountdownOverlay.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
-import GameRow from '../components/lobby/GameRow.tsx'
-import { MOCK_GAMES } from '../components/lobby/mockGames.ts'
+import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
+import type { RoomSummary } from '../components/lobby/types.ts'
+import { apiGet } from '../lib/api.ts'
+
+
+const PAGE_SIZE = 6
 
 const GAME_MODES = ['Bomberman', 'Snake', 'Other'] as const
 type GameMode = (typeof GAME_MODES)[number]
 
-const PAGE_SIZE = 6
 
 export default function Lobby() {
   const [selectedMode, setSelectedMode] = useState<GameMode>(GAME_MODES[0])
@@ -18,11 +21,32 @@ export default function Lobby() {
   const [creatingRoom, setCreatingRoom] = useState(false)
   const [page, setPage] = useState(1)
 
-  // [RETOMAR] Con API, el filtro y la paginación los hará el servidor.
-  const openGames = MOCK_GAMES.filter((g) => g.status !== 'finished')
-  const pageCount = Math.max(1, Math.ceil(openGames.length / PAGE_SIZE))
+  // null = todavía cargando
+  const [rooms, setRooms] = useState<RoomSummary[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  // Pide las salas una vez, al entrar en el lobby
+  useEffect(() => {
+    let cancelled = false
+
+    void apiGet<RoomSummary[]>('/api/rooms').then((result) => {
+      if (cancelled) return
+      if (result.ok) setRooms(result.data)
+      else setError(result.failure.message)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+
+  
+  const roomList = rooms ?? []
+  const pageCount = Math.max(1, Math.ceil(roomList.length / PAGE_SIZE))
   const firstIndex = (page - 1) * PAGE_SIZE
-  const pageGames = openGames.slice(firstIndex, firstIndex + PAGE_SIZE)
+  const pageRooms = roomList.slice(firstIndex, firstIndex + PAGE_SIZE)
+
 
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8">
@@ -78,7 +102,8 @@ export default function Lobby() {
       <div className="flex items-center gap-3.5 mt-[26px] mb-3">
         <h3 className="text-sm font-bold uppercase tracking-[.16em] text-white/60">Open rooms</h3>
         <span className="h-px flex-1 bg-white/10" />
-        <span className="text-xs text-white/40">{openGames.length} rooms</span>
+        <span className="text-xs text-white/40">{roomList.length} rooms</span>
+
         <button
           type="button"
           onClick={() => setCreatingRoom(true)}
@@ -91,23 +116,33 @@ export default function Lobby() {
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 
       <div className="flex flex-col gap-2">
-        {pageGames.map((game) => (
-          <GameRow
-            key={game.id}
-            game={game}
-            onJoin={(g) => navigate(`/dashboard/waiting-room/${g.id}`)}
-            onSpectate={(g) => navigate(`/game/${g.id}`)}
+        {error && <p className="text-sm text-fuse-600">{error}</p>}
+        {!error && rooms === null && <p className="text-sm text-white/45">Loading rooms…</p>}
+        {rooms?.length === 0 && <p className="text-sm text-white/45">No open rooms yet. Create one!</p>}
+        {pageRooms.length > 0 && <RoomListHeader />}
+        {pageRooms.map((room) => (
+          <RoomRow
+            key={room.id}
+            room={room}
+            onJoin={(r) => navigate(`/dashboard/waiting-room/${r.code}`)}
           />
         ))}
       </div>
 
-      {/* Paginador */}
-      <div className="flex items-center gap-2.5 mt-3.5">
-        <span className="text-xs text-white/40">
-          Showing {firstIndex + 1}–{firstIndex + pageGames.length} of {openGames.length}
-        </span>
 
-        <div className="ml-auto flex items-center gap-1.5">
+      {/* Paginador */}
+      
+        <div className="flex items-center gap-2.5 mt-3.5">
+          {roomList.length > 0 && (
+          <span className="text-xs text-white/40">
+
+              Showing {firstIndex + 1}–{firstIndex + pageRooms.length} of {roomList.length}
+
+          </span>
+          )}
+
+          <div className="ml-auto flex items-center gap-1.5">
+     
           <button
             type="button"
             disabled={page === 1}
