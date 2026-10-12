@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type SubmitEvent } from 'react'
 import Avatar from '../ui/Avatar.tsx'
-import { AVATAR_GALLERY } from './avatars.ts'
 import Button from '../ui/Button.tsx'
 import Modal from '../ui/Modal.tsx'
+import { AVATAR_GALLERY } from './avatars.ts'
 import FormField from './FormField.tsx'
 import type { ProfileEdits, ProfileUser } from './types.ts'
 
@@ -75,18 +75,17 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
     current_password: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
-
-function set(field: keyof FormValues, value: string) {
-    setValues((current) => ({ ...current, [field]: value }))
-    setErrors((current) => ({ ...current, [field]: undefined }))
-  }
-
   // Avatar elegido de la galería (null = por defecto)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatarUrl)
   // Fichero subido por el usuario y su URL temporal para previsualizarlo
   const [upload, setUpload] = useState<{ file: File; preview: string } | null>(null)
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
+
+  function set(field: keyof FormValues, value: string) {
+    setValues((current) => ({ ...current, [field]: value }))
+    setErrors((current) => ({ ...current, [field]: undefined }))
+  }
 
   // Libera la URL temporal cuando cambia el fichero o se cierra el modal
   useEffect(() => {
@@ -117,7 +116,7 @@ function set(field: keyof FormValues, value: string) {
   // Lo que se ve en la previsualización: el fichero subido manda sobre la galería
   const preview = upload?.preview ?? avatarUrl
 
-    function onSubmit(event: FormEvent) {
+  function onSubmit(event: SubmitEvent) {
     event.preventDefault()
 
     const found = validate(values, email)
@@ -143,7 +142,7 @@ function set(field: keyof FormValues, value: string) {
       <form onSubmit={onSubmit} noValidate className="mt-4.5 flex flex-col gap-4.5">
         <div className="flex gap-5 rounded-xl border border-line bg-fill p-4">
           <Avatar size={92} src={preview} />
-          
+
           <div className="flex min-w-0 flex-1 flex-col gap-2.5">
             <span className="text-micro-label text-fg-secondary">Avatar</span>
 
@@ -157,11 +156,10 @@ function set(field: keyof FormValues, value: string) {
                     aria-label={item.label}
                     aria-pressed={selected}
                     onClick={() => chooseGallery(item.url)}
-                    className={`cursor-pointer rounded-2xl transition-opacity ${
-                      selected
+                    className={`cursor-pointer rounded-2xl transition-opacity ${selected
                         ? 'ring-2 ring-fuse-600 ring-offset-2 ring-offset-surface'
                         : 'opacity-70 hover:opacity-100'
-                    }`}
+                      }`}
                   >
                     <Avatar size={48} src={item.url} />
                   </button>
@@ -189,8 +187,8 @@ function set(field: keyof FormValues, value: string) {
                 </p>
               )}
             </div>
+          </div>
         </div>
-    </div>
 
         <div className="grid grid-cols-2 gap-4">
           <FormField

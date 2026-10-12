@@ -29,7 +29,7 @@ export default function Modal({ children, onClose, size = 'sm' }: ModalProps) {
       aria-modal="true"
       className="fixed inset-0 z-50 grid place-items-center bg-void/72 p-4 backdrop-blur-sm"
       // Cerrar al pulsar el fondo, pero no al pulsar dentro de la tarjeta
-      onClick={(e) => {
+      onMouseDown={(e) => {
         if (onClose && e.target === e.currentTarget) onClose()
       }}
     >
