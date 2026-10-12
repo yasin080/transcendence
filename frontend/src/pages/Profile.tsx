@@ -1,81 +1,136 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import FriendButton from '../components/friends/FriendButton'
-import type { FriendState, FriendSummary } from '../components/friends/types'
+import type { FriendState, FriendSummary, OnlineStatus } from '../components/friends/types'
 import FriendTile from '../components/profile/FriendTile'
 import { PencilIcon } from '../components/profile/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
-import type { ProfileUser } from '../components/profile/types'
+import type { ProfileEdits, ProfileUser } from '../components/profile/types'
 import Button from '../components/ui/Button'
+import EditProfileModal from '../components/profile/EditProfileModal'
 
 // DATOS FALSOS (MOCK) — sustituir por la API cuando exista
+
+// Perfil propio: lo que la sesión aún no da (bio, avatar, amigos, estadísticas)
 const MOCK_ME: ProfileUser = {
-  id: 'u1',
-  username: 'lunaBoom',
+  id: '',
+  username: '',
+  name: 'Luna García',
   avatarUrl: null,
-  bio: 'Bomb first, ask questions later. Main in Chaos mode, always hunting the longest snake in the arena.',
-  memberSince: '2026-03-14',
+  bio: 'texto puesto por el usuario',
+  memberSince: '',
   friendCount: 7,
   stats: { played: 148, won: 63, bombs: 1240 },
 }
 
-const MOCK_OTHER: ProfileUser = {
-  id: 'u2',
-  username: 'Kiro_TNT',
-  avatarUrl: null,
-  bio: 'Speed runner. If you can see my tail, it is already too late.',
-  memberSince: '2026-05-02',
-  friendCount: 1,
-  stats: { played: 92, won: 31, bombs: 604 },
+// Lo que la API devolverá de otro jugador, visto por mí
+interface MockPlayer {
+  profile: ProfileUser
+  status: OnlineStatus
+  relation: FriendState // relación entre él y yo
+  friends: FriendSummary[]
 }
 
-const MOCK_OTHER_FRIENDS: FriendSummary[] = [
-  { id: 'u3', username: 'Boomer_92', avatarUrl: null, status: 'online' },
-  { id: 'u4', username: 'ex0', avatarUrl: null, status: 'online' },
-  { id: 'u5', username: 'Pixel_Rex', avatarUrl: null, status: 'offline' },
-  { id: 'u6', username: 'ash_fuse', avatarUrl: null, status: 'offline' },
-  { id: 'u7', username: 'zeroKelvin', avatarUrl: null, status: 'online' },
-  { id: 'u8', username: 'Tanuki', avatarUrl: null, status: 'offline' },
-]
-
-// Comprueba que un texto (p. ej. de la URL) es un FriendState válido
-function isFriendState(value: string | null): value is FriendState {
-  return value === 'none' || value === 'sent' || value === 'received' || value === 'friends'
+// Otros jugadores, por id. Ids altos para no chocar con usuarios reales de la BD local.
+const MOCK_PLAYERS: Record<string, MockPlayer> = {
+  '9001': {
+    profile: {
+      id: '9001',
+      username: 'Kiro_TNT',
+      avatarUrl: null,
+      bio: 'Speed runner. If you can see my tail, it is already too late.',
+      memberSince: '2026-05-02',
+      friendCount: 0, // se calcula a partir de friends
+      stats: { played: 92, won: 31, bombs: 604 },
+    },
+    status: 'online',
+    relation: 'none',
+    friends: [
+      { id: '9002', username: 'Bomba_Loca', avatarUrl: null, status: 'offline' },
+      { id: '9003', username: 'Boomer_92', avatarUrl: null, status: 'online' },
+      { id: '9004', username: 'ex0', avatarUrl: null, status: 'online' },
+      { id: '9005', username: 'Pixel_Rex', avatarUrl: null, status: 'offline' },
+      { id: '9006', username: 'zeroKelvin', avatarUrl: null, status: 'online' },
+      { id: '9007', username: 'Tanuki', avatarUrl: null, status: 'offline' },
+    ],
+  },
+  '9002': {
+    profile: {
+      id: '9002',
+      username: 'Bomba_Loca',
+      avatarUrl: null,
+      bio: 'New here. Still learning which end the bombs come out of.',
+      memberSince: '2026-10-01',
+      friendCount: 0,
+      stats: { played: 6, won: 1, bombs: 58 },
+    },
+    status: 'offline',
+    relation: 'received',
+    friends: [],
+  },
 }
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
   const { user } = useAuth()
-  const [searchParams] = useSearchParams()
+  const { userId } = useParams()
   const navigate = useNavigate()
 
-  // Provisional: ?friend=received (etc.) fija el estado inicial de amistad
-  const friendParam = searchParams.get('friend')
-  const [friendState, setFriendState] = useState<FriendState>(
-    isFriendState(friendParam) ? friendParam : 'none',
-  )
+  // Provisional: estado de amistad cambiado en esta sesión, por id de jugador.
+  // Con la API, cada cambio será una petición y el backend devolverá la relación.
+  const [relations, setRelations] = useState<Record<string, FriendState>>({})
+  const [editOpen, setEditOpen] = useState(false)
+  // Provisional: lo guardado desde Edit profile (sin API todavía)
+  const [ownEdits, setOwnEdits] = useState<ProfileEdits | null>(null)
 
   if (!user) return null
 
-  const isOwn = searchParams.get('view') !== 'other'
-  // Provisional: &empty muestra el estado vacío de la cuadrícula
-  const friends = searchParams.has('empty') ? [] : MOCK_OTHER_FRIENDS
-  // El contador de la cabecera sale de la lista, para que siempre coincidan
-  const profile = isOwn ? MOCK_ME : { ...MOCK_OTHER, friendCount: friends.length }
+  // Sin id en la URL, o con mi propio id → mi perfil
+  const isOwn = userId === undefined || userId === String(user.id)
+  const player = !isOwn && userId ? MOCK_PLAYERS[userId] : undefined
+
+  if (!isOwn && !player) {
+    return (
+      <section className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 px-7 text-center">
+        <h1 className="display-heading">Player not found</h1>
+        <p className="text-body-muted">This player doesn't exist or has deleted their account.</p>
+      </section>
+    )
+  }
+
+  const friends = player?.friends ?? []
+
+  const me: ProfileUser = {
+    ...MOCK_ME,
+    id: String(user.id),
+    username: ownEdits?.username ?? user.name,
+    name: ownEdits?.name ?? MOCK_ME.name,
+    bio: ownEdits?.bio ?? MOCK_ME.bio,
+    avatarUrl: ownEdits ? ownEdits.avatarUrl : MOCK_ME.avatarUrl,
+    memberSince: user.created_at,
+  }
+  
+  const profile: ProfileUser = player ? { ...player.profile, friendCount: friends.length } : me
+  const friendState: FriendState = player ? (relations[player.profile.id] ?? player.relation) : 'none'
+
+  function setFriendState(state: FriendState) {
+    if (!player) return
+    setRelations((prev) => ({ ...prev, [player.profile.id]: state }))
+  }
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8">
+    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8 *:shrink-0">
       <ProfileHeader
         user={profile}
         isOwn={isOwn}
-        status={isOwn ? undefined : 'online'}
+        status={player?.status}
         action={
           isOwn ? (
-            <Button variant="ghost" size="sm">
-              <PencilIcon />
+            <Button variant="ghost" size="sm" onClick={() => setEditOpen(true)}>
+              <PencilIcon className="size-3.5" />
               Edit profile
             </Button>
           ) : (
@@ -109,7 +164,7 @@ export default function Profile() {
       {isOwn && <QuickMatchBanner onPlay={() => void navigate('/dashboard')} />}
 
       {/* Solo en el perfil ajeno: sus amigos */}
-      {!isOwn && (
+      {player && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3.5">
             <h2 className="whitespace-nowrap text-section-title">Friends of {profile.username}</h2>
@@ -129,6 +184,14 @@ export default function Profile() {
             </p>
           )}
         </div>
+      )}
+      {editOpen && (
+        <EditProfileModal
+          profile={profile}
+          email={ownEdits?.email ?? user.email}
+          onSave={setOwnEdits}
+          onClose={() => setEditOpen(false)}
+        />
       )}
     </section>
   )

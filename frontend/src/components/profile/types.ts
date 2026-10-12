@@ -11,9 +11,18 @@ export interface ProfileStats {
 export interface ProfileUser {
   id: string
   username: string
+  name?: string
   avatarUrl: string | null // null = avatar por defecto
   bio: string
   memberSince: string // fecha ISO, p. ej. '2026-03-14'
   friendCount: number
   stats: ProfileStats
+}
+
+export interface ProfileEdits {
+  username: string
+  name: string
+  email: string
+  bio: string
+  avatarUrl: string | null
 }

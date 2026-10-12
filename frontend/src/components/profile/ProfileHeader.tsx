@@ -5,6 +5,8 @@ import type { OnlineStatus } from '../friends/types.ts'
 import type { ProfileUser } from './types.ts'
 
 const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' })
+const DEFAULT_BIO = 'No bio yet. This worm is too busy dodging bombs.'
+
 
 interface ProfileHeaderProps {
   user: ProfileUser
@@ -17,6 +19,7 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ user, isOwn, status, action }: ProfileHeaderProps) {
   const friendLabel = user.friendCount === 1 ? 'friend' : 'friends'
+  const bio = user.bio.trim()
 
   return (
     <div className="overflow-hidden rounded-3xl border border-line bg-surface">
@@ -34,9 +37,13 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
       <div className="relative -mt-15.5 flex items-end gap-5.5 px-7">
         <Avatar size={124} src={user.avatarUrl} status={status ?? 'none'} ring="surface" ringWidth={5} />
 
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
-          <h1 className="truncate display-heading">{user.username}</h1>
-          {status && <StatusPill status={status} />}
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <h1 className="truncate display-title">{user.username}</h1>
+            {status && <StatusPill status={status} />}
+          </div>
+          {/* Nombre real: discreto y solo para su dueño */}
+          {isOwn && user.name && <p className="mt-1.5 truncate text-meta text-fg-muted">{user.name}</p>}
         </div>
 
         {action && <div className="flex-none">{action}</div>}
@@ -44,7 +51,11 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
 
       {/* Bio y metadatos */}
       <div className="flex flex-col gap-3.5 px-7 pt-4 pb-6">
-        {user.bio && <p className="max-w-prose text-body-muted">{user.bio}</p>}
+        {bio ? (
+          <p className="max-w-prose text-body-muted">{bio}</p>
+        ) : (
+          <p className="max-w-prose text-sm text-fg-muted italic">{DEFAULT_BIO}</p>
+        )}
 
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-meta text-fg-muted">
           <span className="flex items-center gap-1.5 whitespace-nowrap">

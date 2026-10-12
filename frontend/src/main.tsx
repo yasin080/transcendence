@@ -41,6 +41,7 @@ createRoot(root).render(
               <Route index element={<Lobby />} />
               <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="profile/:userId" element={<Profile />} />
               <Route path="waiting-room/:roomId" element={<WaitingRoom />} />
             </Route>
 
