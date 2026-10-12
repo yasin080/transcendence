@@ -24,3 +24,10 @@ body {
 ::-webkit-scrollbar-thumb:hover {
 	background: rgba(255, 255, 255, 0.24);
 }
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-fuse-300);
+    outline-offset: 2px;
+  }
+}
