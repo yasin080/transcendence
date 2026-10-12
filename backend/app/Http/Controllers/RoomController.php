@@ -10,6 +10,17 @@ use Illuminate\Support\Str;
 
 class RoomController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        $rooms = Room::whereIn('status', ['open', 'playing'])
+            ->with('host:id,name')
+            ->withCount('players')
+            ->latest()
+            ->get();
+
+        return response()->json($rooms);
+    }
+
     public function store(StoreRoomRequest $request): JsonResponse
     {
         $room = DB::transaction(function () use ($request) {
