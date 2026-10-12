@@ -35,7 +35,7 @@ export default function RoomRow({ room, onJoin }: RoomRowProps) {
       </div>
       <div className="text-center text-[13px] text-white/72">{labelFor(FOOD_OPTIONS, room.settings.food)}</div>
       <div className="text-center text-[13px] text-white/72">{labelFor(SPEED_OPTIONS, room.settings.tickMs)}</div>
-      <div className={`text-centertext-[13px] font-bold ${playing ? 'text-ember-600' : 'text-signal-500'}`}>
+      <div className={`text-center text-[13px] font-bold ${playing ? 'text-ember-600' : 'text-signal-500'}`}>
         {room.players_count} / {room.settings.players}
       </div>
       {playing ? (

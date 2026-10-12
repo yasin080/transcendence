@@ -6,7 +6,7 @@ import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
 import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
 import { startQuickMatch } from '../game/api.ts'
-import { apiGet } from '../lib/api.ts'
+import { apiGet, apiPost } from '../lib/api.ts'
 
 
 const PAGE_SIZE = 6
@@ -50,6 +50,16 @@ export default function Lobby() {
       cancelled = true
     }
   }, [])
+
+  const [joinError, setJoinError] = useState<string | null>(null)
+
+  // Primero ocupa un asiento en el backend; solo si lo consigue entra en la sala
+  async function joinRoom(room: RoomSummary) {
+    setJoinError(null)
+    const result = await apiPost(`/api/rooms/${room.code}/join`)
+    if (result.ok) navigate(`/dashboard/waiting-room/${room.code}`)
+    else setJoinError(result.failure.message)
+  }
 
 
   
@@ -123,6 +133,7 @@ export default function Lobby() {
 
       <div className="flex flex-col gap-2">
         {error && <p className="text-sm text-fuse-600">{error}</p>}
+        {joinError && <p className="text-sm text-fuse-600">{joinError}</p>}
         {!error && rooms === null && <p className="text-sm text-white/45">Loading rooms…</p>}
         {rooms?.length === 0 && <p className="text-sm text-white/45">No open rooms yet. Create one!</p>}
         {pageRooms.length > 0 && <RoomListHeader />}
@@ -130,7 +141,7 @@ export default function Lobby() {
           <RoomRow
             key={room.id}
             room={room}
-            onJoin={(r) => navigate(`/dashboard/waiting-room/${r.code}`)}
+            onJoin={joinRoom}
           />
         ))}
       </div>
