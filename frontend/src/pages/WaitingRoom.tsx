@@ -89,6 +89,7 @@ export default function WaitingRoom() {
   return (
     <div className="h-full flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8 font-body">
       <WaitingRoomHeader
+        roomName={room.name}
         isOwner={isOwner}
         hasFreeSeat={hasFreeSeat}
         onAddBot={() => console.log('add bot')}
