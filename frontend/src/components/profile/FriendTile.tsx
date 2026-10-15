@@ -10,7 +10,7 @@ interface FriendTileProps {
 export default function FriendTile({ friend }: FriendTileProps) {
   return (
     <Link
-      to={`/dashboard/profile/${friend.id}`}
+      to={`/lobby/profile/${friend.id}`}
       title={friend.username}
       className="flex min-w-0 flex-col items-center gap-2.5 rounded-xl border border-line bg-fill px-2 pt-4 pb-3.5 transition-colors hover:border-fuse-600/40 hover:bg-fill-strong"
     >

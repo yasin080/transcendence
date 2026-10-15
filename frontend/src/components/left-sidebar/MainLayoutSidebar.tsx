@@ -5,7 +5,7 @@ import SidebarNav from './nav/SidebarNav'
 import Sidebar from '../ui/Sidebar'
 
 /**
- * Sidebar izquierdo del dashboard: compone las piezas dentro de la carcasa genérica.
+ * Sidebar izquierdo del lobby: compone las piezas dentro de la carcasa genérica.
  */
 export default function DashboardSidebar() {
   return (

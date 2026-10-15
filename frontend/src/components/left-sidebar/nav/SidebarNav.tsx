@@ -3,28 +3,27 @@ import { NavLink } from 'react-router'
 type NavItem = {
   to: string
   label: string
-  /** Activo solo con coincidencia exacta (necesario en rutas padre como /dashboard) */
   end?: boolean
 }
 
 // Para añadir una sección: una línea aquí y su ruta en main.tsx
 const items: NavItem[] = [
-  { to: '/dashboard', label: 'Lobby', end: true },
-  { to: '/dashboard/leaderboard', label: 'Leaderboard' },
-  { to: '/dashboard/profile', label: 'Profile' },
+  { to: '/lobby', label: 'Lobby' },
+  { to: '/leaderboard', label: 'Leaderboard' },
+  { to: '/profile', label: 'Profile', end:true },
 ]
 
 // [RETOMAR] TEMPORAL: accesos a pantallas de flujo que aún no se alcanzan desde el Lobby.
 // Solo se muestran en desarrollo; quitar cada uno cuando el Lobby lo enlace.
 const devItems: NavItem[] = [
-  { to: '/dashboard/waiting-room/demo', label: 'Waiting room' },
-  { to: '/dashboard/waiting-room/demo?role=guest', label: 'Waiting room (guest)' },
-  { to: '/dashboard/waiting-room/demo?preview=closed', label: 'Modal: room closed' },
-  { to: '/dashboard/waiting-room/demo?preview=kicked', label: 'Modal: kicked' },
-  { to: '/dashboard/profile', label: 'Profile (own)' },
-  { to: '/dashboard/profile/9001', label: 'Profile: Kiro (none)' },
-  { to: '/dashboard/profile/9002', label: 'Profile: Bomba (received)' },
-  { to: '/dashboard/profile/9999', label: 'Profile: not found' },
+ 
+  { to: '/waiting-room/demo?role=guest', label: 'Waiting room (guest)' },
+  { to: '/waiting-room/demo?preview=closed', label: 'Modal: room closed' },
+  { to: '/waiting-room/demo?preview=kicked', label: 'Modal: kicked' },
+  { to: '/profile', label: 'Profile (own)' },
+  { to: '/profile/9001', label: 'Profile: Kiro (none)' },
+  { to: '/profile/9002', label: 'Profile: Bomba (received)' },
+  { to: '/profile/9999', label: 'Profile: not found' },
   { to: '/game/demo', label: 'Game' },
 ]
 
