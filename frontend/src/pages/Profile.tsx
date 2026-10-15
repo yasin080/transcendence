@@ -161,7 +161,7 @@ export default function Profile() {
 
       {/* Solo en el perfil propio: invitación a jugar */}
       {/* Provisional: lleva al Lobby hasta que exista la partida rápida */}
-      {isOwn && <QuickMatchBanner onPlay={() => void navigate('/dashboard')} />}
+      {isOwn && <QuickMatchBanner onPlay={() => void navigate('/lobby')} />}
 
       {/* Solo en el perfil ajeno: sus amigos */}
       {player && (

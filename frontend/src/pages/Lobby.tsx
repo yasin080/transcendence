@@ -99,7 +99,7 @@ export default function Lobby() {
           <GameRow
             key={game.id}
             game={game}
-            onJoin={(g) => navigate(`/dashboard/waiting-room/${g.id}`)}
+            onJoin={(g) => navigate(`/lobby/waiting-room/${g.id}`)}
             onSpectate={(g) => navigate(`/game/${g.id}`)}
           />
         ))}
