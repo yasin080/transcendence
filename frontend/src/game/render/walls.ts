@@ -1,25 +1,19 @@
 import '@babylonjs/core/Meshes/instancedMesh'
-import '@babylonjs/loaders/glTF'
 
-import { ImportMeshAsync } from '@babylonjs/core/Loading/sceneLoader'
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
 import { Texture } from '@babylonjs/core/Materials/Textures/texture'
 import { Color3 } from '@babylonjs/core/Maths/math.color'
-import type { Mesh } from '@babylonjs/core/Meshes/mesh'
 import type { Scene } from '@babylonjs/core/scene'
 
 import { type Board, Cell, cellAt } from '../logic/board'
 import { toWorld } from './grid'
+import { loadModel } from './model'
 
 const HEIGHT = 0.85
 const SINK = 0.12
 
 async function createWallType(scene: Scene, name: string, colour: Color3) {
-  const { meshes } = await ImportMeshAsync('/models/wall.glb', scene)
-  const [root, box] = meshes as Mesh[]
-  box.setParent(null)
-  box.bakeCurrentTransformIntoVertices()
-  root.dispose()
+  const box = await loadModel(scene, '/models/wall.glb')
 
   const rim = new Texture(`/textures/${name}-rim.png`, scene)
   rim.level = 1.7

@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Game\Game as GameLogic;
+use App\Game\LiveGames;
 use App\Models\Game;
 use App\Models\Room;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class GameController extends Controller
 {
+    private const START_DELAY = 3;
+
     public function show(Request $request, Game $game): JsonResponse
     {
-        $isPlayer = $game->room->players()->where('user_id', $request->user()->id)->exists();
-        abort_unless($isPlayer, 403, 'You are not playing in this match.');
+        $this->seatOf($request, $game);
 
-        return response()->json($game->load('room:id,code,name,settings'));
+        return response()->json([...$game->load('room:id,code,name,settings')->toArray(), 'state' => LiveGames::load($game->id)]);
     }
 
     public function store(Request $request, Room $room): JsonResponse
@@ -31,6 +35,46 @@ class GameController extends Controller
             return $room->games()->create();
         });
 
+        LiveGames::start($game->id, $this->initialState($room));
+
         return response()->json($game, 201);
+    }
+
+    public function turn(Request $request, Game $game): Response
+    {
+        $seat = $this->seatOf($request, $game);
+        $input = $request->validate([
+            'side' => ['required_without:dir', 'in:left,right'],
+            'dir' => ['required_without:side', 'array:x,y'],
+            'dir.x' => ['required_with:dir', 'integer', 'between:-1,1'],
+            'dir.y' => ['required_with:dir', 'integer', 'between:-1,1'],
+        ]);
+        abort_if($game->ended_at !== null, 409, 'This match has already ended.');
+
+        LiveGames::push($game->id, $seat, $input);
+
+        return response()->noContent();
+    }
+
+    private function seatOf(Request $request, Game $game): int
+    {
+        $player = $game->room->players()->where('user_id', $request->user()->id)->first();
+        abort_if($player === null, 403, 'You are not playing in this match.');
+
+        return $player->seat;
+    }
+
+    private function initialState(Room $room): array
+    {
+        $state = GameLogic::create($room->settings);
+        foreach ($room->players()->with('user')->get() as $player) {
+            if (isset($state['worms'][$player->seat])) {
+                $state['worms'][$player->seat]['name'] = $player->user->name ?? 'Bot';
+            }
+        }
+
+        $state['startsAt'] = now()->addSeconds(self::START_DELAY)->getTimestampMs();
+
+        return $state;
     }
 }

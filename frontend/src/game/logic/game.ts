@@ -7,6 +7,7 @@ export type Game = {
   board: Board
   worms: Worm[]
   food: Point[]
+  startsAt?: number
 }
 
 export type ScoreRow = {
@@ -20,19 +21,20 @@ export type ScoreRow = {
 
 const same = (a: Point, b: Point) => a.x === b.x && a.y === b.y
 
-function freeCell(game: Game): Point {
-  for (;;) {
-    const cell = { x: Math.floor(Math.random() * game.board.width), y: Math.floor(Math.random() * game.board.height) }
-    const wall = cellAt(game.board, cell.x, cell.y) !== Cell.Empty
-    const food = game.food.some((f) => same(f, cell))
-    if (!wall && !food && !isOnWorm(game.worms, cell)) return cell
-  }
+function freeCell(game: Game): Point | undefined {
+  const { width, cells } = game.board
+  const free = cells
+    .map((type, i) => ({ type, cell: { x: i % width, y: Math.floor(i / width) } }))
+    .filter(({ type, cell }) => type === Cell.Empty && !game.food.some((f) => same(f, cell)) && !isOnWorm(game.worms, cell))
+  return free[Math.floor(Math.random() * free.length)]?.cell
 }
 
 export function createGame(settings: Settings): Game {
   const board = generateBoard(settings)
-  const game: Game = { settings, board, worms: spawnWorms(board, settings), food: [] }
-  for (let i = 0; i < settings.food; i++) game.food.push(freeCell(game))
+  const worms = spawnWorms(board, settings)
+  for (const p of worms.flatMap((worm) => worm.body)) board.cells[p.y * board.width + p.x] = Cell.Empty
+  const game: Game = { settings, board, worms, food: [] }
+  for (let i = 0, cell; i < settings.food && (cell = freeCell(game)); i++) game.food.push(cell)
   return game
 }
 
@@ -57,7 +59,10 @@ function moveWorm(game: Game, worm: Worm) {
 
   const eaten = game.food.findIndex((f) => same(f, next))
   worm.body = [next, ...(eaten >= 0 ? worm.body : worm.body.slice(0, -1))]
-  if (eaten >= 0) game.food[eaten] = freeCell(game)
+  if (eaten < 0) return
+  game.food.splice(eaten, 1)
+  const cell = freeCell(game)
+  if (cell) game.food.push(cell)
 }
 
 export function tick(game: Game) {

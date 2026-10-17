@@ -2,14 +2,22 @@
 
 namespace Tests\Feature;
 
+use App\Game\LiveGames;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
 class RoomTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Redis::flushdb();
+    }
 
     private const SNAKE = [
         'width' => 30,
@@ -118,5 +126,42 @@ class RoomTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $this->getJson("/api/games/{$gameId}")->assertForbidden();
+    }
+
+    public function test_starting_a_match_puts_its_live_state_in_redis(): void
+    {
+        $host = User::factory()->create(['name' => 'Gusano']);
+        $room = $this->createRoom($host);
+
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->assertSame([$gameId], LiveGames::active());
+        $state = LiveGames::load($gameId);
+        $this->assertSame('Gusano', $state['worms'][0]['name']);
+        $this->assertSame(30, $state['board']['width']);
+    }
+
+    public function test_a_player_can_send_a_turn(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertNoContent();
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'right'])->assertNoContent();
+
+        $this->assertSame([0 => ['side' => 'right']], LiveGames::takeInputs($gameId));
+        $this->assertSame([], LiveGames::takeInputs($gameId));
+    }
+
+    public function test_a_turn_is_validated_and_needs_a_player(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'up'])->assertUnprocessable();
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 5, 'y' => 0]])->assertUnprocessable();
+
+        $this->actingAs(User::factory()->create());
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertForbidden();
     }
 }

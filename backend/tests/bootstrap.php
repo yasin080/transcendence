@@ -22,6 +22,7 @@ $overrides = [
     'DB_DATABASE' => ':memory:',
     'MAIL_MAILER' => 'array',
     'QUEUE_CONNECTION' => 'sync',
+    'REDIS_DB' => '15',
     'SESSION_DRIVER' => 'array',
     'SESSION_DOMAIN' => 'null',
     'TELESCOPE_ENABLED' => 'false',

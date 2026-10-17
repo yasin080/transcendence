@@ -1,6 +1,8 @@
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 
+import { apiPost } from './api'
+
 declare global {
   interface Window {
     Pusher: typeof Pusher
@@ -19,4 +21,17 @@ export const echo = new Echo({
   wssPort: Number(window.location.port) || 443,
   forceTLS: window.location.protocol === 'https:',
   enabledTransports: ['ws', 'wss'],
+  channelAuthorization: {
+    customHandler: async (
+      { socketId, channelName }: { socketId: string; channelName: string },
+      callback: (error: Error | null, auth: { auth: string } | null) => void,
+    ) => {
+      const result = await apiPost<{ auth: string }>('/api/broadcasting/auth', {
+        socket_id: socketId,
+        channel_name: channelName,
+      })
+      if (result.ok) callback(null, result.data)
+      else callback(new Error(result.failure.message), null)
+    },
+  },
 })

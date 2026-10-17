@@ -18,4 +18,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rooms', [RoomController::class, 'store']);
     Route::post('/rooms/{room:code}/games', [GameController::class, 'store']);
     Route::get('/games/{game}', [GameController::class, 'show']);
+    Route::post('/games/{game}/turn', [GameController::class, 'turn']);
 });

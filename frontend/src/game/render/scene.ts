@@ -10,7 +10,7 @@ import { Scene } from '@babylonjs/core/scene'
 import type { Game } from '../logic/game'
 import { createFloor } from './floor'
 import { toWorld } from './grid'
-import { createFood } from './food'
+import { createFood, type FoodUpdate } from './food'
 import { createWalls } from './walls'
 import { createWorms, type WormUpdate } from './worms'
 
@@ -51,10 +51,16 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
   post.bloomEnabled = true
 
   createFloor(scene, board.width + 100, board.height + 100)
-  void createWalls(scene, board)
   let updateWorms: WormUpdate[] = []
-  void createWorms(scene, board, worms).then((loaded) => (updateWorms = loaded))
-  const updateFood = createFood(scene, board, game.food)
+  let updateFood: FoodUpdate = () => {}
+  Promise.all([createWalls(scene, board), createWorms(scene, board, worms), createFood(scene, board, game.food)])
+    .then(([, wormUpdates, foodUpdate]) => {
+      updateWorms = wormUpdates
+      updateFood = foodUpdate
+    })
+    .catch((error: unknown) => {
+      if (!scene.isDisposed) throw error
+    })
 
   let current = worms.map((worm) => worm.body)
   let previous = current
