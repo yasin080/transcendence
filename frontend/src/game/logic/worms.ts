@@ -13,16 +13,14 @@ export type Worm = {
 }
 
 export function spawnWorms(board: Board, { players, startLength }: Settings): Worm[] {
-  const left = startLength
-  const right = board.width - 1 - startLength
-  const top = 1
-  const bottom = board.height - 2
+  const right = board.width - 2
+  const top = board.height - 2
 
   const spawns = [
-    { colour: '#33d1ff', head: { x: left, y: top }, dir: { x: 1, y: 0 } },
-    { colour: '#ff6b52', head: { x: right, y: top }, dir: { x: -1, y: 0 } },
-    { colour: '#8fff57', head: { x: left, y: bottom }, dir: { x: 1, y: 0 } },
-    { colour: '#eb99ff', head: { x: right, y: bottom }, dir: { x: -1, y: 0 } },
+    { colour: '#33d1ff', head: { x: startLength, y: 1 }, dir: { x: 1, y: 0 } },
+    { colour: '#ff6b52', head: { x: right, y: startLength }, dir: { x: 0, y: 1 } },
+    { colour: '#8fff57', head: { x: right + 1 - startLength, y: top }, dir: { x: -1, y: 0 } },
+    { colour: '#eb99ff', head: { x: 1, y: top + 1 - startLength }, dir: { x: 0, y: -1 } },
   ]
 
   return spawns.slice(0, players).map(({ colour, head, dir }, i) => ({

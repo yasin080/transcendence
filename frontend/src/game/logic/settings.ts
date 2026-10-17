@@ -19,15 +19,15 @@ export type Settings = {
 }
 
 export const SNAKE: Settings = {
-  width: 30,
-  height: 30,
+  width: 20,
+  height: 20,
   pillars: false,
   softWalls: 0,
   wrap: false,
-  tickMs: 150,
+  tickMs: 250,
   players: 1,
   startLength: 3,
-  food: 1,
+  food: 3,
   wallHit: 'die',
   bodyHit: 'die',
   controls: 'turn',

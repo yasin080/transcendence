@@ -21,7 +21,7 @@ class StoreRoomRequest extends FormRequest
             'settings.wrap' => ['required', 'boolean'],
             'settings.tickMs' => ['required', 'integer', 'between:50,1000'],
             'settings.players' => ['required', 'integer', 'between:1,4'],
-            'settings.startLength' => ['required', 'integer', 'between:1,10'],
+            'settings.startLength' => ['required', 'integer', 'between:1,6'],
             'settings.food' => ['required', 'integer', 'between:1,50'],
             'settings.wallHit' => ['required', 'in:block,die'],
             'settings.bodyHit' => ['required', 'in:block,die'],

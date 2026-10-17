@@ -1,6 +1,3 @@
-import '@babylonjs/loaders/glTF'
-
-import { ImportMeshAsync } from '@babylonjs/core/Loading/sceneLoader'
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
 import { Color3 } from '@babylonjs/core/Maths/math.color'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
@@ -10,19 +7,22 @@ import type { Scene } from '@babylonjs/core/scene'
 import type { Board } from '../logic/board'
 import type { Point, Worm } from '../logic/worms'
 import { toWorld } from './grid'
+import { loadModel } from './model'
 
 const BALL = 1.12
 
 export type WormUpdate = (from: Point[], to: Point[], t: number) => void
 
-async function loadModel(scene: Scene, file: string) {
-  const { meshes } = await ImportMeshAsync(file, scene)
-  const [root, model] = meshes as Mesh[]
-  model.setParent(null)
-  model.bakeCurrentTransformIntoVertices()
-  model.rotationQuaternion = null
-  root.dispose()
-  return model
+function paintEyes(scene: Scene, head: Mesh) {
+  const eye = new StandardMaterial('eye', scene)
+  eye.emissiveColor = new Color3(0.9, 0.95, 1)
+  eye.disableLighting = true
+
+  const pupil = new StandardMaterial('pupil', scene)
+  pupil.diffuseColor = Color3.Black()
+  pupil.disableLighting = true
+
+  for (const mesh of head.getChildMeshes()) mesh.material = mesh.name.startsWith('pupil') ? pupil : eye
 }
 
 function createSkin(scene: Scene, colour: Color3, alpha: number) {
@@ -39,6 +39,7 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormU
 
   const head = await loadModel(scene, '/models/head.glb')
   head.material = createSkin(scene, colour, 0.36)
+  paintEyes(scene, head)
 
   const segment = await loadModel(scene, '/models/segment.glb')
   segment.material = createSkin(scene, colour, 0.27)

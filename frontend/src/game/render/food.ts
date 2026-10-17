@@ -1,28 +1,32 @@
 import '@babylonjs/core/Meshes/instancedMesh'
 
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
+import { Texture } from '@babylonjs/core/Materials/Textures/texture'
 import { Color3 } from '@babylonjs/core/Maths/math.color'
-import { CreateSphere } from '@babylonjs/core/Meshes/Builders/sphereBuilder'
 import type { Scene } from '@babylonjs/core/scene'
 
 import type { Board } from '../logic/board'
 import type { Point } from '../logic/worms'
 import { toWorld } from './grid'
+import { loadModel } from './model'
 
-const SIZE = 0.45
+const HEIGHT = 0.6
 
-export function createFood(scene: Scene, board: Board, food: Point[]) {
+export type FoodUpdate = (food: Point[]) => void
+
+export async function createFood(scene: Scene, board: Board, food: Point[]): Promise<FoodUpdate> {
+  const apple = await loadModel(scene, '/models/apple.glb')
+
   const material = new StandardMaterial('food', scene)
-  material.diffuseColor = new Color3(1, 0.85, 0.15)
-  material.emissiveColor = new Color3(1, 0.7, 0.1)
+  material.diffuseTexture = new Texture('/textures/apple.png', scene, false, false)
+  material.emissiveColor = new Color3(0.25, 0.12, 0.08)
+  apple.material = material
+  apple.isVisible = false
 
-  const pellet = CreateSphere('food', { diameter: SIZE }, scene)
-  pellet.material = material
-  pellet.isVisible = false
-
-  const pellets = food.map(() => pellet.createInstance('food'))
+  const apples = food.map(() => apple.createInstance('food'))
 
   return function update(food: Point[]) {
-    food.forEach((cell, i) => (pellets[i].position = toWorld(board, cell, SIZE)))
+    apples.forEach((apple, i) => apple.setEnabled(i < food.length))
+    food.forEach((cell, i) => (apples[i].position = toWorld(board, cell, HEIGHT / 2)))
   }
 }
