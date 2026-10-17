@@ -106,10 +106,10 @@ export default function Profile() {
   const me: ProfileUser = {
     ...MOCK_ME,
     id: String(user.id),
-    username: ownEdits?.username ?? user.name,
-    name: ownEdits?.name ?? MOCK_ME.name,
-    bio: ownEdits?.bio ?? MOCK_ME.bio,
-    avatarUrl: ownEdits ? ownEdits.avatarUrl : MOCK_ME.avatarUrl,
+    username: ownEdits?.username ?? user.username,
+    name: ownEdits?.name ?? user.name ?? '',
+    bio: ownEdits?.bio ?? user.bio ?? '',
+    avatarUrl: ownEdits ? ownEdits.avatarUrl : user.avatar_url,
     memberSince: user.created_at,
   }
   
