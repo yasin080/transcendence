@@ -54,3 +54,12 @@ export function XIcon({ className = 'size-4' }: IconProps) {
     </svg>
   )
 }
+
+export function SearchIcon({ className = 'size-4' }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
+    </svg>
+  )
+}
