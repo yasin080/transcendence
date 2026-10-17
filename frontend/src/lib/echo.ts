@@ -1,5 +1,6 @@
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
+import { apiPost } from './api'
 
 declare global {
   interface Window {
@@ -19,4 +20,17 @@ export const echo = new Echo({
   wssPort: Number(window.location.port) || 443,
   forceTLS: window.location.protocol === 'https:',
   enabledTransports: ['ws', 'wss'],
+  // Private channels are authorised through apiPost so the XSRF token is read
+  // per request (it rotates on login) and a stale one gets the 419 retry.
+  authorizer: (channel: { name: string }) => ({
+    authorize: (socketId: string, callback: (error: Error | null, data: { auth: string } | null) => void) => {
+      void apiPost<{ auth: string }>('/api/broadcasting/auth', {
+        socket_id: socketId,
+        channel_name: channel.name,
+      }).then((result) => {
+        if (result.ok) callback(null, result.data)
+        else callback(new Error(result.failure.message), null)
+      })
+    },
+  }),
 })
