@@ -46,7 +46,7 @@ export default function Profile() {
   // Recarga cuando cambia cualquier amistad (por ejemplo, desde el panel)
   useEffect(() => onFriendsChanged(() => void load()), [load])
 
-    // Lanza la acción; el aviso de amistades recarga el perfil
+  // Lanza la acción; el aviso de amistades recarga el perfil
   async function act(action: (userId: string) => Promise<FriendState | null>) {
     if (!data) return
     await action(data.profile.id)

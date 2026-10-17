@@ -62,11 +62,9 @@ export default function FriendsPanel() {
     [load, runSearch, searching, trimmed],
   )
 
-  // Lanza la acción y recarga el panel (y la búsqueda, si hay) para reflejar el resultado
+  // Lanza la acción; el aviso de amistades recarga panel y búsqueda
   async function act(action: (userId: string) => Promise<FriendState | null>, userId: string) {
     await action(userId)
-    await load()
-    if (searching) await runSearch(trimmed)
   }
 
   const friends = data?.friends ?? []
