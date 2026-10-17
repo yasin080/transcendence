@@ -62,6 +62,6 @@ class GoogleAuthController extends Controller
         Auth::login($user);
         $this->rotateSession($request);
 
-        return redirect('/dashboard');
+        return redirect('/lobby');
     }
 }

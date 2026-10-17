@@ -119,7 +119,7 @@ export default function WaitingRoom() {
           title="The host closed the room"
           message="The room creator disconnected, so the match was cancelled for everyone. Nothing counted towards your rank."
           buttonLabel="Back to home"
-          onAction={() => navigate('/dashboard')}
+          onAction={() => navigate('/lobby')}
         />
       )}
       {phase === 'kicked' && (
@@ -128,7 +128,7 @@ export default function WaitingRoom() {
           title="The host removed you from this room"
           message="You can join another room or start your own match whenever you're ready."
           buttonLabel="Back to home"
-          onAction={() => navigate('/dashboard')}
+          onAction={() => navigate('/lobby')}
         />
       )}
     </div>
