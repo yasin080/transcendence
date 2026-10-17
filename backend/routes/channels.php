@@ -12,3 +12,5 @@ Broadcast::channel('room.{code}', function ($user, $code) {
         ->whereHas('players', fn ($q) => $q->where('user_id', $user->id))
         ->exists();
 });
+
+Broadcast::channel('lobby', fn ($user) => true);

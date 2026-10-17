@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Database\UniqueConstraintViolationException;
 use App\Events\RoomPlayersUpdated;
+use App\Events\LobbyRoomUpdated;
 
 class RoomController extends Controller
 {
@@ -37,7 +38,8 @@ class RoomController extends Controller
 
             return $room;
         });
-
+        
+        LobbyRoomUpdated::dispatch($room);
         return response()->json($room->load('players'), 201);
     }
 
@@ -89,6 +91,7 @@ class RoomController extends Controller
         }
 
         RoomPlayersUpdated::dispatch($room);
+        LobbyRoomUpdated::dispatch($room);
         return response()->json($this->withPlayers($room));
     }
 
@@ -107,6 +110,7 @@ class RoomController extends Controller
         }
 
         RoomPlayersUpdated::dispatch($room);
+        LobbyRoomUpdated::dispatch($room);
         return response()->json(null, 204);
     }
 

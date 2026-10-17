@@ -7,6 +7,7 @@ use App\Models\Room;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Events\LobbyRoomUpdated;
 
 class GameController extends Controller
 {
@@ -31,6 +32,7 @@ class GameController extends Controller
             return $room->games()->create();
         });
 
+        LobbyRoomUpdated::dispatch($room->refresh());
         return response()->json($game, 201);
     }
 }
