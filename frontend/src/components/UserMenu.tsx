@@ -69,7 +69,7 @@ export default function UserMenu({ user }: { user: User }) {
             role="menuitem"
             onClick={() => {
               setOpen(false)
-              void navigate('/lobby/profile')
+              void navigate('/profile')
             }}
             className="block w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
           >
