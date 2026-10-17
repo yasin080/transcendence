@@ -1,8 +1,9 @@
 import { apiDelete, apiGet, apiPost } from '../../lib/api'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
+import { notifyFriendsChanged } from './events.ts'
 
 // Cómo envía Laravel a un usuario: id numérico y snake_case
-interface ApiUser {
+export interface ApiUser {
   id: number
   username: string
   avatar_url: string | null
@@ -24,7 +25,7 @@ interface ApiStateResponse {
 
 // Traduce un usuario del backend al tipo del frontend.
 // [RETOMAR] status llegará por el canal de presencia de Reverb; de momento, todos offline.
-function toSummary(user: ApiUser): FriendSummary {
+export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),
     username: user.username,
@@ -55,16 +56,22 @@ export async function searchPlayers(query: string): Promise<SearchResult[]> {
 
 export async function sendRequest(userId: string): Promise<FriendState | null> {
   const result = await apiPost<ApiStateResponse>(`/api/friends/${userId}`)
-  return result.ok ? result.data.friend_state : null
+  if (!result.ok) return null
+  notifyFriendsChanged()
+  return result.data.friend_state
 }
 
 export async function acceptRequest(userId: string): Promise<FriendState | null> {
   const result = await apiPost<ApiStateResponse>(`/api/friends/${userId}/accept`)
-  return result.ok ? result.data.friend_state : null
+  if (!result.ok) return null
+  notifyFriendsChanged()
+  return result.data.friend_state
 }
 
 // Rechazar, cancelar o eliminar: en el backend son la misma acción
 export async function removeFriendship(userId: string): Promise<FriendState | null> {
   const result = await apiDelete<ApiStateResponse>(`/api/friends/${userId}`)
-  return result.ok ? result.data.friend_state : null
+  if (!result.ok) return null
+  notifyFriendsChanged()
+  return result.data.friend_state
 }

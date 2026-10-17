@@ -28,11 +28,11 @@ class FriendController extends Controller
             $other = $iSent ? $friendship->addressee : $friendship->requester;
 
             if ($friendship->status === 'accepted') {
-                $friends[] = $this->summary($other);
+                $friends[] = $other->summary();
             } elseif ($iSent) {
-                $sent[] = $this->summary($other);
+                $sent[] = $other->summary();
             } else {
-                $received[] = $this->summary($other);
+                $received[] = $other->summary();
             }
         }
 
@@ -69,7 +69,7 @@ class FriendController extends Controller
         }
 
         return response()->json($users->map(fn (User $user) => [
-            ...$this->summary($user),
+            ...$user->summary(),
             'friend_state' => $stateOf[$user->id] ?? 'none',
         ]));
     }
@@ -83,7 +83,7 @@ class FriendController extends Controller
             return response()->json(['message' => "You can't add yourself."], 422);
         }
 
-        $friendship = $this->between($me, $user);
+        $friendship = Friendship::between($me, $user);
 
         if (! $friendship) {
             $friendship = Friendship::create(['requester_id' => $me->id, 'addressee_id' => $user->id]);
@@ -92,7 +92,7 @@ class FriendController extends Controller
             $friendship->update(['status' => 'accepted']);
         }
 
-        return response()->json(['friend_state' => $this->stateOf($friendship, $me)]);
+        return response()->json(['friend_state' => Friendship::stateFor($friendship, $me)]);
     }
 
     // POST /api/friends/{user}/accept — aceptar su solicitud
@@ -111,39 +111,8 @@ class FriendController extends Controller
     // DELETE /api/friends/{user} — rechazar, cancelar o eliminar
     public function destroy(Request $request, User $user): JsonResponse
     {
-        $this->between($request->user(), $user)?->delete();
+        Friendship::between($request->user(), $user)?->delete();
 
         return response()->json(['friend_state' => 'none']);
-    }
-
-    // Lo mínimo para pintar a un usuario en una lista
-    private function summary(User $user): array
-    {
-        return [
-            'id' => $user->id,
-            'username' => $user->username,
-            'avatar_url' => $user->avatar_url,
-        ];
-    }
-
-    // La amistad entre dos usuarios, sea cual sea la dirección
-    private function between(User $me, User $other): ?Friendship
-    {
-        return Friendship::where(fn ($q) => $q->where('requester_id', $me->id)->where('addressee_id', $other->id))
-            ->orWhere(fn ($q) => $q->where('requester_id', $other->id)->where('addressee_id', $me->id))
-            ->first();
-    }
-
-    // Traduce una fila de amistad al estado del botón, visto desde el usuario activo
-    private function stateOf(?Friendship $friendship, User $me): string
-    {
-        if (! $friendship) {
-            return 'none';
-        }
-        if ($friendship->status === 'accepted') {
-            return 'friends';
-        }
-
-        return $friendship->requester_id == $me->id ? 'sent' : 'received';
     }
 }
