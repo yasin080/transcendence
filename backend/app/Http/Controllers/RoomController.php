@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Database\UniqueConstraintViolationException;
+use App\Events\RoomPlayersUpdated;
 
 class RoomController extends Controller
 {
@@ -87,6 +88,7 @@ class RoomController extends Controller
             return response()->json(['message' => $error], 409);
         }
 
+        RoomPlayersUpdated::dispatch($room);
         return response()->json($this->withPlayers($room));
     }
 
@@ -104,6 +106,7 @@ class RoomController extends Controller
             $room->players()->where('user_id', $userId)->delete();
         }
 
+        RoomPlayersUpdated::dispatch($room);
         return response()->json(null, 204);
     }
 
