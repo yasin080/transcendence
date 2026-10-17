@@ -74,6 +74,48 @@ class FriendController extends Controller
         ]));
     }
 
+    // POST /api/friends/{user} — enviar solicitud
+    public function store(Request $request, User $user): JsonResponse
+    {
+        $me = $request->user();
+
+        if ($user->id == $me->id) {
+            return response()->json(['message' => "You can't add yourself."], 422);
+        }
+
+        $friendship = $this->between($me, $user);
+
+        if (! $friendship) {
+            $friendship = Friendship::create(['requester_id' => $me->id, 'addressee_id' => $user->id]);
+        } elseif ($friendship->status === 'pending' && $friendship->addressee_id == $me->id) {
+            // Él ya me la había enviado: añadirle equivale a aceptar
+            $friendship->update(['status' => 'accepted']);
+        }
+
+        return response()->json(['friend_state' => $this->stateOf($friendship, $me)]);
+    }
+
+    // POST /api/friends/{user}/accept — aceptar su solicitud
+    public function accept(Request $request, User $user): JsonResponse
+    {
+        $friendship = Friendship::where('requester_id', $user->id)
+            ->where('addressee_id', $request->user()->id)
+            ->where('status', 'pending')
+            ->firstOrFail();
+
+        $friendship->update(['status' => 'accepted']);
+
+        return response()->json(['friend_state' => 'friends']);
+    }
+
+    // DELETE /api/friends/{user} — rechazar, cancelar o eliminar
+    public function destroy(Request $request, User $user): JsonResponse
+    {
+        $this->between($request->user(), $user)?->delete();
+
+        return response()->json(['friend_state' => 'none']);
+    }
+
     // Lo mínimo para pintar a un usuario en una lista
     private function summary(User $user): array
     {
@@ -82,5 +124,26 @@ class FriendController extends Controller
             'username' => $user->username,
             'avatar_url' => $user->avatar_url,
         ];
+    }
+
+    // La amistad entre dos usuarios, sea cual sea la dirección
+    private function between(User $me, User $other): ?Friendship
+    {
+        return Friendship::where(fn ($q) => $q->where('requester_id', $me->id)->where('addressee_id', $other->id))
+            ->orWhere(fn ($q) => $q->where('requester_id', $other->id)->where('addressee_id', $me->id))
+            ->first();
+    }
+
+    // Traduce una fila de amistad al estado del botón, visto desde el usuario activo
+    private function stateOf(?Friendship $friendship, User $me): string
+    {
+        if (! $friendship) {
+            return 'none';
+        }
+        if ($friendship->status === 'accepted') {
+            return 'friends';
+        }
+
+        return $friendship->requester_id == $me->id ? 'sent' : 'received';
     }
 }

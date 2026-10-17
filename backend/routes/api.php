@@ -20,6 +20,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rooms', [RoomController::class, 'store']);
     Route::post('/rooms/{room:code}/games', [GameController::class, 'store']);
     Route::get('/games/{game}', [GameController::class, 'show']);
+    
     Route::get('/friends', [FriendController::class, 'index']);
     Route::get('/users/search', [FriendController::class, 'search']);
+    Route::post('/friends/{user}', [FriendController::class, 'store']);
+    Route::post('/friends/{user}/accept', [FriendController::class, 'accept']);
+    Route::delete('/friends/{user}', [FriendController::class, 'destroy']);
 });
