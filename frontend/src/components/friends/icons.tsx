@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react'
 
-// Iconos de amistad: los usa FriendButton (perfil ajeno y, más adelante, el panel de amigos)
+// Iconos de amistad: los usa FriendButton de perfil ajeno y panel de amigos.
 
 const stroke: SVGProps<SVGSVGElement> = {
   fill: 'none',
@@ -43,6 +43,23 @@ export function UserMinusIcon({ className = 'size-4' }: IconProps) {
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
       <circle cx="9.5" cy="8" r="3.5" />
       <path d="M3 19c.8-3.3 3.4-5 6.5-5s5.7 1.7 6.5 5M16 11h5" />
+    </svg>
+  )
+}
+
+export function XIcon({ className = 'size-4' }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  )
+}
+
+export function SearchIcon({ className = 'size-4' }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
     </svg>
   )
 }

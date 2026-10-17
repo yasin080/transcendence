@@ -21,7 +21,7 @@ export default function QuickMatchBanner({ onPlay }: QuickMatchBannerProps) {
           <p className="mt-2 text-body-muted">Every finished match counts towards your stats.</p>
         </div>
 
-        <Button variant="arcade" size="xl" onClick={onPlay}>
+        <Button variant="arcade" size="xl" pulse onClick={onPlay}>
           Play now
         </Button>
       </div>

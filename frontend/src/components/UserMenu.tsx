@@ -5,7 +5,7 @@ import { useAuth } from '../auth/useAuth'
 import type { User } from '../lib/api'
 
 function initial(user: User): string {
-  return (user.name.trim()[0] ?? '?').toUpperCase()
+  return (user.username[0] ?? '?').toUpperCase()
 }
 
 export default function UserMenu({ user }: { user: User }) {
@@ -56,7 +56,7 @@ export default function UserMenu({ user }: { user: User }) {
         >
           {initial(user)}
         </span>
-        <span className="max-w-32 truncate">{user.name}</span>
+        <span className="max-w-32 truncate">{user.username}</span>
       </button>
 
       {open && (
@@ -69,7 +69,7 @@ export default function UserMenu({ user }: { user: User }) {
             role="menuitem"
             onClick={() => {
               setOpen(false)
-              void navigate('/dashboard/profile')
+              void navigate('/profile')
             }}
             className="block w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
           >

@@ -1,90 +1,96 @@
-import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
+import { acceptRequest, removeFriendship, sendRequest } from '../components/friends/api'
 import FriendButton from '../components/friends/FriendButton'
-import type { FriendState, FriendSummary } from '../components/friends/types'
+import type { FriendState } from '../components/friends/types'
+import { fetchProfile, type ProfileData } from '../components/profile/api'
+import EditProfileModal from '../components/profile/EditProfileModal'
 import FriendTile from '../components/profile/FriendTile'
 import { PencilIcon } from '../components/profile/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
-import type { ProfileUser } from '../components/profile/types'
+import type { ProfileEdits, ProfileUser } from '../components/profile/types'
 import Button from '../components/ui/Button'
-
-// DATOS FALSOS (MOCK) — sustituir por la API cuando exista
-const MOCK_ME: ProfileUser = {
-  id: 'u1',
-  username: 'lunaBoom',
-  avatarUrl: null,
-  bio: 'Bomb first, ask questions later. Main in Chaos mode, always hunting the longest snake in the arena.',
-  memberSince: '2026-03-14',
-  friendCount: 7,
-  stats: { played: 148, won: 63, bombs: 1240 },
-}
-
-const MOCK_OTHER: ProfileUser = {
-  id: 'u2',
-  username: 'Kiro_TNT',
-  avatarUrl: null,
-  bio: 'Speed runner. If you can see my tail, it is already too late.',
-  memberSince: '2026-05-02',
-  friendCount: 1,
-  stats: { played: 92, won: 31, bombs: 604 },
-}
-
-const MOCK_OTHER_FRIENDS: FriendSummary[] = [
-  { id: 'u3', username: 'Boomer_92', avatarUrl: null, status: 'online' },
-  { id: 'u4', username: 'ex0', avatarUrl: null, status: 'online' },
-  { id: 'u5', username: 'Pixel_Rex', avatarUrl: null, status: 'offline' },
-  { id: 'u6', username: 'ash_fuse', avatarUrl: null, status: 'offline' },
-  { id: 'u7', username: 'zeroKelvin', avatarUrl: null, status: 'online' },
-  { id: 'u8', username: 'Tanuki', avatarUrl: null, status: 'offline' },
-]
-
-// Comprueba que un texto (p. ej. de la URL) es un FriendState válido
-function isFriendState(value: string | null): value is FriendState {
-  return value === 'none' || value === 'sent' || value === 'received' || value === 'friends'
-}
+import { onFriendsChanged } from '../components/friends/events'
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
   const { user } = useAuth()
-  const [searchParams] = useSearchParams()
+  const { userId } = useParams()
   const navigate = useNavigate()
 
-  // Provisional: ?friend=received (etc.) fija el estado inicial de amistad
-  const friendParam = searchParams.get('friend')
-  const [friendState, setFriendState] = useState<FriendState>(
-    isFriendState(friendParam) ? friendParam : 'none',
-  )
+  const [data, setData] = useState<ProfileData | null>(null)
+  const [notFound, setNotFound] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  // Provisional: lo guardado desde Edit profile, hasta conectar el modal (parte B)
+  const [ownEdits, setOwnEdits] = useState<ProfileEdits | null>(null)
+
+  // Sin id en la URL → mi perfil
+  const targetId = userId ?? (user ? String(user.id) : null)
+
+  const load = useCallback(async () => {
+    if (!targetId) return
+    const profile = await fetchProfile(targetId)
+    setData(profile)
+    setNotFound(profile === null)
+  }, [targetId])
+
+  useEffect(() => {
+    setData(null)
+    setNotFound(false)
+    void load()
+  }, [load])
+
+  // Recarga cuando cambia cualquier amistad (por ejemplo, desde el panel)
+  useEffect(() => onFriendsChanged(() => void load()), [load])
+
+  // Lanza la acción; el aviso de amistades recarga el perfil
+  async function act(action: (userId: string) => Promise<FriendState | null>) {
+    if (!data) return
+    await action(data.profile.id)
+  }
 
   if (!user) return null
 
-  const isOwn = searchParams.get('view') !== 'other'
-  // Provisional: &empty muestra el estado vacío de la cuadrícula
-  const friends = searchParams.has('empty') ? [] : MOCK_OTHER_FRIENDS
-  // El contador de la cabecera sale de la lista, para que siempre coincidan
-  const profile = isOwn ? MOCK_ME : { ...MOCK_OTHER, friendCount: friends.length }
+  if (notFound) {
+    return (
+      <section className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 px-7 text-center">
+        <h1 className="display-heading">Player not found</h1>
+        <p className="text-body-muted">This player doesn't exist or has deleted their account.</p>
+      </section>
+    )
+  }
+
+  if (!data) return null // cargando
+
+  const { isOwn, friendState, friends } = data
+  const profile: ProfileUser =
+    isOwn && ownEdits
+      ? { ...data.profile, username: ownEdits.username, name: ownEdits.name, bio: ownEdits.bio, avatarUrl: ownEdits.avatarUrl }
+      : data.profile
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8">
+    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8 *:shrink-0">
       <ProfileHeader
         user={profile}
         isOwn={isOwn}
-        status={isOwn ? undefined : 'online'}
+        // [RETOMAR] estado online real con Reverb
+        status={isOwn ? undefined : 'offline'}
         action={
           isOwn ? (
-            <Button variant="ghost" size="sm">
-              <PencilIcon />
+            <Button variant="ghost" size="sm" onClick={() => setEditOpen(true)}>
+              <PencilIcon className="size-3.5" />
               Edit profile
             </Button>
           ) : (
             <FriendButton
               state={friendState}
-              onAdd={() => setFriendState('sent')}
-              onAccept={() => setFriendState('friends')}
-              onDecline={() => setFriendState('none')}
-              onRemove={() => setFriendState('none')}
+              onAdd={() => void act(sendRequest)}
+              onAccept={() => void act(acceptRequest)}
+              onDecline={() => void act(removeFriendship)}
+              onRemove={() => void act(removeFriendship)}
             />
           )
         }
@@ -106,7 +112,7 @@ export default function Profile() {
 
       {/* Solo en el perfil propio: invitación a jugar */}
       {/* Provisional: lleva al Lobby hasta que exista la partida rápida */}
-      {isOwn && <QuickMatchBanner onPlay={() => void navigate('/dashboard')} />}
+      {isOwn && <QuickMatchBanner onPlay={() => void navigate('/lobby')} />}
 
       {/* Solo en el perfil ajeno: sus amigos */}
       {!isOwn && (
@@ -129,6 +135,15 @@ export default function Profile() {
             </p>
           )}
         </div>
+      )}
+
+      {editOpen && (
+        <EditProfileModal
+          profile={profile}
+          email={ownEdits?.email ?? user.email}
+          onSave={setOwnEdits}
+          onClose={() => setEditOpen(false)}
+        />
       )}
     </section>
   )

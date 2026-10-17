@@ -2,7 +2,7 @@ import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router'
 
-import DashboardLayout from './layouts/DashboardLayout.tsx'
+import MainLayout from './layouts/MainLayout.tsx'
 import Lobby from './pages/Lobby.tsx'
 import WaitingRoom from './pages/WaitingRoom.tsx'
 import './index.css'
@@ -36,11 +36,12 @@ createRoot(root).render(
           </Route>
 
           <Route element={<RequireAuth />}>
-            {/* MARCO 2 — dashboard */}
-            <Route path="dashboard" element={<DashboardLayout />}>
-              <Route index element={<Lobby />} />
+            {/* MARCO 2 — app con sidebar (lobby, ranking, perfil, sala)*/}
+            <Route element={<MainLayout />}>
+              <Route path="lobby" element={<Lobby />} />
               <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="profile/:userId" element={<Profile />} />
               <Route path="waiting-room/:roomId" element={<WaitingRoom />} />
             </Route>
 

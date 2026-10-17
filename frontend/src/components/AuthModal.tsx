@@ -128,7 +128,7 @@ export default function AuthModal({
     }
 
     onClose()
-    void navigate('/dashboard')
+    void navigate('/lobby')
   }
 
   return (

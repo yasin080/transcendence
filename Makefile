@@ -49,7 +49,7 @@ shell-front:
 	$(COMPOSE) exec frontend sh
 
 shell-db:
-	$(COMPOSE) exec mariadb sh -c 'mariadb -u"$$DB_USERNAME" -p"$$DB_PASSWORD" "$$DB_DATABASE"'
+	$(COMPOSE) exec mariadb sh -c 'mariadb -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"'
 
 # --- Laravel ----------------------------------------------------------------
 

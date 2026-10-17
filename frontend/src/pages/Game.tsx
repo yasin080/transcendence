@@ -41,7 +41,7 @@ export default function Game() {
       {game && <GameCanvas game={game} gameId={gameId} onGameOver={() => setOver(true)} />}
 
       <Link
-        to="/dashboard"
+        to="/lobby"
         className="absolute left-4 top-4 rounded-xl border border-line bg-void/60 px-3 py-1.5 text-sm text-fg-secondary backdrop-blur-sm transition hover:border-line-strong hover:text-white"
       >
         ← Back to lobby
@@ -65,7 +65,7 @@ export default function Game() {
           title="This match is not available"
           message="It may not exist, or you are not one of its players."
           buttonLabel="Back to lobby"
-          onAction={() => navigate('/dashboard')}
+          onAction={() => navigate('/lobby')}
         />
       )}
     </div>
