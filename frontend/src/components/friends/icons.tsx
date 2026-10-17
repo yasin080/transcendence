@@ -46,3 +46,11 @@ export function UserMinusIcon({ className = 'size-4' }: IconProps) {
     </svg>
   )
 }
+
+export function XIcon({ className = 'size-4' }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  )
+}

@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react'
 
 type Variant = 'primary' | 'secondary' | 'light' | 'arcade' | 'ghost'
-type Size = 'sm' | 'md' | 'lg' | 'xl'
+type Size = 'sm' | 'md' | 'lg' | 'xl' | 'icon'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
@@ -28,6 +28,7 @@ const sizes: Record<Size, string> = {
   md: 'rounded-xl px-5 py-3.75',
   lg: 'rounded-2xl px-8 py-4.75',
   xl: 'rounded-2xl px-9.5 py-5',
+  icon: 'size-8 rounded-lg',
 }
 
 // Por fuera, className solo para colocación (margen, ancho). Nunca colores ni padding.
