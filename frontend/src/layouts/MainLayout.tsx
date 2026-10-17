@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router'
-import SocialPanel from '../components/social/SocialPanel'
-
+import FriendsPanel from '../components/friends/FriendsPanel'
 import MainLayoutSidebar from '../components/left-sidebar/MainLayoutSidebar'
 
 /**
@@ -14,19 +13,19 @@ import MainLayoutSidebar from '../components/left-sidebar/MainLayoutSidebar'
  */
 export default function MainLayout() {
   return (
-    <div className="flex h-screen min-w-[1180px] bg-void text-white">
-      <aside className="w-[268px] flex-none border-r border-white/8 bg-surface-1">
+    <div className="flex h-screen min-w-295 bg-void text-white">
+      <aside className="w-67 flex-none border-r border-white/8 bg-surface-1">
         <MainLayoutSidebar />
       </aside>
 
-      <div className="flex flex-1 min-w-[560px] min-h-0">
+      <div className="flex flex-1 min-w-140 min-h-0">
         {/* La página de turno (Lobby, sala de espera...). La sala de espera
             no es un modal: sustituye al Lobby en este hueco. */}
         <Outlet />
       </div>
 
-      <aside className="w-[340px] flex-none border-l border-white/8 bg-surface-1">
-        <SocialPanel />
+      <aside className="w-85 flex-none border-l border-white/8 bg-surface-1">
+        <FriendsPanel />
       </aside>
     </div>
   )
