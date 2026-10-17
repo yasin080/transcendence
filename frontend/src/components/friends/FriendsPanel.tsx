@@ -4,6 +4,7 @@ import FriendRow from './FriendRow.tsx'
 import { acceptRequest, fetchPanel, removeFriendship, searchPlayers, sendRequest } from './api.ts'
 import { SearchIcon, XIcon } from './icons.tsx'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
+import { onFriendsChanged } from './events.ts'
 
 const MIN_QUERY = 2
 const SEARCH_DELAY_MS = 300
@@ -50,6 +51,16 @@ export default function FriendsPanel() {
     const timer = setTimeout(() => void runSearch(trimmed), SEARCH_DELAY_MS)
     return () => clearTimeout(timer)
   }, [trimmed, searching, runSearch])
+
+  // Recarga cuando cambia cualquier amistad, aquí o en un perfil
+  useEffect(
+    () =>
+      onFriendsChanged(() => {
+        void load()
+        if (searching) void runSearch(trimmed)
+      }),
+    [load, runSearch, searching, trimmed],
+  )
 
   // Lanza la acción y recarga el panel (y la búsqueda, si hay) para reflejar el resultado
   async function act(action: (userId: string) => Promise<FriendState | null>, userId: string) {

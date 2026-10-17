@@ -13,6 +13,7 @@ import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
 import type { ProfileEdits, ProfileUser } from '../components/profile/types'
 import Button from '../components/ui/Button'
+import { onFriendsChanged } from '../components/friends/events'
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
@@ -42,11 +43,13 @@ export default function Profile() {
     void load()
   }, [load])
 
-  // Lanza la acción de amistad y recarga el perfil
+  // Recarga cuando cambia cualquier amistad (por ejemplo, desde el panel)
+  useEffect(() => onFriendsChanged(() => void load()), [load])
+
+    // Lanza la acción; el aviso de amistades recarga el perfil
   async function act(action: (userId: string) => Promise<FriendState | null>) {
     if (!data) return
     await action(data.profile.id)
-    await load()
   }
 
   if (!user) return null
