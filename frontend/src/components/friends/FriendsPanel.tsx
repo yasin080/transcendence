@@ -1,34 +1,42 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../ui/Sidebar.tsx'
 import FriendRow from './FriendRow.tsx'
-import { fetchPanel } from './api.ts'
-import type { FriendsPanelData, FriendSummary } from './types.ts'
+import { acceptRequest, fetchPanel, removeFriendship } from './api.ts'
+import type { FriendState, FriendsPanelData, FriendSummary } from './types.ts'
 
 // Orden alfabético sin distinguir mayúsculas
 function byName(a: FriendSummary, b: FriendSummary) {
   return a.username.localeCompare(b.username, undefined, { sensitivity: 'base' })
 }
 
-// Sidebar derecho global: amigos del usuario autenticado
+// Sidebar derecho global: amigos y solicitudes del usuario autenticado
 export default function FriendsPanel() {
   const [data, setData] = useState<FriendsPanelData | null>(null)
   const [failed, setFailed] = useState(false)
 
-  useEffect(() => {
-    let active = true
-
-    void fetchPanel().then((panel) => {
-      if (!active) return
-      if (panel) setData(panel)
-      else setFailed(true)
-    })
-
-    return () => {
-      active = false
+  const load = useCallback(async () => {
+    const panel = await fetchPanel()
+    if (panel) {
+      setData(panel)
+      setFailed(false)
+    } else {
+      setFailed(true)
     }
   }, [])
 
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  // Lanza la acción y recarga el panel para reflejar el resultado
+  async function act(action: (userId: string) => Promise<FriendState | null>, userId: string) {
+    await action(userId)
+    await load()
+  }
+
   const friends = data?.friends ?? []
+  const received = [...(data?.received ?? [])].sort(byName)
+  const sent = [...(data?.sent ?? [])].sort(byName)
   const online = friends.filter((friend) => friend.status === 'online').sort(byName)
   const offline = friends.filter((friend) => friend.status !== 'online').sort(byName)
 
@@ -37,24 +45,63 @@ export default function FriendsPanel() {
       <div className="flex flex-col gap-4 px-2.5 pb-4">
         {failed && <EmptyBox title="Couldn't load your friends" text="Reload the page to try again." />}
 
+        {received.length > 0 && (
+          <section className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
+              <SectionLabel title="Requests" count={received.length} highlight />
+            </div>
+            {received.map((user) => (
+              <FriendRow
+                key={user.id}
+                user={user}
+                variant="received"
+                onAccept={() => void act(acceptRequest, user.id)}
+                onRemove={() => void act(removeFriendship, user.id)}
+              />
+            ))}
+          </section>
+        )}
+
         {data && friends.length === 0 && (
           <EmptyBox title="No friends yet" text="Use the search above to find players and send a request." />
         )}
 
         {online.length > 0 && (
-          <Section title="Online" count={online.length}>
+          <section className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
+              <SectionLabel title="Online" count={online.length} />
+            </div>
             {online.map((friend) => (
               <FriendRow key={friend.id} user={friend} variant="friend" />
             ))}
-          </Section>
+          </section>
         )}
 
         {offline.length > 0 && (
-          <Section title="Offline" count={offline.length}>
+          <section className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
+              <SectionLabel title="Offline" count={offline.length} />
+            </div>
             {offline.map((friend) => (
               <FriendRow key={friend.id} user={friend} variant="friend" />
             ))}
-          </Section>
+          </section>
+        )}
+
+        {sent.length > 0 && (
+          <section className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
+              <SectionLabel title="Sent requests" count={sent.length} />
+            </div>
+            {sent.map((user) => (
+              <FriendRow
+                key={user.id}
+                user={user}
+                variant="sent"
+                onRemove={() => void act(removeFriendship, user.id)}
+              />
+            ))}
+          </section>
         )}
       </div>
     </Sidebar>
@@ -73,16 +120,20 @@ function PanelHeader({ onlineCount }: { onlineCount: number }) {
   )
 }
 
-function Section({ title, count, children }: { title: string; count: number; children: ReactNode }) {
+// Título de sección + línea + contador. highlight = estilo de "Requests"
+function SectionLabel({ title, count, highlight = false }: { title: string; count: number; highlight?: boolean }) {
   return (
-    <section className="flex flex-col gap-0.5">
-      <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
-        <h4 className="text-micro-label text-fg-muted">{title}</h4>
-        <span aria-hidden="true" className="h-px flex-1 bg-line" />
+    <>
+      <span className={`text-micro-label ${highlight ? 'text-ember-450' : 'text-fg-muted'}`}>{title}</span>
+      <span aria-hidden="true" className="h-px flex-1 bg-line" />
+      {highlight ? (
+        <span className="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-fuse-600 px-1 text-2xs font-bold text-white">
+          {count}
+        </span>
+      ) : (
         <span className="text-meta text-fg-muted">{count}</span>
-      </div>
-      {children}
-    </section>
+      )}
+    </>
   )
 }
 
