@@ -40,7 +40,6 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 flex-wrap items-center gap-3">
             <h1 className="truncate display-title">{user.username}</h1>
-            {status && <StatusPill status={status} />}
           </div>
           {/* Nombre real: discreto y solo para su dueño */}
           {isOwn && user.name && <p className="mt-1.5 truncate text-meta text-fg-muted">{user.name}</p>}
@@ -70,20 +69,5 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
         </div>
       </div>
     </div>
-  )
-}
-
-function StatusPill({ status }: { status: OnlineStatus }) {
-  const online = status === 'online'
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-meta ${
-        online ? 'border-online/35 bg-online/10 text-online' : 'border-line-strong bg-fill text-fg-muted'
-      }`}
-    >
-      <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
-      {online ? 'Online' : 'Offline'}
-    </span>
   )
 }
