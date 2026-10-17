@@ -4,8 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\FriendController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/health', HealthController::class);
 
@@ -18,4 +20,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rooms', [RoomController::class, 'store']);
     Route::post('/rooms/{room:code}/games', [GameController::class, 'store']);
     Route::get('/games/{game}', [GameController::class, 'show']);
+    
+    Route::get('/friends', [FriendController::class, 'index']);
+    Route::get('/users/search', [FriendController::class, 'search']);
+    Route::post('/friends/{user}', [FriendController::class, 'store']);
+    Route::post('/friends/{user}/accept', [FriendController::class, 'accept']);
+    Route::delete('/friends/{user}', [FriendController::class, 'destroy']);
 });
