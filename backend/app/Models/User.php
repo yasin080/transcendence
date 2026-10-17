@@ -60,6 +60,16 @@ class User extends Authenticatable
         return $this->hasMany(Friendship::class, 'addressee_id');
     }
 
+    // Lo mínimo para pintar a un usuario en una lista
+    public function summary(): array
+    {
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'avatar_url' => $this->avatar_url,
+        ];
+    }
+
     /**
      * Get the attributes that should be cast.
      * @return array<string, string>
