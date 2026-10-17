@@ -49,7 +49,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
     }
 
     onClose()
-    void navigate(`/dashboard/waiting-room/${result.data.code}`)
+    void navigate(`/waiting-room/${result.data.code}`)
   }
 
   return (

@@ -10,6 +10,7 @@ import type { MatchSetting, Player } from '../components/waiting-room/types.ts'
 import type { Room } from '../components/lobby/types.ts'
 import { apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
+import { echo } from '../lib/echo'
 
 
 const MOCK_SETTINGS: MatchSetting[] = [
@@ -35,6 +36,7 @@ export default function WaitingRoom() {
     preview === 'closed' || preview === 'kicked' || preview === 'countdown' ? preview : 'waiting'
   const [phase, setPhase] = useState<'waiting' | 'countdown' | 'closed' | 'kicked'>(initialPhase)
 
+
   // Se une al entrar (no solo lee la sala): así entrar por URL también ocupa
   // asiento. Si ya estabas dentro, join devuelve la sala sin tocar nada.
   useEffect(() => {
@@ -48,10 +50,19 @@ export default function WaitingRoom() {
     return () => { cancelled = true }
   }, [roomId])
 
+  const joined = room !== null
+  useEffect(() => {
+    if (!roomId || !joined) return
+    const channel = echo.private(`room.${roomId}`)
+    channel.listen('.players.updated', (e: { room: Room }) => setRoom(e.room))
+    return () => echo.leave(`room.${roomId}`)
+  }, [roomId, joined])
+
+
   // Libera el asiento (o cierra la sala si eres el host).
   async function leaveRoom() {
     if (roomId) await apiPost(`/api/rooms/${roomId}/leave`)
-    navigate('/dashboard')
+    navigate('/lobby')
   }
 
   if (error) return <p>{error}</p>

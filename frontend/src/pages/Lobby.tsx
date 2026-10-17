@@ -57,7 +57,7 @@ export default function Lobby() {
   async function joinRoom(room: RoomSummary) {
     setJoinError(null)
     const result = await apiPost(`/api/rooms/${room.code}/join`)
-    if (result.ok) navigate(`/dashboard/waiting-room/${room.code}`)
+    if (result.ok) navigate(`/waiting-room/${room.code}`)
     else setJoinError(result.failure.message)
   }
 
