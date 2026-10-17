@@ -7,6 +7,8 @@ import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
+import { echo } from '../lib/echo'
+
 
 
 const PAGE_SIZE = 6
@@ -46,8 +48,20 @@ export default function Lobby() {
       else setError(result.failure.message)
     })
 
+    echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {
+    setRooms((prev) => {
+      const list = prev ?? []
+      if (room.status === 'closed' || room.status === 'finished') {
+        return list.filter((r) => r.id !== room.id)
+      }
+      const exists = list.some((r) => r.id === room.id)
+      return exists ? list.map((r) => (r.id === room.id ? room : r)) : [room, ...list]
+    })
+  })
+
     return () => {
       cancelled = true
+      echo.leave('lobby')
     }
   }, [])
 
