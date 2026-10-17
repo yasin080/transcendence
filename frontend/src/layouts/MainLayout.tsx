@@ -6,10 +6,8 @@ import MainLayoutSidebar from '../components/left-sidebar/MainLayoutSidebar'
  * Marco 2 — chasis de 3 columnas del mainlayout.
  *
  * Las tres secciones viven AQUÍ, no dentro de las páginas: así no se
- * desmontan al navegar y el chat no pierde su suscripción a Reverb.
- *
- * PLACEHOLDER: medidas tomadas del diario (sección 5). El contenido de cada
- * sección está por construir.
+ * desmontan al navegar y el panel de amigos conserva su estado (y, más
+ * adelante, su suscripción a Reverb).
  */
 export default function MainLayout() {
   return (
