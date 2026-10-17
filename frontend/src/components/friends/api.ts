@@ -2,7 +2,7 @@ import { apiDelete, apiGet, apiPost } from '../../lib/api'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
 
 // Cómo envía Laravel a un usuario: id numérico y snake_case
-interface ApiUser {
+export interface ApiUser {
   id: number
   username: string
   avatar_url: string | null
@@ -24,7 +24,7 @@ interface ApiStateResponse {
 
 // Traduce un usuario del backend al tipo del frontend.
 // [RETOMAR] status llegará por el canal de presencia de Reverb; de momento, todos offline.
-function toSummary(user: ApiUser): FriendSummary {
+export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),
     username: user.username,
