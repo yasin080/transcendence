@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react'
 
-// Iconos de amistad: los usa FriendButton (perfil ajeno y, más adelante, el panel de amigos)
+// Iconos de amistad: los usa FriendButton de perfil ajeno y panel de amigos.
 
 const stroke: SVGProps<SVGSVGElement> = {
   fill: 'none',
