@@ -12,3 +12,15 @@ export interface FriendSummary {
   avatarUrl: string | null // null = avatar por defecto
   status: OnlineStatus
 }
+
+// Las tres listas del panel
+export interface FriendsPanelData {
+  friends: FriendSummary[]
+  received: FriendSummary[]
+  sent: FriendSummary[]
+}
+
+// Un resultado del buscador: el jugador y mi relación con él
+export interface SearchResult extends FriendSummary {
+  friendState: FriendState
+}
