@@ -47,7 +47,7 @@ class AuthTest extends TestCase
             'email' => 'gusano@example.com',
             'password' => 'secret-worm',
             'password_confirmation' => 'secret-worm',
-        ])->assertStatus(422)->assertJsonValidationErrors('email');
+        ])->assertFails(422)->assertJsonValidationErrors('email');
 
         $this->assertGuest();
     }
@@ -59,7 +59,7 @@ class AuthTest extends TestCase
             'email' => 'gusano@example.com',
             'password' => 'secret-worm',
             'password_confirmation' => 'otra-cosa',
-        ])->assertStatus(422)->assertJsonValidationErrors('password');
+        ])->assertFails(422)->assertJsonValidationErrors('password');
 
         $this->assertGuest();
     }
@@ -71,7 +71,7 @@ class AuthTest extends TestCase
             'email' => 'gusano@example.com',
             'password' => 'corta',
             'password_confirmation' => 'corta',
-        ])->assertStatus(422)->assertJsonValidationErrors('password');
+        ])->assertFails(422)->assertJsonValidationErrors('password');
     }
 
     public function test_a_user_can_log_in(): void
@@ -99,7 +99,7 @@ class AuthTest extends TestCase
         $this->postJson('/api/login', [
             'email' => 'gusano@example.com',
             'password' => 'no-es-esta',
-        ])->assertStatus(422)->assertJsonValidationErrors('email');
+        ])->assertFails(422)->assertJsonValidationErrors('email');
 
         $this->assertGuest();
     }
@@ -109,7 +109,7 @@ class AuthTest extends TestCase
         $this->postJson('/api/login', [
             'email' => 'nadie@example.com',
             'password' => 'secret-worm',
-        ])->assertStatus(422)->assertJsonValidationErrors('email');
+        ])->assertFails(422)->assertJsonValidationErrors('email');
 
         $this->assertGuest();
     }
@@ -266,7 +266,7 @@ class AuthTest extends TestCase
             $this->postJson('/api/login', [
                 'email' => 'gusano@example.com',
                 'password' => 'wrong-password',
-            ])->assertStatus(422);
+            ])->assertFails(422);
         }
 
         // The 6 failed attempts already used the whole per-minute budget for
@@ -275,7 +275,7 @@ class AuthTest extends TestCase
         $this->postJson('/api/login', [
             'email' => 'gusano@example.com',
             'password' => 'secret-worm',
-        ])->assertStatus(429);
+        ])->assertFails(429);
     }
 
     public function test_registration_is_rate_limited(): void
@@ -298,6 +298,6 @@ class AuthTest extends TestCase
             'email' => 'gusano@example.com',
             'password' => 'secret-worm',
             'password_confirmation' => 'secret-worm',
-        ])->assertStatus(429);
+        ])->assertFails(429);
     }
 }
