@@ -11,6 +11,7 @@ type Room = {
   code: string
   host_id: number
   status: string
+  settings: { players: number }
   players: { seat: number; user: { name: string } | null }[]
   games: { id: number }[]
 }
@@ -30,6 +31,7 @@ export default function DevMatch() {
   const [room, setRoom] = useState<Room | null>(null)
   const [error, setError] = useState('')
   const isHost = room?.host_id === user?.id
+  const hasFreeSeat = room !== null && room.status === 'open' && room.players.length < room.settings.players
 
   useEffect(() => {
     if (!roomCode) return
@@ -55,6 +57,13 @@ export default function DevMatch() {
     const result = await apiPost<Room>(`/api/rooms/${code.trim().toUpperCase()}/join`)
     if (!result.ok) return setError(result.failure.message)
     setRoomCode(result.data.code)
+  }
+
+  async function addBot() {
+    if (!room) return
+    const result = await apiPost<Room>(`/api/rooms/${room.code}/bots`)
+    if (!result.ok) return setError(result.failure.message)
+    setRoom(result.data)
   }
 
   async function start() {
@@ -124,9 +133,14 @@ export default function DevMatch() {
             ))}
           </ul>
           {isHost ? (
-            <Button size="md" disabled={room.status !== 'open'} onClick={start}>
-              Start match
-            </Button>
+            <div className="flex gap-3">
+              <Button size="md" disabled={room.status !== 'open'} onClick={start}>
+                Start match
+              </Button>
+              <Button size="md" disabled={!hasFreeSeat} onClick={addBot}>
+                Add bot
+              </Button>
+            </div>
           ) : (
             <p className="text-sm text-fg-muted">Waiting for the host to start…</p>
           )}

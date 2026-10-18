@@ -62,6 +62,8 @@ class RoomController extends Controller
         return response()->json($room->load('players'), 201);
     }
 
+
+
     private function newCode(): string
     {
         do {
@@ -162,6 +164,26 @@ class RoomController extends Controller
         RoomPlayersUpdated::dispatch($room);
         LobbyRoomUpdated::dispatch($room);
         return response()->json(null, 204);
+    }
+
+
+    public function addBot(Request $request, Room $room): JsonResponse
+    {
+        abort_unless($room->host_id === $request->user()->id, 403, 'Only the host can add bots.');
+
+        DB::transaction(function () use ($room) {
+            $room = Room::lockForUpdate()->find($room->id);
+            abort_unless($room->status === 'open', 409, 'This match has already started.');
+
+            $free = collect(range(0, $room->settings['players'] - 1))->diff($room->players()->pluck('seat'))->first();
+            abort_if($free === null, 409, 'This room is full.');
+
+            $room->players()->create(['seat' => $free]);
+        });
+
+        RoomPlayersUpdated::dispatch($room);
+        LobbyRoomUpdated::dispatch($room);
+        return $this->show($room);
     }
 
 

@@ -174,4 +174,32 @@ class GameTest extends TestCase
         $this->assertFalse($game['worms'][0]['alive']);
         $this->assertFalse($game['worms'][1]['alive']);
     }
+
+    public function test_an_away_worm_stays_still(): void
+    {
+        $game = Game::create(self::SNAKE);
+        $game['worms'][0]['away'] = true;
+        $body = $game['worms'][0]['body'];
+
+        Game::turn($game, 0, ['x' => 0, 'y' => 1]);
+        Game::tick($game);
+
+        $this->assertSame($body, $game['worms'][0]['body']);
+        $this->assertTrue($game['worms'][0]['alive']);
+    }
+
+    public function test_reaching_an_away_head_is_a_body_hit_not_a_head_on(): void
+    {
+        $game = Game::create(['players' => 2] + self::SNAKE);
+        $game['worms'][0]['body'] = [['x' => 5, 'y' => 5], ['x' => 4, 'y' => 5], ['x' => 3, 'y' => 5]];
+        $game['worms'][0]['dir'] = $game['worms'][0]['wanted'] = ['x' => 1, 'y' => 0];
+        $game['worms'][1]['body'] = [['x' => 6, 'y' => 5], ['x' => 7, 'y' => 5], ['x' => 8, 'y' => 5]];
+        $game['worms'][1]['dir'] = $game['worms'][1]['wanted'] = ['x' => -1, 'y' => 0];
+        $game['worms'][1]['away'] = true;
+
+        Game::tick($game);
+
+        $this->assertFalse($game['worms'][0]['alive']);
+        $this->assertTrue($game['worms'][1]['alive']);
+    }
 }

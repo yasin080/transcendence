@@ -35,19 +35,19 @@ class Game
     public static function tick(array &$game): void
     {
         foreach ($game['worms'] as &$worm) {
-            if ($worm['alive']) {
+            if (self::moves($worm)) {
                 Worms::applyTurn($worm);
             }
         }
         unset($worm);
 
         $next = array_map(fn ($worm) => Worms::nextCell($worm, $game['board']), $game['worms']);
-        $crashed = array_map(fn ($i) => $game['worms'][$i]['alive'] && self::headOn($game, $next, $i), array_keys($game['worms']));
+        $crashed = array_map(fn ($i) => self::moves($game['worms'][$i]) && self::headOn($game, $next, $i), array_keys($game['worms']));
 
         foreach (array_keys($game['worms']) as $i) {
             if ($crashed[$i]) {
                 $game['worms'][$i]['alive'] = false;
-            } elseif ($game['worms'][$i]['alive']) {
+            } elseif (self::moves($game['worms'][$i])) {
                 self::moveWorm($game, $i, $next[$i]);
             }
         }
@@ -60,12 +60,17 @@ class Game
         return count($game['worms']) === 1 ? $alive === 0 : $alive <= 1;
     }
 
+    private static function moves(array $worm): bool
+    {
+        return $worm['alive'] && empty($worm['away']);
+    }
+
     private static function headOn(array $game, array $next, int $i): bool
     {
         foreach ($game['worms'] as $j => $other) {
             $sameCell = $next[$j] == $next[$i];
             $swap = $next[$i] == $other['body'][0] && $next[$j] == $game['worms'][$i]['body'][0];
-            if ($j !== $i && $other['alive'] && ($sameCell || $swap)) {
+            if ($j !== $i && self::moves($other) && ($sameCell || $swap)) {
                 return true;
             }
         }

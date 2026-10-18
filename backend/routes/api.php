@@ -26,11 +26,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rooms/{room:code}/join', [RoomController::class, 'join']);
     Route::post('/rooms/{room:code}/leave', [RoomController::class, 'leave']);
     Route::post('/rooms/{room:code}/kick/{player}', [RoomController::class, 'kick']);
+    Route::post('/rooms/{room:code}/bots', [RoomController::class, 'addBot']);
     Route::post('/rooms/{room:code}/games', [GameController::class, 'store']);
 
     // Games
     Route::get('/games/{game}', [GameController::class, 'show']);
     Route::post('/games/{game}/turn', [GameController::class, 'turn']);
+    Route::post('/games/{game}/ping', [GameController::class, 'ping']);
+    Route::post('/games/{game}/leave', [GameController::class, 'leave']);
 
     // Friends
     Route::get('/friends', [FriendController::class, 'index']);

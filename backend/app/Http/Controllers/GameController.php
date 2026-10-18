@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Game\Game as GameLogic;
 use App\Game\LiveGames;
+use App\Game\Presence;
 use App\Models\Game;
 use App\Models\Room;
 use Illuminate\Http\JsonResponse;
@@ -66,6 +67,20 @@ class GameController extends Controller
         return response()->noContent();
     }
 
+    public function ping(Request $request, Game $game): Response
+    {
+        LiveGames::seen($game->id, $this->seatOf($request, $game), now()->getTimestampMs());
+
+        return response()->noContent();
+    }
+
+    public function leave(Request $request, Game $game): Response
+    {
+        LiveGames::seen($game->id, $this->seatOf($request, $game), now()->getTimestampMs() - Presence::AWAY_MS);
+
+        return response()->noContent();
+    }
+
     private function seatOf(Request $request, Game $game): int
     {
         $player = $game->room->players()->where('user_id', $request->user()->id)->first();
@@ -80,6 +95,7 @@ class GameController extends Controller
         foreach ($room->players()->with('user')->get() as $player) {
             if (isset($state['worms'][$player->seat])) {
                 $state['worms'][$player->seat]['name'] = $player->user->name ?? 'Bot';
+                $state['worms'][$player->seat]['bot'] = $player->isBot();
             }
         }
 

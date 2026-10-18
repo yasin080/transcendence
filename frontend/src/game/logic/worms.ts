@@ -10,6 +10,7 @@ export type Worm = {
   dir: Point
   wanted: Point
   alive: boolean
+  away?: boolean
 }
 
 export function spawnWorms(board: Board, { players, startLength }: Settings): Worm[] {
