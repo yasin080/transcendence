@@ -17,9 +17,14 @@ class GameController extends Controller
 
     public function show(Request $request, Game $game): JsonResponse
     {
-        $this->seatOf($request, $game);
+        $seat = $this->seatOf($request, $game);
 
-        return response()->json([...$game->load('room:id,code,name,settings')->toArray(), 'state' => LiveGames::load($game->id)]);
+        return response()->json([
+            ...$game->load('room:id,code,name,settings')->toArray(),
+            'seat' => $seat,
+            'now' => now()->getTimestampMs(),
+            'state' => LiveGames::load($game->id),
+        ]);
     }
 
     public function store(Request $request, Room $room): JsonResponse

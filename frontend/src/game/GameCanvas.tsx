@@ -6,11 +6,9 @@ import { type Game, isOver, steer, turn } from './logic/game'
 import { type Input, listenOnline, sendInput } from './online'
 import { createGameScene } from './render/scene'
 
-const YOU = 0
+type Props = { game: Game; gameId: string; you: number; onGameOver: () => void }
 
-type Props = { game: Game; gameId: string; onGameOver: () => void }
-
-export default function GameCanvas({ game, gameId, onGameOver }: Props) {
+export default function GameCanvas({ game, gameId, you, onGameOver }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -20,13 +18,17 @@ export default function GameCanvas({ game, gameId, onGameOver }: Props) {
     const scene = createGameScene(canvas, game)
     const onTick = () => {
       scene.onTick()
-      if (!game.worms[YOU].alive || isOver(game)) onGameOver()
+      if (!game.worms[you].alive || isOver(game)) onGameOver()
     }
 
     const online = gameId !== 'demo'
     const applyLocally = (input: Input) =>
-      'side' in input ? steer(game, YOU, input.side) : turn(game, YOU, input.dir)
-    const send = online ? (input: Input) => sendInput(gameId, input) : applyLocally
+      'side' in input ? steer(game, you, input.side) : turn(game, you, input.dir)
+    const send = (input: Input) => {
+      if (!game.worms[you].alive) return
+      if (online) sendInput(gameId, input)
+      else applyLocally(input)
+    }
 
     const stopListening =
       game.settings.controls === 'dpad'
@@ -39,7 +41,7 @@ export default function GameCanvas({ game, gameId, onGameOver }: Props) {
       stopListening()
       scene.dispose()
     }
-  }, [game, gameId])
+  }, [game, gameId, you])
 
   return <canvas ref={canvasRef} className="block h-full w-full touch-none outline-none" />
 }

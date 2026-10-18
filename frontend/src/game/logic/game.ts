@@ -47,9 +47,15 @@ export function steer(game: Game, player: number, side: 'left' | 'right') {
   game.worms[player].wanted = side === 'left' ? { x: -y, y: x } : { x: y, y: -x }
 }
 
-function moveWorm(game: Game, worm: Worm) {
-  applyTurn(worm)
-  const next = nextCell(worm, game.board)
+function headOn(game: Game, next: Point[], i: number) {
+  const head = (k: number) => game.worms[k].body[0]
+  return game.worms.some(
+    (other, j) =>
+      j !== i && other.alive && (same(next[j], next[i]) || (same(next[i], head(j)) && same(next[j], head(i)))),
+  )
+}
+
+function moveWorm(game: Game, worm: Worm, next: Point) {
   const wall = cellAt(game.board, next.x, next.y) !== Cell.Empty
   if (wall || isOnWorm(game.worms, next)) {
     const hit = wall ? game.settings.wallHit : game.settings.bodyHit
@@ -66,7 +72,13 @@ function moveWorm(game: Game, worm: Worm) {
 }
 
 export function tick(game: Game) {
-  for (const worm of game.worms) if (worm.alive) moveWorm(game, worm)
+  for (const worm of game.worms) if (worm.alive) applyTurn(worm)
+  const next = game.worms.map((worm) => nextCell(worm, game.board))
+  const crashed = game.worms.map((worm, i) => worm.alive && headOn(game, next, i))
+  game.worms.forEach((worm, i) => {
+    if (crashed[i]) worm.alive = false
+    else if (worm.alive) moveWorm(game, worm, next[i])
+  })
 }
 
 export function isOver(game: Game) {

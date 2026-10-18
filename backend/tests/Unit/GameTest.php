@@ -144,4 +144,34 @@ class GameTest extends TestCase
 
         $this->assertCount(64 - 4 * 6, $game['food']);
     }
+
+    public function test_two_heads_into_the_same_cell_both_die(): void
+    {
+        $game = Game::create(['players' => 2, 'wallHit' => 'block', 'bodyHit' => 'block'] + self::SNAKE);
+        $game['food'] = [];
+        $game['worms'][0]['body'] = [['x' => 10, 'y' => 10], ['x' => 9, 'y' => 10]];
+        $game['worms'][0]['dir'] = $game['worms'][0]['wanted'] = ['x' => 1, 'y' => 0];
+        $game['worms'][1]['body'] = [['x' => 12, 'y' => 10], ['x' => 13, 'y' => 10]];
+        $game['worms'][1]['dir'] = $game['worms'][1]['wanted'] = ['x' => -1, 'y' => 0];
+
+        Game::tick($game);
+
+        $this->assertFalse($game['worms'][0]['alive']);
+        $this->assertFalse($game['worms'][1]['alive']);
+    }
+
+    public function test_two_heads_swapping_places_both_die(): void
+    {
+        $game = Game::create(['players' => 2, 'wallHit' => 'block', 'bodyHit' => 'block'] + self::SNAKE);
+        $game['food'] = [];
+        $game['worms'][0]['body'] = [['x' => 10, 'y' => 10], ['x' => 9, 'y' => 10]];
+        $game['worms'][0]['dir'] = $game['worms'][0]['wanted'] = ['x' => 1, 'y' => 0];
+        $game['worms'][1]['body'] = [['x' => 11, 'y' => 10], ['x' => 12, 'y' => 10]];
+        $game['worms'][1]['dir'] = $game['worms'][1]['wanted'] = ['x' => -1, 'y' => 0];
+
+        Game::tick($game);
+
+        $this->assertFalse($game['worms'][0]['alive']);
+        $this->assertFalse($game['worms'][1]['alive']);
+    }
 }
