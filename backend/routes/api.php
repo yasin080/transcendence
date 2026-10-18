@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rooms', [RoomController::class, 'store']);
     Route::get('/rooms/{room:code}', [RoomController::class, 'show']);
     Route::post('/rooms/{room:code}/join', [RoomController::class, 'join']);
+    Route::post('/rooms/{room:code}/bots', [RoomController::class, 'addBot']);
     Route::post('/rooms/{room:code}/games', [GameController::class, 'store']);
     Route::get('/games/{game}', [GameController::class, 'show']);
     Route::post('/games/{game}/turn', [GameController::class, 'turn']);
