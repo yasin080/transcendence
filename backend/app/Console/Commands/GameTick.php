@@ -6,6 +6,7 @@ use App\Events\GameTicked;
 use App\Game\Bot;
 use App\Game\Game as GameLogic;
 use App\Game\LiveGames;
+use App\Game\Presence;
 use App\Models\Game;
 use Illuminate\Console\Command;
 
@@ -47,6 +48,7 @@ class GameTick extends Command
         }
         $this->nextTick[$id] = ($this->nextTick[$id] ?? $now) + $state['settings']['tickMs'];
 
+        Presence::apply($state, LiveGames::lastSeen($id), (int) $now);
         Bot::play($state);
         foreach (LiveGames::takeInputs($id) as $seat => $input) {
             isset($input['side'])

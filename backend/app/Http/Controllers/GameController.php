@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Game\Game as GameLogic;
 use App\Game\LiveGames;
+use App\Game\Presence;
 use App\Models\Game;
 use App\Models\Room;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +58,20 @@ class GameController extends Controller
         abort_if($game->ended_at !== null, 409, 'This match has already ended.');
 
         LiveGames::push($game->id, $seat, $input);
+
+        return response()->noContent();
+    }
+
+    public function ping(Request $request, Game $game): Response
+    {
+        LiveGames::seen($game->id, $this->seatOf($request, $game), now()->getTimestampMs());
+
+        return response()->noContent();
+    }
+
+    public function leave(Request $request, Game $game): Response
+    {
+        LiveGames::seen($game->id, $this->seatOf($request, $game), now()->getTimestampMs() - Presence::AWAY_MS);
 
         return response()->noContent();
     }

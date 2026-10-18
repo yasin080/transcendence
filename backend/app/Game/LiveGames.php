@@ -46,9 +46,20 @@ class LiveGames
         return array_map(fn ($json) => json_decode($json, true), $inputs ?: []);
     }
 
+    public static function seen(int $id, int $seat, int $at): void
+    {
+        Redis::hset("game:$id:seen", $seat, $at);
+    }
+
+    public static function lastSeen(int $id): array
+    {
+        return array_map('intval', Redis::hgetall("game:$id:seen") ?: []);
+    }
+
     public static function finish(int $id): void
     {
         Redis::srem(self::ACTIVE, $id);
         Redis::expire("game:$id", 3600);
+        Redis::del("game:$id:seen");
     }
 }

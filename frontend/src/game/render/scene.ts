@@ -69,7 +69,7 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
   scene.onBeforeRenderObservable.add(() => {
     elapsed += engine.getDeltaTime()
     const t = Math.min(elapsed / game.settings.tickMs, 1)
-    updateWorms.forEach((update, i) => update(previous[i], current[i], t))
+    updateWorms.forEach((update, i) => update(previous[i], current[i], t, !!worms[i].away))
     updateFood(game.food)
     if (follow) {
       const head = Vector3.Lerp(toWorld(board, previous[0][0]), toWorld(board, current[0][0]), t)

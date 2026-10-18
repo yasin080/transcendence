@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { listenToDpad, listenToTurns } from './keyboard'
 import { runLocally } from './local'
 import { type Game, isOver, steer, turn } from './logic/game'
-import { type Input, listenOnline, sendInput } from './online'
+import { type Input, listenOnline, reportPresence, sendInput } from './online'
 import { createGameScene } from './render/scene'
 
 type Props = { game: Game; gameId: string; you: number; onGameOver: () => void }
@@ -35,9 +35,11 @@ export default function GameCanvas({ game, gameId, you, onGameOver }: Props) {
         ? listenToDpad((dir) => send({ dir }))
         : listenToTurns((side) => send({ side }))
     const stopRunning = online ? listenOnline(gameId, game, onTick) : runLocally(game, onTick)
+    const stopReporting = online ? reportPresence(gameId) : () => {}
 
     return () => {
       stopRunning()
+      stopReporting()
       stopListening()
       scene.dispose()
     }
