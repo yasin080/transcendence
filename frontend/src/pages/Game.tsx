@@ -44,15 +44,21 @@ export default function Game() {
   }, [over])
 
   return (
-    <div className="relative h-screen overflow-hidden bg-void text-white">
-      {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} />}
+    <div className="flex h-screen flex-col overflow-hidden bg-void text-white">
+      <header className="flex h-11 flex-none items-center border-b border-line px-4 text-sm text-fg-muted">
+        scoreboard
+      </header>
 
-      <Link
-        to="/lobby"
-        className="absolute left-4 top-4 rounded-xl border border-line bg-void/60 px-3 py-1.5 text-sm text-fg-secondary backdrop-blur-sm transition hover:border-line-strong hover:text-white"
-      >
-        ← Back to lobby
-      </Link>
+      <div className="relative min-h-0 flex-1">
+        {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} />}
+
+        <Link
+          to="/lobby"
+          className="absolute left-4 top-4 rounded-xl border border-line bg-void/60 px-3 py-1.5 text-sm text-fg-secondary backdrop-blur-sm transition hover:border-line-strong hover:text-white"
+        >
+          ← Back to lobby
+        </Link>
+      </div>
 
       {countdownEnd > 0 && match && (
         <CountdownOverlay endsAt={countdownEnd} controls={match.game.settings.controls} onDone={() => setCountdownEnd(0)} />
