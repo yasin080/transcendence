@@ -18,7 +18,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::get('/user', fn (Request $request) => response()->json(['user' => $request->user()]));
 
 Route::middleware('auth:sanctum')->group(function () {
-    // Rooms: rutas literales antes de {room:code}
+    // Rooms
     Route::get('/rooms', [RoomController::class, 'index']);
     Route::post('/rooms', [RoomController::class, 'store']);
     Route::get('/rooms/current', [RoomController::class, 'current']);
