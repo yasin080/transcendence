@@ -121,7 +121,7 @@ export default function WaitingRoom() {
   const playerCount = room.players.length
   const maxPlayers = room.settings.players
   const hasFreeSeat = playerCount < maxPlayers
-  const canStart = playerCount === maxPlayers
+  const canStart = playerCount > 0
   
 
   return (

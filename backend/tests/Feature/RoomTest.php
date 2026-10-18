@@ -70,11 +70,11 @@ class RoomTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $this->postJson('/api/rooms', ['name' => '', 'settings' => ['players' => 9, 'wallHit' => 'explode'] + self::SNAKE])
-            ->assertUnprocessable()
+            ->assertFails(422)
             ->assertJsonValidationErrors(['name', 'settings.players', 'settings.wallHit']);
 
         $this->postJson('/api/rooms', ['name' => 'Extra', 'settings' => self::SNAKE + ['cheat' => true]])
-            ->assertUnprocessable()
+            ->assertFails(422)
             ->assertJsonValidationErrors(['settings']);
     }
 
@@ -108,17 +108,32 @@ class RoomTest extends TestCase
         $room = $this->createRoom(User::factory()->create());
 
         $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
-        $this->postJson("/api/rooms/{$room->code}/games")->assertConflict();
+        $this->postJson("/api/rooms/{$room->code}/games")->assertFails(409);
         $this->assertDatabaseCount('games', 1);
     }
 
-    public function test_a_match_cannot_start_until_the_room_is_full(): void
+    public function test_a_match_starts_with_whoever_is_seated(): void
     {
-        $room = $this->createRoom(User::factory()->create(), players: 2);
+        $room = $this->createRoom(User::factory()->create(), players: 4);
+        $this->postJson("/api/rooms/{$room->code}/bots");
 
-        $this->postJson("/api/rooms/{$room->code}/games")->assertConflict();
-        $this->assertSame('open', $room->fresh()->status);
-        $this->assertDatabaseCount('games', 0);
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->assertCreated()->json('id');
+
+        $this->assertCount(2, LiveGames::load($gameId)['worms']);
+    }
+
+    public function test_starting_closes_the_gaps_left_in_the_seats(): void
+    {
+        $room = $this->createRoom(User::factory()->create(), players: 4);
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join");
+        $this->actingAs($room->host)->postJson("/api/rooms/{$room->code}/bots");
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/leave");
+
+        $gameId = $this->actingAs($room->host)->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->assertSame([0, 1], $room->players()->orderBy('seat')->pluck('seat')->all());
+        $this->assertTrue(LiveGames::load($gameId)['worms'][1]['bot']);
     }
 
     public function test_starting_a_match_notifies_the_room(): void
@@ -172,7 +187,7 @@ class RoomTest extends TestCase
         $this->postJson("/api/rooms/{$first->code}/join")->assertOk();
 
         $this->postJson("/api/rooms/{$second->code}/join")
-            ->assertConflict()
+            ->assertFails(409)
             ->assertJsonPath('message', 'You are already in another room');
         $this->assertFalse($second->players()->where('user_id', $guest->id)->exists());
     }
@@ -182,7 +197,7 @@ class RoomTest extends TestCase
         $this->createRoom(User::factory()->create());
 
         $this->postJson('/api/rooms', ['name' => 'Second', 'settings' => self::SNAKE])
-            ->assertConflict()
+            ->assertFails(409)
             ->assertJsonPath('message', 'You are already in another room');
         $this->assertDatabaseCount('rooms', 1);
     }
@@ -242,8 +257,8 @@ class RoomTest extends TestCase
         $room = $this->createRoom(User::factory()->create());
         $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
 
-        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'up'])->assertUnprocessable();
-        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 5, 'y' => 0]])->assertUnprocessable();
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'up'])->assertFails(422);
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 5, 'y' => 0]])->assertFails(422);
 
         $this->actingAs(User::factory()->create());
         $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertForbidden();
@@ -261,7 +276,7 @@ class RoomTest extends TestCase
         $this->assertDatabaseCount('room_players', 2);
 
         $this->actingAs(User::factory()->create());
-        $this->postJson("/api/rooms/{$code}/join")->assertConflict();
+        $this->postJson("/api/rooms/{$code}/join")->assertFails(409);
     }
 
     public function test_nobody_can_join_a_started_match(): void
@@ -270,7 +285,7 @@ class RoomTest extends TestCase
         $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
         $this->actingAs(User::factory()->create());
 
-        $this->postJson("/api/rooms/{$room->code}/join")->assertConflict();
+        $this->postJson("/api/rooms/{$room->code}/join")->assertFails(409);
     }
 
     public function test_each_player_gets_their_own_worm(): void
@@ -293,7 +308,7 @@ class RoomTest extends TestCase
         $code = $this->postJson('/api/rooms', ['name' => 'Duel', 'settings' => ['players' => 2] + self::SNAKE])->json('code');
 
         $this->postJson("/api/rooms/{$code}/bots")->assertOk()->assertJsonPath('players.1.user_id', null)->assertJsonPath('players.1.seat', 1);
-        $this->postJson("/api/rooms/{$code}/bots")->assertConflict();
+        $this->postJson("/api/rooms/{$code}/bots")->assertFails(409);
         $this->assertDatabaseCount('room_players', 2);
     }
 
@@ -310,7 +325,7 @@ class RoomTest extends TestCase
         $room = $this->createRoom(User::factory()->create());
         $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
 
-        $this->postJson("/api/rooms/{$room->code}/bots")->assertConflict();
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertFails(409);
     }
 
     public function test_bot_worms_are_marked_in_the_live_state(): void
@@ -388,7 +403,7 @@ class RoomTest extends TestCase
         $otherSeat = $other->players()->firstOrFail();
         $this->actingAs($host);
 
-        $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertUnprocessable();
+        $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertFails(422);
         $this->postJson("/api/rooms/{$room->code}/kick/{$otherSeat->id}")->assertNotFound();
         $this->assertDatabaseCount('room_players', 2);
     }

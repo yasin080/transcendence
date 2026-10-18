@@ -4,6 +4,7 @@ import { DirectionalLight } from '@babylonjs/core/Lights/directionalLight'
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight'
 import { Color3, Color4 } from '@babylonjs/core/Maths/math.color'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { Logger } from '@babylonjs/core/Misc/logger'
 import { DefaultRenderingPipeline } from '@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline'
 import { Scene } from '@babylonjs/core/scene'
 
@@ -18,6 +19,8 @@ import { createWorms, type WormUpdate } from './worms'
 export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
   const { board, worms } = game
 
+  // Keep Babylon's warnings and errors, drop its version banner from the console.
+  Logger.LogLevels = Logger.WarningLogLevel | Logger.ErrorLogLevel
   const engine = new Engine(canvas, true, { stencil: false }, true)
   const scene = new Scene(engine)
   scene.clearColor = new Color4(0.045, 0.04, 0.085, 1)

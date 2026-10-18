@@ -96,14 +96,17 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
   if (response.status === 204) return { ok: true, data: undefined as T }
 
   const payload: unknown = await response.json().catch(() => null)
-  const record = (payload ?? null) as { message?: unknown; errors?: unknown } | null
+  const record = (payload ?? null) as { ok?: unknown; status?: unknown; message?: unknown; errors?: unknown } | null
 
-  if (!response.ok) {
+  // Expected failures (validation, conflict, rate limit) arrive as 200 with
+  // ok:false so Chrome does not log them; the real status is in the body.
+  if (!response.ok || record?.ok === false) {
+    const status = response.ok ? Number(record?.status) : response.status
     return {
       ok: false,
       failure: {
-        status: response.status,
-        message: messageFor(response.status, record),
+        status,
+        message: messageFor(status, record),
         errors: (record?.errors ?? {}) as FieldErrors,
       },
     }

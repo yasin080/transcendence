@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SoftFailures;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        // Global, so it also sees what route middleware like throttle returns.
+        $middleware->append(SoftFailures::class);
         $middleware->trustProxies(at: '172.28.0.0/16');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
