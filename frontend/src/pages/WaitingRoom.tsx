@@ -30,11 +30,11 @@ export default function WaitingRoom() {
   const { roomId } = useParams()
   const [room, setRoom] = useState<Room | null>(null)
   const [error, setError] = useState<string | null>(null)
-    
+  const [startError, setStartError] = useState<string | null>(null)
+
   const preview = searchParams.get('preview')
-  const initialPhase =
-    preview === 'closed' || preview === 'kicked' || preview === 'countdown' ? preview : 'waiting'
-  const [phase, setPhase] = useState<'waiting' | 'countdown' | 'closed' | 'kicked'>(initialPhase)
+  const initialPhase = preview === 'closed' || preview === 'kicked' ? preview : 'waiting'
+  const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>(initialPhase)
 
 
   // Se une al entrar (no solo lee la sala): así entrar por URL también ocupa
@@ -60,8 +60,11 @@ export default function WaitingRoom() {
       const stillIn = e.room.players.some((p) => p.user_id === user?.id)
       if (!stillIn) setPhase('kicked')
     })
+    channel.listen('.match.started', (e: { gameId: number }) => {
+      navigate(`/game/${e.gameId}`)
+    })
     return () => echo.leave(`room.${roomId}`)
-  }, [roomId, joined, user?.id])
+  }, [roomId, joined, user?.id, navigate])
 
 
 
@@ -71,6 +74,14 @@ export default function WaitingRoom() {
     echo.leave(`room.${roomId}`)
     await apiPost(`/api/rooms/${roomId}/leave`)
     navigate('/lobby')
+  }
+
+  // Solo pide empezar; la navegación llega por el evento match.started.
+  async function startMatch() {
+    if (!roomId) return
+    setStartError(null)
+    const result = await apiPost(`/api/rooms/${roomId}/games`)
+    if (!result.ok) setStartError(result.failure.message)
   }
 
   if (error) return <p>{error}</p>
@@ -102,7 +113,7 @@ export default function WaitingRoom() {
   const playerCount = room.players.length
   const maxPlayers = room.settings.players
   const hasFreeSeat = playerCount < maxPlayers
-  const canStart = playerCount >= 1
+  const canStart = playerCount === maxPlayers
   
 
   return (
@@ -119,9 +130,10 @@ export default function WaitingRoom() {
         maxPlayers={maxPlayers}
         settings={MOCK_SETTINGS}
         canStart={canStart}
-        onStart={() => setPhase('countdown')}
+        onStart={startMatch}
         onLeave={leaveRoom}
       />
+      {startError && <p className="mt-2 text-sm text-fuse-400">{startError}</p>}
       <PlayerGrid
         players={players}
         maxPlayers={maxPlayers}

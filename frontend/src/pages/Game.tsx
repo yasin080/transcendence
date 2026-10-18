@@ -34,7 +34,7 @@ export default function Game() {
 
   function backToRoom() {
     if (!match?.roomCode) return navigate('/lobby')
-    navigate(`/dev/match?room=${match.roomCode}&after=${gameId}`)
+    navigate(`/waiting-room/${match.roomCode}`)
   }
 
   useEffect(() => {

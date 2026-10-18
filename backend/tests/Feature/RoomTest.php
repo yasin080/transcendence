@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Events\MatchStarted;
 use App\Game\LiveGames;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
@@ -107,6 +109,25 @@ class RoomTest extends TestCase
         $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
         $this->postJson("/api/rooms/{$room->code}/games")->assertConflict();
         $this->assertDatabaseCount('games', 1);
+    }
+
+    public function test_a_match_cannot_start_until_the_room_is_full(): void
+    {
+        $room = $this->createRoom(User::factory()->create(), players: 2);
+
+        $this->postJson("/api/rooms/{$room->code}/games")->assertConflict();
+        $this->assertSame('open', $room->fresh()->status);
+        $this->assertDatabaseCount('games', 0);
+    }
+
+    public function test_starting_a_match_notifies_the_room(): void
+    {
+        Event::fake([MatchStarted::class]);
+        $room = $this->createRoom(User::factory()->create());
+
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        Event::assertDispatched(MatchStarted::class, fn (MatchStarted $e) => $e->gameId === $gameId && $e->room->is($room));
     }
 
     public function test_a_player_can_load_their_match(): void

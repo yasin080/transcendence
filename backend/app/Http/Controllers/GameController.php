@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Events\LobbyRoomUpdated;
+use App\Events\MatchStarted;
 
 class GameController extends Controller
 {
@@ -35,6 +36,7 @@ class GameController extends Controller
         $game = DB::transaction(function () use ($room) {
             $room = Room::lockForUpdate()->find($room->id);
             abort_unless($room->status === 'open', 409, 'This match has already started.');
+            abort_if($room->players()->count() < $room->settings['players'], 409, 'The room is not full yet.');
 
             $room->update(['status' => 'playing']);
 
@@ -43,6 +45,7 @@ class GameController extends Controller
 
         LiveGames::start($game->id, $this->initialState($room));
 
+        MatchStarted::dispatch($room, $game->id);
         LobbyRoomUpdated::dispatch($room->refresh());
         return response()->json($game, 201);
     }
