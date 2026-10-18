@@ -37,8 +37,10 @@ export default function Lobby() {
   // null = todavía cargando
   const [rooms, setRooms] = useState<RoomSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // Código de la sala en la que ya tengo asiento (null = en ninguna)
+  const [myRoomCode, setMyRoomCode] = useState<string | null>(null)
 
-  // Pide las salas una vez, al entrar en el lobby
+  // Pide las salas y mi sala actual una vez, al entrar en el lobby
   useEffect(() => {
     let cancelled = false
 
@@ -48,7 +50,15 @@ export default function Lobby() {
       else setError(result.failure.message)
     })
 
+    void apiGet<{ code: string | null }>('/api/rooms/current').then((result) => {
+      if (!cancelled && result.ok) setMyRoomCode(result.data.code)
+    })
+
     echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {
+    // Si cierran o termina mi sala, ya no estoy en ninguna
+    if (room.status === 'closed' || room.status === 'finished') {
+      setMyRoomCode((prev) => (prev === room.code ? null : prev))
+    }
     setRooms((prev) => {
       const list = prev ?? []
       if (room.status === 'closed' || room.status === 'finished') {
@@ -67,9 +77,14 @@ export default function Lobby() {
 
   const [joinError, setJoinError] = useState<string | null>(null)
 
-  // Primero ocupa un asiento en el backend; solo si lo consigue entra en la sala
+  // Primero ocupa un asiento en el backend; solo si lo consigue entra en la sala.
+  // Si ya tengo asiento en ella, entro directamente.
   async function joinRoom(room: RoomSummary) {
     setJoinError(null)
+    if (room.code === myRoomCode) {
+      navigate(`/waiting-room/${room.code}`)
+      return
+    }
     const result = await apiPost(`/api/rooms/${room.code}/join`)
     if (result.ok) navigate(`/waiting-room/${room.code}`)
     else setJoinError(result.failure.message)
@@ -136,8 +151,10 @@ export default function Lobby() {
 
         <button
           type="button"
+          disabled={myRoomCode !== null}
+          title={myRoomCode ? 'You are already in another room' : undefined}
           onClick={() => setCreatingRoom(true)}
-          className="px-4 py-2 rounded-[10px] border border-white/12 bg-white/5 text-[13px] font-bold text-white cursor-pointer hover:bg-white/12"
+          className="px-4 py-2 rounded-[10px] border border-white/12 bg-white/5 text-[13px] font-bold text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-40"
         >
           + Create room
         </button>
@@ -156,6 +173,8 @@ export default function Lobby() {
             key={room.id}
             room={room}
             onJoin={joinRoom}
+            isMine={room.code === myRoomCode}
+            locked={myRoomCode !== null && room.code !== myRoomCode}
           />
         ))}
       </div>

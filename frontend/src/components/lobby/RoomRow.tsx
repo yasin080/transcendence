@@ -4,6 +4,10 @@ import type { RoomSummary } from './types.ts'
 interface RoomRowProps {
   room: RoomSummary
   onJoin: (room: RoomSummary) => void
+  // Ya tengo asiento en esta sala: "Enter" en vez de "Join", aunque esté llena
+  isMine: boolean
+  // Tengo asiento en otra sala: no puedo unirme a esta
+  locked: boolean
 }
 
 // Cabecera y filas comparten columnas y relleno para quedar alineadas.
@@ -13,7 +17,7 @@ const ROW_LAYOUT = 'grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_6.5rem] items
 
 // Fila: nombre · tablero · velocidad · plazas + botón.
 // Punto verde = sala abierta (Join), naranja = en partida ("In game", sin botón).
-export default function RoomRow({ room, onJoin }: RoomRowProps) {
+export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) {
   const playing = room.status === 'playing'
   const full = room.players_count >= room.settings.players
 
@@ -43,11 +47,12 @@ export default function RoomRow({ room, onJoin }: RoomRowProps) {
       ) : (
         <button
           type="button"
-          disabled={full}
+          disabled={!isMine && (full || locked)}
+          title={locked ? 'You are already in another room' : undefined}
           onClick={() => onJoin(room)}
           className="py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Join
+          {isMine ? 'Enter' : 'Join'}
         </button>
       )}
     </div>

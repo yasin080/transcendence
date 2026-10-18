@@ -27,10 +27,12 @@ class RoomTest extends TestCase
         'camera' => 'board',
     ];
 
-    private function createRoom(User $host): Room
+    // El nombre tiene que ser único entre las salas activas
+    private function createRoom(User $host, int $players = 1, string $name = 'Snake night'): Room
     {
         $this->actingAs($host);
-        $code = $this->postJson('/api/rooms', ['name' => 'Snake night', 'settings' => self::SNAKE])->json('code');
+        $settings = ['players' => $players] + self::SNAKE;
+        $code = $this->postJson('/api/rooms', ['name' => $name, 'settings' => $settings])->json('code');
 
         return Room::where('code', $code)->firstOrFail();
     }
@@ -118,5 +120,65 @@ class RoomTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $this->getJson("/api/games/{$gameId}")->assertForbidden();
+    }
+
+    public function test_a_player_can_rejoin_their_room_even_if_it_is_full(): void
+    {
+        $room = $this->createRoom(User::factory()->create(), players: 2);
+        $guest = User::factory()->create();
+        $this->actingAs($guest);
+        $this->postJson("/api/rooms/{$room->code}/join")->assertOk();
+
+        $this->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $this->assertSame(2, $room->players()->count());
+    }
+
+    public function test_a_player_cannot_join_a_second_room(): void
+    {
+        $first = $this->createRoom(User::factory()->create(), players: 2);
+        $second = $this->createRoom(User::factory()->create(), players: 2, name: 'Second room');
+        $guest = User::factory()->create();
+        $this->actingAs($guest);
+        $this->postJson("/api/rooms/{$first->code}/join")->assertOk();
+
+        $this->postJson("/api/rooms/{$second->code}/join")
+            ->assertConflict()
+            ->assertJsonPath('message', 'You are already in another room');
+        $this->assertFalse($second->players()->where('user_id', $guest->id)->exists());
+    }
+
+    public function test_a_player_in_a_room_cannot_create_another(): void
+    {
+        $this->createRoom(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Second', 'settings' => self::SNAKE])
+            ->assertConflict()
+            ->assertJsonPath('message', 'You are already in another room');
+        $this->assertDatabaseCount('rooms', 1);
+    }
+
+    public function test_a_player_can_join_another_room_after_leaving(): void
+    {
+        $first = $this->createRoom(User::factory()->create(), players: 2);
+        $second = $this->createRoom(User::factory()->create(), players: 2, name: 'Second room');
+        $this->actingAs(User::factory()->create());
+        $this->postJson("/api/rooms/{$first->code}/join")->assertOk();
+        $this->postJson("/api/rooms/{$first->code}/leave")->assertNoContent();
+
+        $this->postJson("/api/rooms/{$second->code}/join")->assertOk();
+    }
+
+    public function test_current_returns_the_players_room(): void
+    {
+        $host = User::factory()->create();
+        $this->actingAs($host);
+        $this->getJson('/api/rooms/current')->assertOk()->assertExactJson(['code' => null]);
+
+        $room = $this->createRoom($host);
+        $this->getJson('/api/rooms/current')->assertExactJson(['code' => $room->code]);
+
+        // El host sale: la sala se cierra y deja de contar
+        $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
+        $this->getJson('/api/rooms/current')->assertExactJson(['code' => null]);
     }
 }
