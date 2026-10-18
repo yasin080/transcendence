@@ -1,15 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
-import GameRow from '../components/lobby/GameRow.tsx'
-import { MOCK_GAMES } from '../components/lobby/mockGames.ts'
+import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
+import type { RoomSummary } from '../components/lobby/types.ts'
 import { startQuickMatch } from '../game/api.ts'
+import { apiGet, apiPost } from '../lib/api.ts'
+import { echo } from '../lib/echo'
+
+
+
+const PAGE_SIZE = 6
 
 const GAME_MODES = ['Bomberman', 'Snake', 'Other'] as const
 type GameMode = (typeof GAME_MODES)[number]
 
-const PAGE_SIZE = 6
 
 export default function Lobby() {
   const [selectedMode, setSelectedMode] = useState<GameMode>(GAME_MODES[0])
@@ -25,11 +30,71 @@ export default function Lobby() {
     else setPlayError(true)
   }
 
-  // [RETOMAR] Con API, el filtro y la paginación los hará el servidor.
-  const openGames = MOCK_GAMES.filter((g) => g.status !== 'finished')
-  const pageCount = Math.max(1, Math.ceil(openGames.length / PAGE_SIZE))
+
+
+  // null = todavía cargando
+  const [rooms, setRooms] = useState<RoomSummary[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  // Código de la sala en la que ya tengo asiento (null = en ninguna)
+  const [myRoomCode, setMyRoomCode] = useState<string | null>(null)
+
+  // Pide las salas y mi sala actual una vez, al entrar en el lobby
+  useEffect(() => {
+    let cancelled = false
+
+    void apiGet<RoomSummary[]>('/api/rooms').then((result) => {
+      if (cancelled) return
+      if (result.ok) setRooms(result.data)
+      else setError(result.failure.message)
+    })
+
+    void apiGet<{ code: string | null }>('/api/rooms/current').then((result) => {
+      if (!cancelled && result.ok) setMyRoomCode(result.data.code)
+    })
+
+    echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {
+    // Si cierran o termina mi sala, ya no estoy en ninguna
+    if (room.status === 'closed' || room.status === 'finished') {
+      setMyRoomCode((prev) => (prev === room.code ? null : prev))
+    }
+    setRooms((prev) => {
+      const list = prev ?? []
+      if (room.status === 'closed' || room.status === 'finished') {
+        return list.filter((r) => r.id !== room.id)
+      }
+      const exists = list.some((r) => r.id === room.id)
+      return exists ? list.map((r) => (r.id === room.id ? room : r)) : [room, ...list]
+    })
+  })
+
+    return () => {
+      cancelled = true
+      echo.leave('lobby')
+    }
+  }, [])
+
+  const [joinError, setJoinError] = useState<string | null>(null)
+
+  // Primero ocupa un asiento en el backend; solo si lo consigue entra en la sala.
+  // Si ya tengo asiento en ella, entro directamente.
+  async function joinRoom(room: RoomSummary) {
+    setJoinError(null)
+    if (room.code === myRoomCode) {
+      navigate(`/waiting-room/${room.code}`)
+      return
+    }
+    const result = await apiPost(`/api/rooms/${room.code}/join`)
+    if (result.ok) navigate(`/waiting-room/${room.code}`)
+    else setJoinError(result.failure.message)
+  }
+
+
+  
+  const roomList = rooms ?? []
+  const pageCount = Math.max(1, Math.ceil(roomList.length / PAGE_SIZE))
   const firstIndex = (page - 1) * PAGE_SIZE
-  const pageGames = openGames.slice(firstIndex, firstIndex + PAGE_SIZE)
+  const pageRooms = roomList.slice(firstIndex, firstIndex + PAGE_SIZE)
+
 
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8">
@@ -75,11 +140,14 @@ export default function Lobby() {
       <div className="flex items-center gap-3.5 mt-[26px] mb-3">
         <h3 className="text-sm font-bold uppercase tracking-[.16em] text-white/60">Open rooms</h3>
         <span className="h-px flex-1 bg-white/10" />
-        <span className="text-xs text-white/40">{openGames.length} rooms</span>
+        <span className="text-xs text-white/40">{roomList.length} rooms</span>
+
         <button
           type="button"
+          disabled={myRoomCode !== null}
+          title={myRoomCode ? 'You are already in another room' : undefined}
           onClick={() => setCreatingRoom(true)}
-          className="px-4 py-2 rounded-[10px] border border-white/12 bg-white/5 text-[13px] font-bold text-white cursor-pointer hover:bg-white/12"
+          className="px-4 py-2 rounded-[10px] border border-white/12 bg-white/5 text-[13px] font-bold text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-40"
         >
           + Create room
         </button>
@@ -88,23 +156,36 @@ export default function Lobby() {
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 
       <div className="flex flex-col gap-2">
-        {pageGames.map((game) => (
-          <GameRow
-            key={game.id}
-            game={game}
-            onJoin={(g) => navigate(`/lobby/waiting-room/${g.id}`)}
-            onSpectate={(g) => navigate(`/game/${g.id}`)}
+        {error && <p className="text-sm text-fuse-600">{error}</p>}
+        {joinError && <p className="text-sm text-fuse-600">{joinError}</p>}
+        {!error && rooms === null && <p className="text-sm text-white/45">Loading rooms…</p>}
+        {rooms?.length === 0 && <p className="text-sm text-white/45">No open rooms yet. Create one!</p>}
+        {pageRooms.length > 0 && <RoomListHeader />}
+        {pageRooms.map((room) => (
+          <RoomRow
+            key={room.id}
+            room={room}
+            onJoin={joinRoom}
+            isMine={room.code === myRoomCode}
+            locked={myRoomCode !== null && room.code !== myRoomCode}
           />
         ))}
       </div>
 
-      {/* Paginador */}
-      <div className="flex items-center gap-2.5 mt-3.5">
-        <span className="text-xs text-white/40">
-          Showing {firstIndex + 1}–{firstIndex + pageGames.length} of {openGames.length}
-        </span>
 
-        <div className="ml-auto flex items-center gap-1.5">
+      {/* Paginador */}
+      
+        <div className="flex items-center gap-2.5 mt-3.5">
+          {roomList.length > 0 && (
+          <span className="text-xs text-white/40">
+
+              Showing {firstIndex + 1}–{firstIndex + pageRooms.length} of {roomList.length}
+
+          </span>
+          )}
+
+          <div className="ml-auto flex items-center gap-1.5">
+     
           <button
             type="button"
             disabled={page === 1}

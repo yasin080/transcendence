@@ -2,6 +2,7 @@
 
 use App\Models\Game;
 use Illuminate\Support\Facades\Broadcast;
+use App\Models\Room;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
@@ -10,3 +11,11 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('game.{game}', function ($user, Game $game) {
     return $game->room->players()->where('user_id', $user->id)->exists();
 });
+
+Broadcast::channel('room.{code}', function ($user, $code) {
+    return Room::where('code', $code)
+        ->whereHas('players', fn ($q) => $q->where('user_id', $user->id))
+        ->exists();
+});
+
+Broadcast::channel('lobby', fn ($user) => true);

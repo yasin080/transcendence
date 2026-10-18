@@ -81,4 +81,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the room the user is currently in.
+     */
+      public function currentRoom(): ?Room
+    {
+        return Room::whereIn('status', ['open', 'playing'])
+            ->whereHas('players', fn ($q) => $q->where('user_id', $this->id))
+            ->first();
+    }
 }

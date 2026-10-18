@@ -1,19 +1,24 @@
 import { BotIcon } from '../left-sidebar/ui/Icons.tsx'
 
 interface WaitingRoomHeaderProps {
+  roomName: string
   isOwner: boolean
   hasFreeSeat: boolean
   onAddBot: () => void
 }
 
 export default function WaitingRoomHeader({
+  roomName,
   isOwner,
   hasFreeSeat,
   onAddBot,
 }: WaitingRoomHeaderProps) {
   return (
     <header className="mb-5 flex flex-wrap items-center gap-4">
-      <h1 className="min-w-0 display-heading">Waiting room</h1>
+      <div className="min-w-0">
+        <div className="text-eyebrow">Waiting room</div>
+        <h1 className="truncate display-title">{roomName}</h1>
+      </div>
 
       <div className="ml-auto flex items-center gap-2.5">
         <span className="inline-flex items-center gap-2 rounded-full border border-line bg-void/50 px-3.5 py-2 text-meta">

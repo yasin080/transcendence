@@ -1,6 +1,5 @@
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
-
 import { apiPost } from './api'
 
 declare global {
