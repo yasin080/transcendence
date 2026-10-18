@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Database\UniqueConstraintViolationException;
 use App\Events\RoomPlayersUpdated;
 use App\Events\LobbyRoomUpdated;
@@ -63,30 +62,6 @@ class RoomController extends Controller
         return response()->json($room->load('players'), 201);
     }
 
-    public function show(Room $room): JsonResponse
-    {
-        return response()->json($room->load('players.user:id,name', 'games:id,room_id'));
-    }
-
-    public function join(Request $request, Room $room): JsonResponse
-    {
-        DB::transaction(function () use ($request, $room) {
-            $room = Room::lockForUpdate()->find($room->id);
-            abort_unless($room->status === 'open', 409, 'This match has already started.');
-
-            $seats = $room->players()->pluck('seat', 'user_id');
-            if ($seats->has($request->user()->id)) {
-                return;
-            }
-            $free = collect(range(0, $room->settings['players'] - 1))->diff($seats)->first();
-            abort_if($free === null, 409, 'This room is full.');
-
-            $room->players()->create(['user_id' => $request->user()->id, 'seat' => $free]);
-        });
-
-        return $this->show($room);
-    }
-
     private function newCode(): string
     {
         do {
@@ -98,7 +73,8 @@ class RoomController extends Controller
 
     public function show(Room $room): JsonResponse
     {
-        return response()->json($this->withPlayers($room));
+        // DevMatch usa games para saber a qué partida ir
+        return response()->json($this->withPlayers($room)->load('games:id,room_id'));
     }
 
     public function join(Request $request, Room $room): JsonResponse

@@ -264,4 +264,56 @@ class RoomTest extends TestCase
         $this->actingAs($guest)->postJson("/api/games/{$gameId}/turn", ['side' => 'left']);
         $this->assertSame([1 => ['side' => 'left']], LiveGames::takeInputs($gameId));
     }
+
+    public function test_show_returns_the_players_and_games(): void
+    {
+        $host = User::factory()->create(['name' => 'Host']);
+        $room = $this->createRoom($host);
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->getJson("/api/rooms/{$room->code}")
+            ->assertOk()
+            ->assertJsonPath('players.0.user.name', 'Host')
+            ->assertJsonPath('games.0.id', $gameId);
+    }
+
+    public function test_the_host_can_kick_a_player(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 2);
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $player = $room->players()->where('user_id', $guest->id)->firstOrFail();
+
+        $this->actingAs($host)->postJson("/api/rooms/{$room->code}/kick/{$player->id}")->assertNoContent();
+
+        $this->assertFalse($room->players()->where('user_id', $guest->id)->exists());
+        // El asiento queda libre para otro jugador
+        $this->actingAs(User::factory()->create())->postJson("/api/rooms/{$room->code}/join")->assertOk();
+    }
+
+    public function test_only_the_host_can_kick(): void
+    {
+        $room = $this->createRoom(User::factory()->create(), players: 2);
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $hostSeat = $room->players()->where('user_id', $room->host_id)->firstOrFail();
+
+        $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertForbidden();
+        $this->assertSame(2, $room->players()->count());
+    }
+
+    public function test_the_host_cannot_kick_themselves_or_players_of_another_room(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 2);
+        $other = $this->createRoom(User::factory()->create(), players: 2, name: 'Other room');
+        $hostSeat = $room->players()->where('user_id', $host->id)->firstOrFail();
+        $otherSeat = $other->players()->firstOrFail();
+        $this->actingAs($host);
+
+        $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertUnprocessable();
+        $this->postJson("/api/rooms/{$room->code}/kick/{$otherSeat->id}")->assertNotFound();
+        $this->assertDatabaseCount('room_players', 2);
+    }
 }
