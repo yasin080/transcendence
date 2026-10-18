@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Game\LiveGames;
+use App\Game\Presence;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -240,5 +241,20 @@ class RoomTest extends TestCase
             ->assertJsonPath('state.worms.0.bot', false)
             ->assertJsonPath('state.worms.1.bot', true)
             ->assertJsonPath('state.worms.1.name', 'Bot');
+    }
+
+    public function test_a_player_reports_presence_and_leaving(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->postJson("/api/games/{$gameId}/ping")->assertNoContent();
+        $this->assertEqualsWithDelta(now()->getTimestampMs(), LiveGames::lastSeen($gameId)[0], 1000);
+
+        $this->postJson("/api/games/{$gameId}/leave")->assertNoContent();
+        $this->assertEqualsWithDelta(now()->getTimestampMs() - Presence::AWAY_MS, LiveGames::lastSeen($gameId)[0], 1000);
+
+        $this->actingAs(User::factory()->create());
+        $this->postJson("/api/games/{$gameId}/ping")->assertForbidden();
     }
 }

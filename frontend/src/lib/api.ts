@@ -57,7 +57,7 @@ function messageFor(status: number, payload: { message?: unknown } | null): stri
   return 'Something went wrong. Please try again.'
 }
 
-async function request<T>(method: string, path: string, body?: unknown, retry = true): Promise<ApiResult<T>> {
+async function request<T>(method: string, path: string, body?: unknown, retry = true, keepalive = false): Promise<ApiResult<T>> {
   if (method !== 'GET') await ensureCsrfCookie()
 
   const headers: Record<string, string> = { Accept: 'application/json' }
@@ -73,6 +73,7 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
       method,
       credentials: 'include',
       headers,
+      keepalive,
       body: body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
@@ -113,4 +114,5 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
 
 export const apiGet = <T>(path: string) => request<T>('GET', path)
 export const apiPost = <T>(path: string, body?: unknown) => request<T>('POST', path, body)
+export const apiPostOnClose = (path: string) => request('POST', path, undefined, true, true)
 export const apiDelete = <T>(path: string) => request<T>('DELETE', path)

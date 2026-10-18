@@ -25,6 +25,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rooms/{room:code}/games', [GameController::class, 'store']);
     Route::get('/games/{game}', [GameController::class, 'show']);
     Route::post('/games/{game}/turn', [GameController::class, 'turn']);
+    Route::post('/games/{game}/ping', [GameController::class, 'ping']);
+    Route::post('/games/{game}/leave', [GameController::class, 'leave']);
     
     Route::get('/friends', [FriendController::class, 'index']);
     Route::get('/users/search', [FriendController::class, 'search']);
