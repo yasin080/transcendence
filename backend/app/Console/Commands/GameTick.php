@@ -37,7 +37,7 @@ class GameTick extends Command
 
         $state = LiveGames::load($id);
         if ($state === null) {
-            LiveGames::finish($id);
+            $this->end($id);
 
             return;
         }
