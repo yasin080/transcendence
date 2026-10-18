@@ -54,7 +54,9 @@ export default function Game() {
         ← Back to lobby
       </Link>
 
-      {countdownEnd > 0 && <CountdownOverlay endsAt={countdownEnd} onDone={() => setCountdownEnd(0)} />}
+      {countdownEnd > 0 && match && (
+        <CountdownOverlay endsAt={countdownEnd} controls={match.game.settings.controls} onDone={() => setCountdownEnd(0)} />
+      )}
 
       {over && match && (
         <MessageModal

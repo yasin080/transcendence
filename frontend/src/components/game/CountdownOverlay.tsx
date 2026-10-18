@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 
+import type { Controls } from '../../game/logic/settings'
+import { isTouch } from '../../game/touch'
+
 interface CountdownOverlayProps {
   endsAt: number
+  controls: Controls
   onDone: () => void
 }
 
-export default function CountdownOverlay({ endsAt, onDone }: CountdownOverlayProps) {
+export default function CountdownOverlay({ endsAt, controls, onDone }: CountdownOverlayProps) {
   const [now, setNow] = useState(Date.now)
   const secondsLeft = Math.ceil((endsAt - now) / 1000)
 
@@ -31,6 +35,9 @@ export default function CountdownOverlay({ endsAt, onDone }: CountdownOverlayPro
         <div className="display-hero text-[220px] [text-shadow:0_0_46px_color-mix(in_srgb,var(--color-fuse-600)_55%,transparent)]">
           {secondsLeft}
         </div>
+        {isTouch && (
+          <div className="text-body-muted">{controls === 'turn' ? 'Tap left or right to turn' : 'Swipe to change direction'}</div>
+        )}
       </div>
     </div>
   )
