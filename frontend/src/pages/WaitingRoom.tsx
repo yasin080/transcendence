@@ -54,14 +54,22 @@ export default function WaitingRoom() {
   useEffect(() => {
     if (!roomId || !joined) return
     const channel = echo.private(`room.${roomId}`)
-    channel.listen('.players.updated', (e: { room: Room }) => setRoom(e.room))
+    channel.listen('.players.updated', (e: { room: Room }) => {
+      setRoom(e.room)
+      // Si ya no estoy en la lista, el host me ha expulsado.
+      const stillIn = e.room.players.some((p) => p.user_id === user?.id)
+      if (!stillIn) setPhase('kicked')
+    })
     return () => echo.leave(`room.${roomId}`)
-  }, [roomId, joined])
+  }, [roomId, joined, user?.id])
+
 
 
   // Libera el asiento (o cierra la sala si eres el host).
   async function leaveRoom() {
-    if (roomId) await apiPost(`/api/rooms/${roomId}/leave`)
+    if (!roomId) return
+    echo.leave(`room.${roomId}`)
+    await apiPost(`/api/rooms/${roomId}/leave`)
     navigate('/lobby')
   }
 
@@ -82,7 +90,7 @@ export default function WaitingRoom() {
         name: p.user?.name ?? 'Player',
         isOwner: p.user_id === room.host_id,
         isBot: false,
-        // Aún no hay estadísticas ni colores en el backend
+        // [RETOMAR] Aún no hay estadísticas ni colores en el backend
         winPct: '—',
         avgScore: '—',
         background: 'linear-gradient(150deg,#3b2f7a,#1b1636)',
@@ -118,7 +126,7 @@ export default function WaitingRoom() {
         players={players}
         maxPlayers={maxPlayers}
         isOwner={isOwner}
-        onKick={(playerId) => console.log('kick', playerId)}
+        onKick={(playerId) => void apiPost(`/api/rooms/${roomId}/kick/${playerId}`)}
       />
       <BackstageBanner>
          <img src={backstage} alt="" className="size-full object-cover" />
