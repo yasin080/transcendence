@@ -1,7 +1,10 @@
 export type User = {
   id: number
-  name: string
+  username: string
+  name: string | null
   email: string
+  avatar_url: string | null
+  bio: string | null
   created_at: string
 }
 
@@ -110,3 +113,4 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
 
 export const apiGet = <T>(path: string) => request<T>('GET', path)
 export const apiPost = <T>(path: string, body?: unknown) => request<T>('POST', path, body)
+export const apiDelete = <T>(path: string) => request<T>('DELETE', path)

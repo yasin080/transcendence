@@ -21,10 +21,13 @@ const devItems: NavItem[] = [
   { to: '/waiting-room/demo?preview=closed', label: 'Modal: room closed' },
   { to: '/waiting-room/demo?preview=kicked', label: 'Modal: kicked' },
   { to: '/profile', label: 'Profile (own)' },
-  { to: '/profile/9001', label: 'Profile: Kiro (none)' },
-  { to: '/profile/9002', label: 'Profile: Bomba (received)' },
-  { to: '/profile/9999', label: 'Profile: not found' },
+  { to: '/profile/2', label: 'Profile: Boomer (friends)' },
+  { to: '/profile/9', label: 'Profile: Bomba (received)' },
+  { to: '/profile/11', label: 'Profile: BoltX (sent)' },
+  { to: '/profile/13', label: 'Profile: BombJovi (none)' },
+  { to: '/profile/99999', label: 'Profile: not found' },
   { to: '/game/demo', label: 'Game' },
+  { to: '/dev/match', label: 'Multiplayer test' },
 ]
 
 export default function SidebarNav() {

@@ -2,14 +2,22 @@
 
 namespace Tests\Feature;
 
+use App\Game\LiveGames;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
 class RoomTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Redis::flushdb();
+    }
 
     private const SNAKE = [
         'width' => 30,
@@ -180,5 +188,80 @@ class RoomTest extends TestCase
         // El host sale: la sala se cierra y deja de contar
         $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
         $this->getJson('/api/rooms/current')->assertExactJson(['code' => null]);
+    }
+
+    public function test_starting_a_match_puts_its_live_state_in_redis(): void
+    {
+        $host = User::factory()->create(['name' => 'Gusano']);
+        $room = $this->createRoom($host);
+
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->assertSame([$gameId], LiveGames::active());
+        $state = LiveGames::load($gameId);
+        $this->assertSame('Gusano', $state['worms'][0]['name']);
+        $this->assertSame(30, $state['board']['width']);
+    }
+
+    public function test_a_player_can_send_a_turn(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertNoContent();
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'right'])->assertNoContent();
+
+        $this->assertSame([0 => ['side' => 'right']], LiveGames::takeInputs($gameId));
+        $this->assertSame([], LiveGames::takeInputs($gameId));
+    }
+
+    public function test_a_turn_is_validated_and_needs_a_player(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'up'])->assertUnprocessable();
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 5, 'y' => 0]])->assertUnprocessable();
+
+        $this->actingAs(User::factory()->create());
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertForbidden();
+    }
+
+    public function test_a_player_can_join_an_open_room(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $code = $this->postJson('/api/rooms', ['name' => 'Duel', 'settings' => ['players' => 2] + self::SNAKE])->json('code');
+        $guest = User::factory()->create();
+        $this->actingAs($guest);
+
+        $this->postJson("/api/rooms/{$code}/join")->assertOk()->assertJsonPath('players.1.user_id', $guest->id)->assertJsonPath('players.1.seat', 1);
+        $this->postJson("/api/rooms/{$code}/join")->assertOk();
+        $this->assertDatabaseCount('room_players', 2);
+
+        $this->actingAs(User::factory()->create());
+        $this->postJson("/api/rooms/{$code}/join")->assertConflict();
+    }
+
+    public function test_nobody_can_join_a_started_match(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson("/api/rooms/{$room->code}/join")->assertConflict();
+    }
+
+    public function test_each_player_gets_their_own_worm(): void
+    {
+        $host = User::factory()->create(['name' => 'Host']);
+        $this->actingAs($host);
+        $code = $this->postJson('/api/rooms', ['name' => 'Duel', 'settings' => ['players' => 2] + self::SNAKE])->json('code');
+        $guest = User::factory()->create(['name' => 'Guest']);
+        $this->actingAs($guest)->postJson("/api/rooms/{$code}/join");
+        $gameId = $this->actingAs($host)->postJson("/api/rooms/{$code}/games")->json('id');
+
+        $this->actingAs($guest)->getJson("/api/games/{$gameId}")->assertJsonPath('seat', 1)->assertJsonPath('state.worms.1.name', 'Guest');
+        $this->actingAs($guest)->postJson("/api/games/{$gameId}/turn", ['side' => 'left']);
+        $this->assertSame([1 => ['side' => 'left']], LiveGames::takeInputs($gameId));
     }
 }

@@ -6,16 +6,19 @@ import { Plane } from '@babylonjs/core/Maths/math.plane'
 import { CreateGround } from '@babylonjs/core/Meshes/Builders/groundBuilder'
 import type { Scene } from '@babylonjs/core/scene'
 
-const CELLS_PER_TILE = 4
+const CELLS_PER_TILE = 8
 
-export function createFloor(scene: Scene, width: number, height: number) {
-  const texture = new Texture('/textures/floor.png', scene)
+function tiled(scene: Scene, file: string, width: number, height: number) {
+  const texture = new Texture(file, scene)
   texture.uScale = width / CELLS_PER_TILE
   texture.vScale = height / CELLS_PER_TILE
+  return texture
+}
 
+export function createFloor(scene: Scene, width: number, height: number) {
   const material = new StandardMaterial('floor', scene)
-  material.diffuseTexture = texture
-  material.specularColor = new Color3(0.1, 0.1, 0.15)
+  material.diffuseTexture = tiled(scene, '/textures/floor.png', width, height)
+  material.specularColor = new Color3(0.25, 0.22, 0.3)
 
   const mirror = new MirrorTexture('floor-mirror', 512, scene, true)
   mirror.mirrorPlane = new Plane(0, -1, 0, 0)

@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react'
 
 interface CountdownOverlayProps {
-  from: number
+  endsAt: number
   onDone: () => void
 }
 
-export default function CountdownOverlay({ from, onDone }: CountdownOverlayProps) {
-  const [n, setN] = useState(from)
+export default function CountdownOverlay({ endsAt, onDone }: CountdownOverlayProps) {
+  const [now, setNow] = useState(Date.now)
+  const secondsLeft = Math.ceil((endsAt - now) / 1000)
 
   useEffect(() => {
-    if (n <= 1) {
-      const t = setTimeout(onDone, 1000)
-      return () => clearTimeout(t)
-    }
-    const t = setTimeout(() => setN((v) => v - 1), 1000)
-    return () => clearTimeout(t)
-  }, [n, onDone])
+    const timer = setInterval(() => setNow(Date.now()), 100)
+    return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    if (secondsLeft <= 0) onDone()
+  }, [secondsLeft, onDone])
+
+  if (secondsLeft <= 0) return null
 
   return (
     <div className="fixed inset-0 z-40 grid place-items-center bg-void/84 backdrop-blur-md">
@@ -26,7 +29,7 @@ export default function CountdownOverlay({ from, onDone }: CountdownOverlayProps
       <div className="relative flex flex-col items-center gap-1.5 text-center text-white">
         <div className="text-eyebrow">Match starts in</div>
         <div className="display-hero text-[220px] [text-shadow:0_0_46px_color-mix(in_srgb,var(--color-fuse-600)_55%,transparent)]">
-          {n}
+          {secondsLeft}
         </div>
       </div>
     </div>

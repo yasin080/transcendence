@@ -1,41 +1,51 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
+import CountdownOverlay from '../components/game/CountdownOverlay'
 import MessageModal from '../components/ui/MessageModal'
-import { loadSettings, startQuickMatch } from '../game/api'
+import { loadMatch, type Match } from '../game/api'
 import GameCanvas from '../game/GameCanvas'
-import { createGame, type Game as GameState } from '../game/logic/game'
+
+const RETURN_DELAY = 3000
 
 export default function Game() {
   const { gameId = '' } = useParams()
   const navigate = useNavigate()
-  const [game, setGame] = useState<GameState | null>(null)
+  const [match, setMatch] = useState<Match | null>(null)
   const [missing, setMissing] = useState(false)
   const [over, setOver] = useState(false)
+  const [countdownEnd, setCountdownEnd] = useState(0)
 
   useEffect(() => {
     let cancelled = false
-    setGame(null)
+    setMatch(null)
     setMissing(false)
     setOver(false)
-    loadSettings(gameId).then((settings) => {
+    loadMatch(gameId).then((loaded) => {
       if (cancelled) return
-      if (settings) setGame(createGame(settings))
-      else setMissing(true)
+      if (!loaded) return setMissing(true)
+      setMatch(loaded)
+      setCountdownEnd(loaded.game.startsAt ?? 0)
     })
     return () => {
       cancelled = true
     }
   }, [gameId])
 
-  async function playAgain() {
-    const id = await startQuickMatch()
-    if (id) navigate(`/game/${id}`)
+  function backToRoom() {
+    if (!match?.roomCode) return navigate('/lobby')
+    navigate(`/dev/match?room=${match.roomCode}&after=${gameId}`)
   }
+
+  useEffect(() => {
+    if (!over) return
+    const timer = setTimeout(backToRoom, RETURN_DELAY)
+    return () => clearTimeout(timer)
+  }, [over])
 
   return (
     <div className="relative h-screen overflow-hidden bg-void text-white">
-      {game && <GameCanvas game={game} onGameOver={() => setOver(true)} />}
+      {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} />}
 
       <Link
         to="/lobby"
@@ -44,13 +54,15 @@ export default function Game() {
         ← Back to lobby
       </Link>
 
-      {over && game && (
+      {countdownEnd > 0 && <CountdownOverlay endsAt={countdownEnd} onDone={() => setCountdownEnd(0)} />}
+
+      {over && match && (
         <MessageModal
-          kicker="Game over"
-          title={`Length ${game.worms[0].body.length}`}
-          message="You crashed. Try again and grow a longer worm."
-          buttonLabel="Play again"
-          onAction={playAgain}
+          kicker={match.game.worms[match.seat].alive ? 'You win' : 'Game over'}
+          title={`Length ${match.game.worms[match.seat].body.length}`}
+          message="Back to the room in 3 seconds."
+          buttonLabel="OK"
+          onAction={backToRoom}
         />
       )}
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Game;
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Room;
 

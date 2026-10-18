@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
-import CountdownOverlay from '../components/game/CountdownOverlay.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
 import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
@@ -20,7 +19,6 @@ type GameMode = (typeof GAME_MODES)[number]
 export default function Lobby() {
   const [selectedMode, setSelectedMode] = useState<GameMode>(GAME_MODES[0])
   const navigate = useNavigate()
-  const [gameId, setGameId] = useState<number | null>(null)
   const [playError, setPlayError] = useState(false)
   const [creatingRoom, setCreatingRoom] = useState(false)
   const [page, setPage] = useState(1)
@@ -28,7 +26,7 @@ export default function Lobby() {
   async function playNow() {
     setPlayError(false)
     const id = await startQuickMatch()
-    if (id) setGameId(id)
+    if (id) navigate(`/game/${id}`)
     else setPlayError(true)
   }
 
@@ -137,11 +135,6 @@ export default function Lobby() {
         onPlay={playNow}
       />
       {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
-
-      {/* [RETOMAR] Con matchmaking, el servidor enviará {gameId, startsAt} y la
-          cuenta atrás se calculará desde startsAt para que todos los jugadores
-          empiecen a la vez. */}
-      {gameId && <CountdownOverlay from={3} onDone={() => navigate(`/game/${gameId}`)} />}
 
       {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
       <div className="flex items-center gap-3.5 mt-[26px] mb-3">

@@ -3,11 +3,12 @@ import { useEffect, useRef } from 'react'
 import { listenToDpad, listenToTurns } from './keyboard'
 import { runLocally } from './local'
 import { type Game, isOver, steer, turn } from './logic/game'
+import { type Input, listenOnline, sendInput } from './online'
 import { createGameScene } from './render/scene'
 
-const YOU = 0
+type Props = { game: Game; gameId: string; you: number; onGameOver: () => void }
 
-export default function GameCanvas({ game, onGameOver }: { game: Game; onGameOver: () => void }) {
+export default function GameCanvas({ game, gameId, you, onGameOver }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -15,21 +16,32 @@ export default function GameCanvas({ game, onGameOver }: { game: Game; onGameOve
     if (!canvas) return
 
     const scene = createGameScene(canvas, game)
+    const onTick = () => {
+      scene.onTick()
+      if (!game.worms[you].alive || isOver(game)) onGameOver()
+    }
+
+    const online = gameId !== 'demo'
+    const applyLocally = (input: Input) =>
+      'side' in input ? steer(game, you, input.side) : turn(game, you, input.dir)
+    const send = (input: Input) => {
+      if (!game.worms[you].alive) return
+      if (online) sendInput(gameId, input)
+      else applyLocally(input)
+    }
+
     const stopListening =
       game.settings.controls === 'dpad'
-        ? listenToDpad((dir) => turn(game, YOU, dir))
-        : listenToTurns((side) => steer(game, YOU, side))
-    const stopRunning = runLocally(game, () => {
-      scene.onTick()
-      if (isOver(game)) onGameOver()
-    })
+        ? listenToDpad((dir) => send({ dir }))
+        : listenToTurns((side) => send({ side }))
+    const stopRunning = online ? listenOnline(gameId, game, onTick) : runLocally(game, onTick)
 
     return () => {
       stopRunning()
       stopListening()
       scene.dispose()
     }
-  }, [game])
+  }, [game, gameId, you])
 
   return <canvas ref={canvasRef} className="block h-full w-full touch-none outline-none" />
 }
