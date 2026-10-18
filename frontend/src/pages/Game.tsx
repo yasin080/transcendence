@@ -3,28 +3,28 @@ import { Link, useNavigate, useParams } from 'react-router'
 
 import CountdownOverlay from '../components/game/CountdownOverlay'
 import MessageModal from '../components/ui/MessageModal'
-import { loadGame, startQuickMatch } from '../game/api'
+import { loadMatch, type Match, startQuickMatch } from '../game/api'
 import GameCanvas from '../game/GameCanvas'
-import type { Game as GameState } from '../game/logic/game'
 
 export default function Game() {
   const { gameId = '' } = useParams()
   const navigate = useNavigate()
-  const [game, setGame] = useState<GameState | null>(null)
+  const [match, setMatch] = useState<Match | null>(null)
   const [missing, setMissing] = useState(false)
   const [over, setOver] = useState(false)
   const [countdown, setCountdown] = useState(0)
 
   useEffect(() => {
     let cancelled = false
-    setGame(null)
+    setMatch(null)
     setMissing(false)
     setOver(false)
-    loadGame(gameId).then((loaded) => {
+    loadMatch(gameId).then((loaded) => {
       if (cancelled) return
       if (!loaded) return setMissing(true)
-      setGame(loaded)
-      if (loaded.startsAt) setCountdown(Math.ceil((loaded.startsAt - Date.now()) / 1000))
+      setMatch(loaded)
+      const { startsAt } = loaded.game
+      if (startsAt) setCountdown(Math.ceil((startsAt - Date.now()) / 1000))
     })
     return () => {
       cancelled = true
@@ -38,7 +38,7 @@ export default function Game() {
 
   return (
     <div className="relative h-screen overflow-hidden bg-void text-white">
-      {game && <GameCanvas game={game} gameId={gameId} onGameOver={() => setOver(true)} />}
+      {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} />}
 
       <Link
         to="/lobby"
@@ -49,11 +49,11 @@ export default function Game() {
 
       {countdown > 0 && <CountdownOverlay from={countdown} onDone={() => setCountdown(0)} />}
 
-      {over && game && (
+      {over && match && (
         <MessageModal
-          kicker={game.worms[0].alive ? 'You win' : 'Game over'}
-          title={`Length ${game.worms[0].body.length}`}
-          message={game.worms[0].alive ? 'You are the last worm standing.' : 'You crashed. Try again and grow a longer worm.'}
+          kicker={match.game.worms[match.seat].alive ? 'You win' : 'Game over'}
+          title={`Length ${match.game.worms[match.seat].body.length}`}
+          message={match.game.worms[match.seat].alive ? 'You are the last worm standing.' : 'You crashed. Try again and grow a longer worm.'}
           buttonLabel="Play again"
           onAction={playAgain}
         />

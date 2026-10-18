@@ -15,6 +15,7 @@ import Privacy from './pages/Privacy.tsx'
 import Profile from './pages/Profile.tsx'
 import Terms from './pages/Terms.tsx'
 import Leaderboard from './pages/Leaderboard.tsx'
+import DevMatch from './pages/dev/DevMatch.tsx'
 
 const Game = lazy(() => import('./pages/Game.tsx'))
 
@@ -43,6 +44,7 @@ createRoot(root).render(
               <Route path="profile" element={<Profile />} />
               <Route path="profile/:userId" element={<Profile />} />
               <Route path="waiting-room/:roomId" element={<WaitingRoom />} />
+              <Route path="dev/match" element={<DevMatch />} />
             </Route>
 
             {/* MARCO 3 — juego a pantalla completa */}

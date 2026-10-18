@@ -164,4 +164,42 @@ class RoomTest extends TestCase
         $this->actingAs(User::factory()->create());
         $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertForbidden();
     }
+
+    public function test_a_player_can_join_an_open_room(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $code = $this->postJson('/api/rooms', ['name' => 'Duel', 'settings' => ['players' => 2] + self::SNAKE])->json('code');
+        $guest = User::factory()->create();
+        $this->actingAs($guest);
+
+        $this->postJson("/api/rooms/{$code}/join")->assertOk()->assertJsonPath('players.1.user_id', $guest->id)->assertJsonPath('players.1.seat', 1);
+        $this->postJson("/api/rooms/{$code}/join")->assertOk();
+        $this->assertDatabaseCount('room_players', 2);
+
+        $this->actingAs(User::factory()->create());
+        $this->postJson("/api/rooms/{$code}/join")->assertConflict();
+    }
+
+    public function test_nobody_can_join_a_started_match(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson("/api/rooms/{$room->code}/join")->assertConflict();
+    }
+
+    public function test_each_player_gets_their_own_worm(): void
+    {
+        $host = User::factory()->create(['name' => 'Host']);
+        $this->actingAs($host);
+        $code = $this->postJson('/api/rooms', ['name' => 'Duel', 'settings' => ['players' => 2] + self::SNAKE])->json('code');
+        $guest = User::factory()->create(['name' => 'Guest']);
+        $this->actingAs($guest)->postJson("/api/rooms/{$code}/join");
+        $gameId = $this->actingAs($host)->postJson("/api/rooms/{$code}/games")->json('id');
+
+        $this->actingAs($guest)->getJson("/api/games/{$gameId}")->assertJsonPath('seat', 1)->assertJsonPath('state.worms.1.name', 'Guest');
+        $this->actingAs($guest)->postJson("/api/games/{$gameId}/turn", ['side' => 'left']);
+        $this->assertSame([1 => ['side' => 'left']], LiveGames::takeInputs($gameId));
+    }
 }

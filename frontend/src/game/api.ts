@@ -3,7 +3,8 @@ import { createGame, type Game } from './logic/game'
 import { SNAKE } from './logic/settings'
 
 type Room = { code: string }
-type GameRecord = { id: number; state: Game | null }
+type GameRecord = { id: number; seat: number; state: Game | null }
+export type Match = { game: Game; seat: number }
 
 export async function startQuickMatch(): Promise<number | null> {
   const room = await apiPost<Room>('/api/rooms', { name: 'Quick match', settings: SNAKE })
@@ -13,9 +14,9 @@ export async function startQuickMatch(): Promise<number | null> {
   return game.ok ? game.data.id : null
 }
 
-export async function loadGame(gameId: string): Promise<Game | null> {
-  if (gameId === 'demo') return createGame(SNAKE)
+export async function loadMatch(gameId: string): Promise<Match | null> {
+  if (gameId === 'demo') return { game: createGame(SNAKE), seat: 0 }
 
-  const game = await apiGet<GameRecord>(`/api/games/${gameId}`)
-  return game.ok ? game.data.state : null
+  const record = await apiGet<GameRecord>(`/api/games/${gameId}`)
+  return record.ok && record.data.state ? { game: record.data.state, seat: record.data.seat } : null
 }

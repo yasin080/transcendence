@@ -34,9 +34,21 @@ class Game
 
     public static function tick(array &$game): void
     {
+        foreach ($game['worms'] as &$worm) {
+            if ($worm['alive']) {
+                Worms::applyTurn($worm);
+            }
+        }
+        unset($worm);
+
+        $next = array_map(fn ($worm) => Worms::nextCell($worm, $game['board']), $game['worms']);
+        $crashed = array_map(fn ($i) => $game['worms'][$i]['alive'] && self::headOn($game, $next, $i), array_keys($game['worms']));
+
         foreach (array_keys($game['worms']) as $i) {
-            if ($game['worms'][$i]['alive']) {
-                self::moveWorm($game, $i);
+            if ($crashed[$i]) {
+                $game['worms'][$i]['alive'] = false;
+            } elseif ($game['worms'][$i]['alive']) {
+                self::moveWorm($game, $i, $next[$i]);
             }
         }
     }
@@ -48,11 +60,22 @@ class Game
         return count($game['worms']) === 1 ? $alive === 0 : $alive <= 1;
     }
 
-    private static function moveWorm(array &$game, int $i): void
+    private static function headOn(array $game, array $next, int $i): bool
+    {
+        foreach ($game['worms'] as $j => $other) {
+            $sameCell = $next[$j] == $next[$i];
+            $swap = $next[$i] == $other['body'][0] && $next[$j] == $game['worms'][$i]['body'][0];
+            if ($j !== $i && $other['alive'] && ($sameCell || $swap)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function moveWorm(array &$game, int $i, array $next): void
     {
         $worm = &$game['worms'][$i];
-        Worms::applyTurn($worm);
-        $next = Worms::nextCell($worm, $game['board']);
 
         $wall = Board::cellAt($game['board'], $next['x'], $next['y']) !== Board::EMPTY;
         if ($wall || Worms::isOnWorm($game['worms'], $next)) {
