@@ -42,6 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/friends/{user}', [FriendController::class, 'destroy']);
 
     // Users
-    Route::get('/users/search', [UserController::class, 'search']);
+    Route::get('/users/search', [FriendController::class, 'search']);    
     Route::get('/users/{user}', [UserController::class, 'show'])->whereNumber('user');
 });
