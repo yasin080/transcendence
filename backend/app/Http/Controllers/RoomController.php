@@ -30,7 +30,7 @@ class RoomController extends Controller
 
     public function show(Room $room): JsonResponse
     {
-        return response()->json($room->load('players.user:id,name', 'games:id,room_id'));
+        return response()->json($room->load(['players' => fn ($players) => $players->orderBy('seat'), 'players.user:id,name', 'games:id,room_id']));
     }
 
     public function join(Request $request, Room $room): JsonResponse
@@ -47,6 +47,23 @@ class RoomController extends Controller
             abort_if($free === null, 409, 'This room is full.');
 
             $room->players()->create(['user_id' => $request->user()->id, 'seat' => $free]);
+        });
+
+        return $this->show($room);
+    }
+
+    public function addBot(Request $request, Room $room): JsonResponse
+    {
+        abort_unless($room->host_id === $request->user()->id, 403, 'Only the host can add bots.');
+
+        DB::transaction(function () use ($room) {
+            $room = Room::lockForUpdate()->find($room->id);
+            abort_unless($room->status === 'open', 409, 'This match has already started.');
+
+            $free = collect(range(0, $room->settings['players'] - 1))->diff($room->players()->pluck('seat'))->first();
+            abort_if($free === null, 409, 'This room is full.');
+
+            $room->players()->create(['seat' => $free]);
         });
 
         return $this->show($room);

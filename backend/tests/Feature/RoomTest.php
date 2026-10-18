@@ -202,4 +202,43 @@ class RoomTest extends TestCase
         $this->actingAs($guest)->postJson("/api/games/{$gameId}/turn", ['side' => 'left']);
         $this->assertSame([1 => ['side' => 'left']], LiveGames::takeInputs($gameId));
     }
+
+    public function test_the_host_can_add_a_bot_to_a_free_seat(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $code = $this->postJson('/api/rooms', ['name' => 'Duel', 'settings' => ['players' => 2] + self::SNAKE])->json('code');
+
+        $this->postJson("/api/rooms/{$code}/bots")->assertOk()->assertJsonPath('players.1.user_id', null)->assertJsonPath('players.1.seat', 1);
+        $this->postJson("/api/rooms/{$code}/bots")->assertConflict();
+        $this->assertDatabaseCount('room_players', 2);
+    }
+
+    public function test_only_the_host_can_add_a_bot(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertForbidden();
+    }
+
+    public function test_no_bot_can_be_added_to_a_started_match(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertConflict();
+    }
+
+    public function test_bot_worms_are_marked_in_the_live_state(): void
+    {
+        $this->actingAs(User::factory()->create(['name' => 'Host']));
+        $code = $this->postJson('/api/rooms', ['name' => 'Duel', 'settings' => ['players' => 2] + self::SNAKE])->json('code');
+        $this->postJson("/api/rooms/{$code}/bots");
+        $gameId = $this->postJson("/api/rooms/{$code}/games")->json('id');
+
+        $this->getJson("/api/games/{$gameId}")
+            ->assertJsonPath('state.worms.0.bot', false)
+            ->assertJsonPath('state.worms.1.bot', true)
+            ->assertJsonPath('state.worms.1.name', 'Bot');
+    }
 }
