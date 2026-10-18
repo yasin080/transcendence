@@ -66,6 +66,6 @@ class GameTick extends Command
         unset($this->nextTick[$id]);
         $game = Game::find($id);
         $game?->update(['ended_at' => now()]);
-        $game?->room->update(['status' => 'finished']);
+        $game?->room->update(['status' => 'open']);
     }
 }

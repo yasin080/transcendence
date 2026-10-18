@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
+
+import { useAuth } from '../../auth/useAuth'
 
 import Button from '../../components/ui/Button'
 import { SNAKE } from '../../game/logic/settings'
@@ -7,6 +9,7 @@ import { apiGet, apiPost } from '../../lib/api'
 
 type Room = {
   code: string
+  host_id: number
   status: string
   players: { seat: number; user: { name: string } | null }[]
   games: { id: number }[]
@@ -18,35 +21,40 @@ type Room = {
  */
 export default function DevMatch() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const [params] = useSearchParams()
+  const after = Number(params.get('after') ?? 0)
   const [players, setPlayers] = useState(2)
   const [code, setCode] = useState('')
+  const [roomCode, setRoomCode] = useState(params.get('room'))
   const [room, setRoom] = useState<Room | null>(null)
-  const [isHost, setIsHost] = useState(false)
   const [error, setError] = useState('')
+  const isHost = room?.host_id === user?.id
 
   useEffect(() => {
-    if (!room) return
-    const timer = setInterval(async () => {
-      const result = await apiGet<Room>(`/api/rooms/${room.code}`)
+    if (!roomCode) return
+    const refresh = async () => {
+      const result = await apiGet<Room>(`/api/rooms/${roomCode}`)
       if (!result.ok) return
       setRoom(result.data)
       const game = result.data.games.at(-1)
-      if (result.data.status === 'playing' && game) navigate(`/game/${game.id}`)
-    }, 1000)
+      if (result.data.status === 'playing' && game && game.id > after) navigate(`/game/${game.id}`)
+    }
+    void refresh()
+    const timer = setInterval(refresh, 1000)
     return () => clearInterval(timer)
-  }, [room?.code, navigate])
+  }, [roomCode, after, navigate])
 
   async function host() {
     const result = await apiPost<Room>('/api/rooms', { name: 'Dev match', settings: { ...SNAKE, players } })
     if (!result.ok) return setError(result.failure.message)
-    setIsHost(true)
-    setRoom(result.data)
+    setRoomCode(result.data.code)
   }
 
   async function join() {
     const result = await apiPost<Room>(`/api/rooms/${code.trim().toUpperCase()}/join`)
     if (!result.ok) return setError(result.failure.message)
-    setRoom(result.data)
+    setRoomCode(result.data.code)
   }
 
   async function start() {
@@ -64,7 +72,7 @@ export default function DevMatch() {
 
       {error && <p className="mt-4 text-sm text-fuse-400">{error}</p>}
 
-      {!room && (
+      {!roomCode && (
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
           <div className="flex flex-col gap-3 rounded-2xl border border-line bg-fill p-5">
             <h2 className="font-display text-lg">Host</h2>
@@ -116,7 +124,7 @@ export default function DevMatch() {
             ))}
           </ul>
           {isHost ? (
-            <Button size="md" onClick={start}>
+            <Button size="md" disabled={room.status !== 'open'} onClick={start}>
               Start match
             </Button>
           ) : (

@@ -3,8 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router'
 
 import CountdownOverlay from '../components/game/CountdownOverlay'
 import MessageModal from '../components/ui/MessageModal'
-import { loadMatch, type Match, startQuickMatch } from '../game/api'
+import { loadMatch, type Match } from '../game/api'
 import GameCanvas from '../game/GameCanvas'
+
+const RETURN_DELAY = 3000
 
 export default function Game() {
   const { gameId = '' } = useParams()
@@ -12,7 +14,7 @@ export default function Game() {
   const [match, setMatch] = useState<Match | null>(null)
   const [missing, setMissing] = useState(false)
   const [over, setOver] = useState(false)
-  const [countdown, setCountdown] = useState(0)
+  const [countdownEnd, setCountdownEnd] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -23,18 +25,23 @@ export default function Game() {
       if (cancelled) return
       if (!loaded) return setMissing(true)
       setMatch(loaded)
-      const { startsAt } = loaded.game
-      if (startsAt) setCountdown(Math.ceil((startsAt - Date.now()) / 1000))
+      setCountdownEnd(loaded.game.startsAt ?? 0)
     })
     return () => {
       cancelled = true
     }
   }, [gameId])
 
-  async function playAgain() {
-    const id = await startQuickMatch()
-    if (id) navigate(`/game/${id}`)
+  function backToRoom() {
+    if (!match?.roomCode) return navigate('/lobby')
+    navigate(`/dev/match?room=${match.roomCode}&after=${gameId}`)
   }
+
+  useEffect(() => {
+    if (!over) return
+    const timer = setTimeout(backToRoom, RETURN_DELAY)
+    return () => clearTimeout(timer)
+  }, [over])
 
   return (
     <div className="relative h-screen overflow-hidden bg-void text-white">
@@ -47,15 +54,15 @@ export default function Game() {
         ← Back to lobby
       </Link>
 
-      {countdown > 0 && <CountdownOverlay from={countdown} onDone={() => setCountdown(0)} />}
+      {countdownEnd > 0 && <CountdownOverlay endsAt={countdownEnd} onDone={() => setCountdownEnd(0)} />}
 
       {over && match && (
         <MessageModal
           kicker={match.game.worms[match.seat].alive ? 'You win' : 'Game over'}
           title={`Length ${match.game.worms[match.seat].body.length}`}
-          message={match.game.worms[match.seat].alive ? 'You are the last worm standing.' : 'You crashed. Try again and grow a longer worm.'}
-          buttonLabel="Play again"
-          onAction={playAgain}
+          message="Back to the room in 3 seconds."
+          buttonLabel="OK"
+          onAction={backToRoom}
         />
       )}
 

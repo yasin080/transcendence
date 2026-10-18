@@ -22,6 +22,7 @@ class GameController extends Controller
         return response()->json([
             ...$game->load('room:id,code,name,settings')->toArray(),
             'seat' => $seat,
+            'now' => now()->getTimestampMs(),
             'state' => LiveGames::load($game->id),
         ]);
     }
