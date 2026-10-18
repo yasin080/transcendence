@@ -8,6 +8,7 @@ import { DefaultRenderingPipeline } from '@babylonjs/core/PostProcesses/RenderPi
 import { Scene } from '@babylonjs/core/scene'
 
 import type { Game } from '../logic/game'
+import { isTouch } from '../touch'
 import { createFloor } from './floor'
 import { toWorld } from './grid'
 import { createFood, type FoodUpdate } from './food'
@@ -36,6 +37,8 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
   cam.upperBetaLimit = 0.8
   cam.wheelPrecision = 6
   cam.inputs.removeByType('ArcRotateCameraKeyboardMoveInput')
+  // On touch screens a drag steers the worm, so it must not also orbit the camera.
+  if (isTouch) cam.inputs.removeByType('ArcRotateCameraPointersInput')
 
   const sky = new HemisphericLight('sky', new Vector3(0, 1, 0), scene)
   sky.intensity = 0.5

@@ -5,6 +5,7 @@ import { runLocally } from './local'
 import { type Game, isOver, steer, turn } from './logic/game'
 import { type Input, listenOnline, reportPresence, sendInput } from './online'
 import { createGameScene } from './render/scene'
+import { listenToTouch } from './touch'
 
 type Props = { game: Game; gameId: string; you: number; onGameOver: () => void }
 
@@ -34,6 +35,11 @@ export default function GameCanvas({ game, gameId, you, onGameOver }: Props) {
       game.settings.controls === 'dpad'
         ? listenToDpad((dir) => send({ dir }))
         : listenToTurns((side) => send({ side }))
+    const stopTouching = listenToTouch(
+      canvas,
+      (side) => send({ side }),
+      (dir) => send({ dir }),
+    )
     const stopRunning = online ? listenOnline(gameId, game, onTick) : runLocally(game, onTick)
     const stopReporting = online ? reportPresence(gameId) : () => {}
 
@@ -41,6 +47,7 @@ export default function GameCanvas({ game, gameId, you, onGameOver }: Props) {
       stopRunning()
       stopReporting()
       stopListening()
+      stopTouching()
       scene.dispose()
     }
   }, [game, gameId, you])
