@@ -16,6 +16,7 @@ export type ScoreRow = {
   score: number
   length: number
   alive: boolean
+  away: boolean
   isYou: boolean
 }
 
@@ -96,6 +97,7 @@ export function scoreboard(game: Game, you: number): ScoreRow[] {
       score: worm.body.length - game.settings.startLength,
       length: worm.body.length,
       alive: worm.alive,
+      away: !!worm.away,
       isYou: i === you,
     }))
     .sort((a, b) => Number(b.alive) - Number(a.alive) || b.score - a.score)
