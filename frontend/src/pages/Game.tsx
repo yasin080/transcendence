@@ -6,9 +6,16 @@ import Scoreboard from '../components/game/Scoreboard'
 import MessageModal from '../components/ui/MessageModal'
 import { loadMatch, type Match } from '../game/api'
 import GameCanvas from '../game/GameCanvas'
-import { scoreboard } from '../game/logic/game'
+import { type Game, scoreboard } from '../game/logic/game'
 
 const RETURN_DELAY = 3000
+
+function resultOf(game: Game, you: number) {
+  if (game.worms.length === 1) return 'Game over'
+  const winner = game.worms.findIndex((worm) => worm.alive)
+  if (winner === -1) return 'Draw'
+  return winner === you ? 'You win' : `${game.worms[winner].name} wins`
+}
 
 export default function Game() {
   const { gameId = '' } = useParams()
@@ -84,8 +91,8 @@ export default function Game() {
 
       {over && match && (
         <MessageModal
-          kicker={match.game.worms[match.seat].alive ? 'You win' : 'Game over'}
-          title={`Length ${match.game.worms[match.seat].body.length}`}
+          kicker="Match over"
+          title={resultOf(match.game, match.seat)}
           message="Back to the room in 3 seconds."
           buttonLabel="OK"
           onAction={backToRoom}
