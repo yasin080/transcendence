@@ -6,6 +6,7 @@ import Scoreboard from '../components/game/Scoreboard'
 import MessageModal from '../components/ui/MessageModal'
 import { loadMatch, type Match } from '../game/api'
 import GameCanvas from '../game/GameCanvas'
+import { scoreboard } from '../game/logic/game'
 
 const RETURN_DELAY = 3000
 
@@ -16,6 +17,7 @@ export default function Game() {
   const [missing, setMissing] = useState(false)
   const [over, setOver] = useState(false)
   const [countdownEnd, setCountdownEnd] = useState(0)
+  const [, setTicks] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -46,10 +48,17 @@ export default function Game() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-void text-white">
-      <Scoreboard />
+        {match && (
+        <Scoreboard
+          rows={scoreboard(match.game, match.seat)}
+          alive={match.game.worms.filter((worm) => worm.alive).length}
+          total={match.game.worms.length}
+          elapsedMs={match.game.startsAt ? Math.max(0, Date.now() - match.game.startsAt) : 0}
+        />
+      )}
 
       <div className="relative min-h-0 flex-1">
-        {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} />}
+        {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} onUpdate={() => setTicks((n) => n + 1)} />}
 
         <Link
           to="/lobby"

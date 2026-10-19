@@ -1,16 +1,16 @@
 import type { ScoreRow } from '../../game/logic/game'
 import Button from '../ui/Button'
 
-const rows: ScoreRow[] = [
-  { name: 'ex_player1', colour: '#8fff57', score: 12, length: 15, alive: true, away: false, isYou: false },
-  { name: 'ex_player2', colour: '#33d1ff', score: 9, length: 12, alive: true, away: false, isYou: true },
-  { name: 'ex_player3', colour: '#ff6b52', score: 4, length: 7, alive: true, away: true, isYou: false },
-  { name: 'ex_player4_long_name', colour: '#eb99ff', score: 6, length: 9, alive: false, away: false, isYou: false },
-]
-const alive = 3
-const total = 4
+type Props = { rows: ScoreRow[]; alive: number; total: number; elapsedMs: number }
 
-export default function Scoreboard() {
+function formatTime(ms: number) {
+  const seconds = Math.floor(ms / 1000)
+  const mm = String(Math.floor(seconds / 60)).padStart(2, '0')
+  const ss = String(seconds % 60).padStart(2, '0')
+  return `${mm}:${ss}`
+}
+
+export default function Scoreboard({ rows, alive, total, elapsedMs }: Props) {
   return (
     <header className="flex flex-none flex-col border-b border-line bg-surface px-4 text-sm sm:flex-row sm:items-center sm:gap-4">
       <ul className="order-last grid grid-cols-2 gap-1 pb-2 sm:order-none sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:pb-0">
@@ -39,7 +39,7 @@ export default function Scoreboard() {
         <span className="text-fg-secondary">
           {alive} / {total} alive
         </span>
-        <span className="font-semibold text-white tabular-nums">01:42</span>
+        {formatTime(elapsedMs)}
         <span className="h-5 w-px bg-line" />
         <Button variant="ghost" size="sm">
           Leave

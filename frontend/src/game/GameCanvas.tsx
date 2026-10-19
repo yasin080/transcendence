@@ -7,9 +7,9 @@ import { type Input, listenOnline, reportPresence, sendInput } from './online'
 import { createGameScene } from './render/scene'
 import { listenToTouch } from './touch'
 
-type Props = { game: Game; gameId: string; you: number; onGameOver: () => void }
+type Props = { game: Game; gameId: string; you: number; onGameOver: () => void; onUpdate: () => void }
 
-export default function GameCanvas({ game, gameId, you, onGameOver }: Props) {
+export default function GameCanvas({ game, gameId, you, onGameOver, onUpdate }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -19,6 +19,7 @@ export default function GameCanvas({ game, gameId, you, onGameOver }: Props) {
     const scene = createGameScene(canvas, game)
     const onTick = () => {
       scene.onTick()
+      onUpdate()
       if (!game.worms[you].alive || isOver(game)) onGameOver()
     }
 
