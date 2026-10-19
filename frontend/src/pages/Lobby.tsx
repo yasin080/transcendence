@@ -7,8 +7,6 @@ import type { RoomSummary } from '../components/lobby/types.ts'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
-import LegalLinks from '../components/LegalLinks.tsx'
-
 
 
 const PAGE_SIZE = 6
@@ -229,10 +227,6 @@ export default function Lobby() {
             </svg>
           </button>
         </div>
-      </div>
-
-      <div className="mt-8 flex justify-center border-t border-line xl:hidden">
-        <LegalLinks />
       </div>
     </section>
   )
