@@ -29,6 +29,10 @@ class GoogleAuthController extends Controller
             return redirect('/?error=oauth');
         }
 
+        if (! ($googleUser->user['email_verified'] ?? false)) {
+            return redirect('/?error=oauth');
+        }
+
         $account = OauthAccount::where('provider', 'google')
             ->where('provider_id', $googleUser->getId())
             ->first();
