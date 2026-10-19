@@ -48,7 +48,7 @@ export default function Game() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-void text-white">
-        {match && (
+      {match && (
         <Scoreboard
           rows={scoreboard(match.game, match.seat)}
           alive={match.game.worms.filter((worm) => worm.alive).length}

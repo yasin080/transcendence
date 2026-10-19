@@ -16,7 +16,7 @@ export default function Scoreboard({ rows, alive, total, elapsedMs }: Props) {
       <ul className="order-last grid grid-cols-2 gap-1 pb-2 sm:order-none sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:pb-0">
         {rows.map((row) => (
           <li
-            key={row.name}
+            key={row.colour}
             className={`flex min-w-0 items-center gap-2 rounded-full border px-3 py-1 ${
               row.isYou
                 ? 'border-fuse-600/60 bg-fuse-600/15 font-semibold text-white'
