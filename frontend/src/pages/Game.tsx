@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import CountdownOverlay from '../components/game/CountdownOverlay'
 import Scoreboard from '../components/game/Scoreboard'
+import Button from '../components/ui/Button'
 import MessageModal from '../components/ui/MessageModal'
+import Modal from '../components/ui/Modal'
 import { loadMatch, type Match } from '../game/api'
 import GameCanvas from '../game/GameCanvas'
 import { type Game, scoreboard } from '../game/logic/game'
@@ -26,6 +28,7 @@ export default function Game() {
   const [eliminated, setEliminated] = useState(false)
   const [countdownEnd, setCountdownEnd] = useState(0)
   const [, setTicks] = useState(0)
+  const [leaving, setLeaving] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -63,19 +66,12 @@ export default function Game() {
           alive={match.game.worms.filter((worm) => worm.alive).length}
           total={match.game.worms.length}
           elapsedMs={match.game.startsAt ? Math.max(0, Date.now() - match.game.startsAt) : 0}
+          onLeave={() => setLeaving(true)}
         />
       )}
 
       <div className="relative min-h-0 flex-1">
         {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} onEliminated={() => setEliminated(true)} onUpdate={() => setTicks((n) => n + 1)} />}
-
-        <Link
-          to="/lobby"
-          className="absolute left-4 top-4 rounded-xl border border-line bg-void/60 px-3 py-1.5 text-sm text-fg-secondary backdrop-blur-sm transition hover:border-line-strong hover:text-white"
-        >
-          ← Back to lobby
-        </Link>
-
         {eliminated && !over && (
           <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
             <div className="rounded-xl border border-line bg-void/70 px-4 py-2 text-sm text-fg-secondary backdrop-blur-sm">
@@ -87,6 +83,21 @@ export default function Game() {
 
       {countdownEnd > 0 && match && (
         <CountdownOverlay endsAt={countdownEnd} controls={match.game.settings.controls} onDone={() => setCountdownEnd(0)} />
+      )}
+
+      {leaving && !over && (
+        <Modal onClose={() => setLeaving(false)}>
+          <h3 className="display-heading">Leave the match?</h3>
+          <p className="mt-3 text-body-muted">You will go back to the room.</p>
+          <div className="mt-5.5 flex gap-3">
+            <Button variant="secondary" size="md" className="flex-1" onClick={() => setLeaving(false)}>
+              Cancel
+            </Button>
+            <Button size="md" className="flex-1" onClick={backToRoom}>
+              Leave
+            </Button>
+          </div>
+        </Modal>
       )}
 
       {over && match && (

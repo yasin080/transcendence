@@ -1,7 +1,7 @@
 import type { ScoreRow } from '../../game/logic/game'
 import Button from '../ui/Button'
 
-type Props = { rows: ScoreRow[]; alive: number; total: number; elapsedMs: number }
+type Props = { rows: ScoreRow[]; alive: number; total: number; elapsedMs: number; onLeave: () => void }
 
 function formatTime(ms: number) {
   const seconds = Math.floor(ms / 1000)
@@ -10,7 +10,7 @@ function formatTime(ms: number) {
   return `${mm}:${ss}`
 }
 
-export default function Scoreboard({ rows, alive, total, elapsedMs }: Props) {
+export default function Scoreboard({ rows, alive, total, elapsedMs, onLeave }: Props) {
   return (
     <header className="flex flex-none flex-col border-b border-line bg-surface px-4 text-sm sm:flex-row sm:items-center sm:gap-4">
       <ul className="order-last grid grid-cols-2 gap-1 pb-2 sm:order-none sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:pb-0">
@@ -39,9 +39,9 @@ export default function Scoreboard({ rows, alive, total, elapsedMs }: Props) {
         <span className="text-fg-secondary">
           {alive} / {total} alive
         </span>
-        {formatTime(elapsedMs)}
+        <span className="font-semibold text-white tabular-nums">{formatTime(elapsedMs)}</span>
         <span className="h-5 w-px bg-line" />
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" onClick={onLeave}>
           Leave
         </Button>
       </div>
