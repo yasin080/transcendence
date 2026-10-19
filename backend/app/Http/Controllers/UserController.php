@@ -6,6 +6,7 @@ use App\Models\Friendship;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\UpdateProfileRequest;
 
 class UserController extends Controller
 {
@@ -37,5 +38,20 @@ class UserController extends Controller
             'friend_count' => $friends->count(),
             'friends' => $friends,
         ]);
+    }
+
+    // PATCH /api/user — el usuario autenticado actualiza su propio perfil
+    public function update(UpdateProfileRequest $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $data = $request->safe()->except(['password', 'current_password']);
+        if ($request->filled('password')) {
+            $data['password'] = $request->input('password');
+        }
+
+        $user->update($data);
+
+        return $this->show($request, $user);
     }
 }

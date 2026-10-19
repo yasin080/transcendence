@@ -12,12 +12,16 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
-#[Fillable(['username', 'name', 'email', 'password', 'avatar_url', 'bio'])]
+#[Fillable(['username', 'name', 'email', 'password', 'avatar', 'bio'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    // Avatares de la galería (frontend/public/avatar/). null = el de por defecto.
+    // Una imagen subida se guarda en la misma columna (AvatarController).
+    public const AVATAR_PRESETS = ['/avatar/red-worm.png'];
 
     // Si al crear un usuario nadie da username, se genera uno a partir de name
     protected static function booted(): void
@@ -66,7 +70,7 @@ class User extends Authenticatable
         return [
             'id' => $this->id,
             'username' => $this->username,
-            'avatar_url' => $this->avatar_url,
+            'avatar' => $this->avatar,
         ];
     }
 

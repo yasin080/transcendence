@@ -18,11 +18,3 @@ export interface ProfileUser {
   friendCount: number
   stats: ProfileStats
 }
-
-export interface ProfileEdits {
-  username: string
-  name: string
-  email: string
-  bio: string
-  avatarUrl: string | null
-}

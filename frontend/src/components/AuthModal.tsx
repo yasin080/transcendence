@@ -7,7 +7,7 @@ import type { FieldErrors } from '../lib/api'
 type Mode = 'login' | 'register'
 
 type Values = {
-  name: string
+  username: string
   email: string
   password: string
   password_confirmation: string
@@ -15,7 +15,7 @@ type Values = {
 }
 
 const EMPTY: Values = {
-  name: '',
+  username: '',
   email: '',
   password: '',
   password_confirmation: '',
@@ -26,12 +26,15 @@ const EMPTY: Values = {
 // This only catches the obvious typo before spending a round trip on it.
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+// Same rule as the backend (RegisterRequest) and Edit profile.
+const USERNAME = /^[A-Za-z0-9_-]{3,20}$/
+
 /** Frontend half of the validation the subject requires on both sides. */
 function validate(mode: Mode, values: Values): FieldErrors {
   const errors: FieldErrors = {}
 
-  if (mode === 'register' && values.name.trim() === '') {
-    errors.name = ['Enter a name.']
+  if (mode === 'register' && !USERNAME.test(values.username.trim())) {
+    errors.username = ['Use 3–20 letters, numbers, _ or -.']
   }
 
   if (values.email.trim() === '') {
@@ -115,7 +118,7 @@ export default function AuthModal({
     const failure =
       mode === 'login'
         ? await login({ email: values.email, password: values.password, remember: values.remember })
-        : await register(values)
+        : await register({ ...values, username: values.username.trim() })
 
     setBusy(false)
 
@@ -193,12 +196,12 @@ export default function AuthModal({
           {mode === 'register' && (
             <Field
               ref={firstField}
-              label="Name"
-              name="name"
-              autoComplete="name"
-              value={values.name}
-              onChange={(value) => set('name', value)}
-              errors={errors.name}
+              label="Username"
+              name="username"
+              autoComplete="username"
+              value={values.username}
+              onChange={(value) => set('username', value)}
+              errors={errors.username}
             />
           )}
 

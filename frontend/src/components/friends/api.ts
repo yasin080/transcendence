@@ -6,7 +6,7 @@ import { notifyFriendsChanged } from './events.ts'
 export interface ApiUser {
   id: number
   username: string
-  avatar_url: string | null
+  avatar: string | null
 }
 
 interface ApiPanel {
@@ -29,7 +29,7 @@ export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),
     username: user.username,
-    avatarUrl: user.avatar_url,
+    avatarUrl: user.avatar,
     status: 'offline',
   }
 }
