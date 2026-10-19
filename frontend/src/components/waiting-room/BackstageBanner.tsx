@@ -8,7 +8,7 @@ interface BackstageBannerProps {
 
 export default function BackstageBanner({ children }: BackstageBannerProps) {
   return (
-    <div className="relative mt-6.5 -mx-7 -mb-8 h-70 min-h-45 overflow-hidden">
+    <div className="relative mt-6.5 -mx-4 -mb-8 h-70 min-h-45 overflow-hidden md:-mx-7">
       <div className="absolute inset-0">{children}</div>
 
       <div
