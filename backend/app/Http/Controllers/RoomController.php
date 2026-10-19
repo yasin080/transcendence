@@ -131,6 +131,11 @@ class RoomController extends Controller
     {
         $userId = $request->user()->id;
 
+        // Mid-match you keep your seat, so you can still go back to the game.
+        if ($room->status === 'playing') {
+            return response()->json(null, 204);
+        }
+
         if ($room->host_id === $userId) {
             if ($room->status === 'open') {
                 $room->update(['status' => 'closed']);

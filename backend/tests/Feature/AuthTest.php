@@ -129,7 +129,7 @@ class AuthTest extends TestCase
                 'email' => 'gusano@example.com',
                 'password' => 'secret-worm',
             ])
-            ->assertStatus(419);
+            ->assertFails(419);
     }
 
     public function test_the_user_endpoint_returns_null_for_a_visitor(): void
@@ -162,7 +162,7 @@ class AuthTest extends TestCase
 
     public function test_logout_needs_a_session(): void
     {
-        $this->postJson('/api/logout')->assertUnauthorized();
+        $this->postJson('/api/logout')->assertFails(401);
     }
 
     public function test_login_without_remember_does_not_set_a_persistent_cookie(): void

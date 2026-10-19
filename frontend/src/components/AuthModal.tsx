@@ -195,7 +195,7 @@ export default function AuthModal({
               ref={firstField}
               label="Name"
               name="name"
-              autoComplete="nickname"
+              autoComplete="name"
               value={values.name}
               onChange={(value) => set('name', value)}
               errors={errors.name}

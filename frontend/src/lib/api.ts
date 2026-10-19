@@ -83,25 +83,23 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
     }
   }
 
-  // A stale CSRF token is worth one silent retry with a fresh cookie; anything
-  // more would loop on a genuinely broken session.
-  if (response.status === 419 && retry) {
-    // Clearing the cookie from JS is unreliable (it is scoped to SESSION_DOMAIN),
-    // so let the server overwrite it instead.
-    await ensureCsrfCookie(true)
-
-    return request<T>(method, path, body, false)
-  }
-
   if (response.status === 204) return { ok: true, data: undefined as T }
 
   const payload: unknown = await response.json().catch(() => null)
   const record = (payload ?? null) as { ok?: unknown; status?: unknown; message?: unknown; errors?: unknown } | null
 
-  // Expected failures (validation, conflict, rate limit) arrive as 200 with
-  // ok:false so Chrome does not log them; the real status is in the body.
   if (!response.ok || record?.ok === false) {
     const status = response.ok ? Number(record?.status) : response.status
+
+
+    if (status === 419 && retry) {
+      await ensureCsrfCookie(true)
+
+      return request<T>(method, path, body, false)
+    }
+
+    if (status === 401 && window.location.pathname !== '/') window.location.assign('/')
+
     return {
       ok: false,
       failure: {

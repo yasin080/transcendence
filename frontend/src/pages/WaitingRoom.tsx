@@ -58,7 +58,10 @@ export default function WaitingRoom() {
       setRoom(e.room)
       // Si ya no estoy en la lista, el host me ha expulsado.
       const stillIn = e.room.players.some((p) => p.user_id === user?.id)
-      if (!stillIn) setPhase('kicked')
+      if (stillIn) return
+      // Kicked
+      echo.leave(`room.${roomId}`)
+      setPhase('kicked')
     })
     channel.listen('.match.started', (e: { gameId: number }) => {
       navigate(`/game/${e.gameId}`)
