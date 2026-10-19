@@ -12,8 +12,8 @@ const total = 4
 
 export default function Scoreboard() {
   return (
-    <header className="flex h-11 flex-none items-center gap-4 border-b border-line bg-surface px-4 text-sm">
-      <ul className="flex min-w-0 flex-1 items-center gap-1">
+    <header className="flex flex-none flex-col border-b border-line bg-surface px-4 text-sm sm:flex-row sm:items-center sm:gap-4">
+      <ul className="order-last grid grid-cols-2 gap-1 pb-2 sm:order-none sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:pb-0">
         {rows.map((row) => (
           <li
             key={row.name}
@@ -35,7 +35,7 @@ export default function Scoreboard() {
         ))}
       </ul>
 
-      <div className="flex flex-none items-center gap-4">
+      <div className="flex h-11 flex-none items-center justify-end gap-4">
         <span className="text-fg-secondary">
           {alive} / {total} alive
         </span>
