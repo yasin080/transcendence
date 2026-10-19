@@ -4,6 +4,7 @@ import FriendsPanel from '../components/friends/FriendsPanel'
 import MainLayoutSidebar from '../components/left-sidebar/MainLayoutSidebar'
 import { XIcon } from '../components/friends/icons'
 import Button from '../components/ui/Button'
+import TabBar from '../components/TabBar'
 
 /**
  * Marco 2 — chasis de 3 columnas del mainlayout.
@@ -31,8 +32,8 @@ export default function MainLayout() {
   }, [friendsOpen])
 
   return (
-    <div className="flex h-screen bg-void text-white">
-      <aside className="w-19 flex-none border-r border-white/8 bg-surface-1 xl:w-67">
+    <div className="flex h-screen flex-col bg-void text-white md:flex-row">
+      <aside className="hidden w-19 flex-none border-r border-white/8 bg-surface-1 md:block xl:w-67">
         <MainLayoutSidebar onOpenFriends={() => setFriendsOpen(true)} />
       </aside>
 
@@ -45,13 +46,13 @@ export default function MainLayout() {
       {friendsOpen && (
         <div
           aria-hidden="true"
-          className="fixed inset-0 z-30 bg-void/70 backdrop-blur-sm xl:hidden"
+          className="fixed inset-0 z-30 hidden bg-void/70 backdrop-blur-sm md:block xl:hidden"
           onClick={() => setFriendsOpen(false)}
         />
       )}
 
       <aside
-        className={`${friendsOpen ? 'fixed inset-y-0 right-0 z-40 w-90' : 'hidden'} flex-none border-l border-white/8 bg-surface-1 xl:static xl:block xl:w-85`}
+        className={`${friendsOpen ? 'fixed inset-x-0 top-0 bottom-16 z-40 md:bottom-0 md:left-auto md:w-90 bg-void' : 'hidden'} flex-none border-l border-white/8 xl:static xl:block xl:w-85 xl:bg-surface-1`}
       >
         <Button
           variant="ghost"
@@ -65,6 +66,8 @@ export default function MainLayout() {
         </Button>
         <FriendsPanel />
       </aside>
+
+      <TabBar friendsOpen={friendsOpen} onFriendsOpenChange={setFriendsOpen} />
     </div>
   )
 }
