@@ -6,11 +6,16 @@ import Sidebar from '../ui/Sidebar'
 import LegalLinks from '../LegalLinks'
 import { useAuth } from '../../auth/useAuth'
 import Avatar from '../ui/Avatar'
+import { UsersIcon } from './ui/Icons'
+
+type MainLayoutSidebarProps = {
+  onOpenFriends: () => void
+}
 
 /**
  * Sidebar izquierdo del lobby: compone las piezas dentro de la carcasa genérica.
  */
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ onOpenFriends }: MainLayoutSidebarProps) {
   return (
     <Sidebar
       header={<SidebarHeader />}
@@ -29,6 +34,17 @@ export default function DashboardSidebar() {
       }
     >
       <SidebarNav />
+        <div className="mt-1 px-3 xl:hidden">
+        <button
+          type="button"
+          onClick={onOpenFriends}
+          aria-label="Friends"
+          title="Friends"
+          className="flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl px-4 py-2.5 text-fg-secondary transition-colors hover:bg-fill-strong hover:text-white"
+        >
+          <UsersIcon />
+        </button>
+      </div>
     </Sidebar>
   )
 }
