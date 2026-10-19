@@ -14,6 +14,8 @@ import StatCard from '../components/profile/StatCard'
 import type { ProfileEdits, ProfileUser } from '../components/profile/types'
 import Button from '../components/ui/Button'
 import { onFriendsChanged } from '../components/friends/events'
+import LegalLinks from '../components/LegalLinks'
+import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
@@ -134,6 +136,13 @@ export default function Profile() {
               {profile.username} has no friends yet
             </p>
           )}
+        </div>
+      )}
+
+      {isOwn && (
+        <div className="mt-auto flex flex-col items-center gap-2 md:hidden">
+          <LogoutButton />
+          <LegalLinks />
         </div>
       )}
 

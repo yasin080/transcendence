@@ -1,8 +1,7 @@
-import { Link } from 'react-router'
-
 import LogoutButton from './auth/LogoutButton'
 import SidebarNav from './nav/SidebarNav'
 import Sidebar from '../ui/Sidebar'
+import LegalLinks from '../LegalLinks'
 
 /**
  * Sidebar izquierdo del lobby: compone las piezas dentro de la carcasa genérica.
@@ -15,10 +14,8 @@ export default function DashboardSidebar() {
       footer={
         <>
           <LogoutButton />
-          {/* El subject exige que estas páginas sean accesibles desde la app */}
-          <div className="mt-3 flex gap-3 text-xs text-fg-faint">
-            <Link to="/privacy" className="hover:text-fg-secondary">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-fg-secondary">Terms of Service</Link>
+          <div className="mt-3">
+            <LegalLinks/>
           </div>
         </>
       }

@@ -7,6 +7,7 @@ import type { RoomSummary } from '../components/lobby/types.ts'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
+import LegalLinks from '../components/LegalLinks.tsx'
 
 
 
@@ -99,7 +100,7 @@ export default function Lobby() {
   }
 
 
-  
+
   const roomList = rooms ?? []
   const pageCount = Math.max(1, Math.ceil(roomList.length / PAGE_SIZE))
   const firstIndex = (page - 1) * PAGE_SIZE
@@ -185,7 +186,6 @@ export default function Lobby() {
 
 
       {/* Paginador */}
-      
         <div className="flex items-center gap-2.5 mt-3.5">
           {roomList.length > 0 && (
           <span className="text-xs text-white/40">
@@ -196,7 +196,6 @@ export default function Lobby() {
           )}
 
           <div className="ml-auto flex items-center gap-1.5">
-     
           <button
             type="button"
             disabled={page === 1}
@@ -232,8 +231,9 @@ export default function Lobby() {
         </div>
       </div>
 
-
-
+      <div className="mt-8 flex justify-center border-t border-line xl:hidden">
+        <LegalLinks />
+      </div>
     </section>
   )
 }
