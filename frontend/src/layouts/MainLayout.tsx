@@ -11,12 +11,12 @@ import MainLayoutSidebar from '../components/left-sidebar/MainLayoutSidebar'
  */
 export default function MainLayout() {
   return (
-    <div className="flex h-screen min-w-295 bg-void text-white">
+    <div className="flex h-screen bg-void text-white">
       <aside className="w-67 flex-none border-r border-white/8 bg-surface-1">
         <MainLayoutSidebar />
       </aside>
 
-      <div className="flex flex-1 min-w-140 min-h-0">
+      <div className="flex flex-1 min-w-0 min-h-0">
         {/* La página de turno (Lobby, sala de espera...). La sala de espera
             no es un modal: sustituye al Lobby en este hueco. */}
         <Outlet />
