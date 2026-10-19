@@ -16,6 +16,7 @@ export default function Game() {
   const [match, setMatch] = useState<Match | null>(null)
   const [missing, setMissing] = useState(false)
   const [over, setOver] = useState(false)
+  const [eliminated, setEliminated] = useState(false)
   const [countdownEnd, setCountdownEnd] = useState(0)
   const [, setTicks] = useState(0)
 
@@ -24,6 +25,7 @@ export default function Game() {
     setMatch(null)
     setMissing(false)
     setOver(false)
+    setEliminated(false)
     loadMatch(gameId).then((loaded) => {
       if (cancelled) return
       if (!loaded) return setMissing(true)
@@ -58,7 +60,7 @@ export default function Game() {
       )}
 
       <div className="relative min-h-0 flex-1">
-        {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} onUpdate={() => setTicks((n) => n + 1)} />}
+        {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} onEliminated={() => setEliminated(true)} onUpdate={() => setTicks((n) => n + 1)} />}
 
         <Link
           to="/lobby"
@@ -66,6 +68,14 @@ export default function Game() {
         >
           ← Back to lobby
         </Link>
+
+        {eliminated && !over && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
+            <div className="rounded-xl border border-line bg-void/70 px-4 py-2 text-sm text-fg-secondary backdrop-blur-sm">
+              Eliminated · watching until the end
+            </div>
+          </div>
+        )}
       </div>
 
       {countdownEnd > 0 && match && (
