@@ -11,8 +11,8 @@ interface PlayerGridProps {
 export default function PlayerGrid({ players, maxPlayers, isOwner, onKick }: PlayerGridProps) {
   const seated = players.slice(0, maxPlayers)
   const emptyCount = Math.max(0, maxPlayers - seated.length)
-  // Hasta 9 plazas: 3 por fila. Más de 9: 5 por fila, para que la cuadrícula no se alargue.
-  const columns = maxPlayers > 9 ? 'grid-cols-5' : 'grid-cols-3'
+  // Móvil: una por fila. Desde sm, 3 por fila; con más de 9 plazas, 5 desde lg
+  const columns = maxPlayers > 9 ? 'sm:grid-cols-3 lg:grid-cols-5' : 'sm:grid-cols-3'
 
   return (
     <section>
@@ -20,7 +20,7 @@ export default function PlayerGrid({ players, maxPlayers, isOwner, onKick }: Pla
         <h2 className="text-section-title">Players</h2>
       </div>
 
-      <div className={`grid gap-2.5 ${columns}`}>
+      <div className={`grid grid-cols-1 gap-2.5 ${columns}`}>
         {seated.map((p) => (
           <PlayerCard key={p.id} player={p} onKick={isOwner && !p.isOwner ? onKick : undefined} />
         ))}
@@ -34,7 +34,7 @@ export default function PlayerGrid({ players, maxPlayers, isOwner, onKick }: Pla
 
 function EmptySlot() {
   return (
-    <div className="flex min-h-37.5 animate-breathe flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line-strong bg-fill-subtle p-4 motion-reduce:animate-none">
+      <div className="flex min-h-21 animate-breathe items-center gap-3 rounded-2xl border border-dashed border-line-strong bg-fill-subtle p-4 motion-reduce:animate-none sm:min-h-37.5 sm:flex-col sm:justify-center">
       <div className="size-13 rounded-2xl border border-dashed border-line-strong" />
       <div className="text-micro-label text-fg-faint">Waiting for player</div>
     </div>

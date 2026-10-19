@@ -54,7 +54,7 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
       </div>
 
       {!player.isBot && (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(68px,1fr))] gap-2">
+        <div className="hidden gap-2 sm:grid sm:grid-cols-[repeat(auto-fit,minmax(68px,1fr))]">
           <Stat value={player.winPct} label="Win rate" />
           <Stat value={player.avgScore} label="Avg score" />
         </div>
