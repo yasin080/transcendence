@@ -1,4 +1,4 @@
-import { apiGet } from '../../lib/api'
+import { apiGet, apiPatch, apiPost, type ApiResult } from '../../lib/api'
 import { toSummary, type ApiUser } from '../friends/api.ts'
 import type { FriendState, FriendSummary } from '../friends/types.ts'
 import type { ProfileStats, ProfileUser } from './types.ts'
@@ -35,7 +35,7 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
       id: String(data.id),
       username: data.username,
       name: data.name ?? undefined,
-      avatarUrl: data.avatar_url,
+      avatarUrl: data.avatar,
       bio: data.bio ?? '',
       memberSince: data.created_at,
       friendCount: data.friend_count,
@@ -45,4 +45,26 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
     friendState: data.friend_state,
     friends: data.friends.map(toSummary),
   }
+}
+
+// Lo que acepta PATCH /api/user
+export interface ProfileUpdate {
+  username: string
+  name: string
+  email: string
+  bio: string
+  avatar?: string | null // solo al elegir de la galería o volver al de por defecto
+  password?: string
+  password_confirmation?: string
+  current_password?: string
+}
+
+export function updateProfile(update: ProfileUpdate): Promise<ApiResult<unknown>> {
+  return apiPatch('/api/user', update)
+}
+
+export function uploadAvatar(file: File): Promise<ApiResult<{ avatar: string }>> {
+  const form = new FormData()
+  form.append('avatar', file)
+  return apiPost('/api/user/avatar', form)
 }
