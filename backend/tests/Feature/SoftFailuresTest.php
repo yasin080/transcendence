@@ -21,8 +21,11 @@ class SoftFailuresTest extends TestCase
             ->assertJsonPath('status', 422);
     }
 
-    public function test_misuse_of_the_api_keeps_its_4xx(): void
+    public function test_any_api_client_error_is_soft_but_pages_keep_their_status(): void
     {
-        $this->postJson('/api/rooms', [])->assertUnauthorized();
+        $this->postJson('/api/rooms', [])->assertFails(401);
+        $this->getJson('/api/no-such-endpoint')->assertFails(404);
+
+        $this->get('/no-such-page')->assertNotFound();
     }
 }

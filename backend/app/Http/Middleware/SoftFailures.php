@@ -8,19 +8,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Chrome logs every 4xx response in the console, even an expected "wrong
- * password". The expected outcomes of a form (validation, conflict, rate
- * limit) go out as 200 with `ok: false` and the real status in the body;
- * misuse of the API (401, 403, 404, 419) stays a 4xx.
+ * password" or "room not found". So the API never answers 4xx: a client error
+ * goes out as 200 with `ok: false` and the real status in the body. Server
+ * errors (5xx) keep their status: those are bugs and should be seen.
  */
 class SoftFailures
 {
-    private const SOFT = [409, 422, 429];
-
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
         $status = $response->getStatusCode();
-        if (! $request->is('api/*') || ! in_array($status, self::SOFT, true)) {
+        if (! $request->is('api/*') || $status < 400 || $status >= 500) {
             return $response;
         }
 

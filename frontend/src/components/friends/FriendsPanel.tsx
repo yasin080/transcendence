@@ -198,6 +198,7 @@ function SearchBox({ value, onChange }: { value: string; onChange: (value: strin
       >
         <SearchIcon className="size-4 flex-none text-fg-muted" />
         <input
+          name="player-search"
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="Search players"

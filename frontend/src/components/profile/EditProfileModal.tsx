@@ -171,6 +171,7 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
               <input
                 ref={fileInput}
                 type="file"
+                name="avatar"
                 accept={AVATAR_TYPES.join(',')}
                 onChange={onFileChange}
                 className="hidden"
@@ -194,7 +195,7 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
           <FormField
             label="Username"
             name="username"
-            autoComplete="nickname"
+            autoComplete="username"
             value={values.username}
             onChange={(value) => set('username', value)}
             errors={errors.username}

@@ -14,6 +14,7 @@ import Landing from './pages/Landing.tsx'
 import Privacy from './pages/Privacy.tsx'
 import Profile from './pages/Profile.tsx'
 import Terms from './pages/Terms.tsx'
+import NotFound from './pages/NotFound.tsx'
 import Leaderboard from './pages/Leaderboard.tsx'
 
 const Game = lazy(() => import('./pages/Game.tsx'))
@@ -33,6 +34,7 @@ createRoot(root).render(
             <Route path="health" element={<Health />} />
             <Route path="privacy" element={<Privacy />} />
             <Route path="terms" element={<Terms />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
 
           <Route element={<RequireAuth />}>

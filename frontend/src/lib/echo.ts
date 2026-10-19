@@ -34,3 +34,10 @@ export const echo = new Echo({
     },
   },
 })
+
+window.addEventListener('pagehide', (event) => {
+  if (event.persisted) echo.connector.pusher.disconnect()
+})
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) echo.connector.pusher.connect()
+})

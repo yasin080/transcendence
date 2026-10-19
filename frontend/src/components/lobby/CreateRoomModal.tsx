@@ -60,6 +60,8 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
         <label className="block mt-4.5">
           <span className={FIELD_LABEL}>Room name</span>
           <input
+            name="name"
+            autoComplete="off"
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={40}

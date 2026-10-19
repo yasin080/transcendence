@@ -121,6 +121,7 @@ export default function Lobby() {
               <path d="M20 20l-3.5-3.5" />
             </svg>
             <input
+              name="room-search"
               placeholder="Search room or code"
               className="w-[190px] border-0 bg-transparent text-[13px] text-white outline-none"
             />

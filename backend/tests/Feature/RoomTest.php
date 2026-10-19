@@ -80,7 +80,7 @@ class RoomTest extends TestCase
 
     public function test_a_guest_cannot_create_a_room(): void
     {
-        $this->postJson('/api/rooms', ['name' => 'Snake night', 'settings' => self::SNAKE])->assertUnauthorized();
+        $this->postJson('/api/rooms', ['name' => 'Snake night', 'settings' => self::SNAKE])->assertFails(401);
     }
 
     public function test_the_host_can_start_the_match(): void
@@ -99,7 +99,7 @@ class RoomTest extends TestCase
         $room = $this->createRoom(User::factory()->create());
         $this->actingAs(User::factory()->create());
 
-        $this->postJson("/api/rooms/{$room->code}/games")->assertForbidden();
+        $this->postJson("/api/rooms/{$room->code}/games")->assertFails(403);
         $this->assertDatabaseCount('games', 0);
     }
 
@@ -164,7 +164,7 @@ class RoomTest extends TestCase
         $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
         $this->actingAs(User::factory()->create());
 
-        $this->getJson("/api/games/{$gameId}")->assertForbidden();
+        $this->getJson("/api/games/{$gameId}")->assertFails(403);
     }
 
     public function test_a_player_can_rejoin_their_room_even_if_it_is_full(): void
@@ -261,7 +261,7 @@ class RoomTest extends TestCase
         $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 5, 'y' => 0]])->assertFails(422);
 
         $this->actingAs(User::factory()->create());
-        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertForbidden();
+        $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertFails(403);
     }
 
     public function test_a_player_can_join_an_open_room(): void
@@ -317,7 +317,7 @@ class RoomTest extends TestCase
         $room = $this->createRoom(User::factory()->create());
         $this->actingAs(User::factory()->create());
 
-        $this->postJson("/api/rooms/{$room->code}/bots")->assertForbidden();
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertFails(403);
     }
 
     public function test_no_bot_can_be_added_to_a_started_match(): void
@@ -353,7 +353,7 @@ class RoomTest extends TestCase
         $this->assertEqualsWithDelta(now()->getTimestampMs() - Presence::AWAY_MS, LiveGames::lastSeen($gameId)[0], 1000);
 
         $this->actingAs(User::factory()->create());
-        $this->postJson("/api/games/{$gameId}/ping")->assertForbidden();
+        $this->postJson("/api/games/{$gameId}/ping")->assertFails(403);
     }
 
     public function test_show_returns_the_players_and_games(): void
@@ -390,7 +390,7 @@ class RoomTest extends TestCase
         $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join")->assertOk();
         $hostSeat = $room->players()->where('user_id', $room->host_id)->firstOrFail();
 
-        $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertForbidden();
+        $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertFails(403);
         $this->assertSame(2, $room->players()->count());
     }
 
@@ -404,7 +404,19 @@ class RoomTest extends TestCase
         $this->actingAs($host);
 
         $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertFails(422);
-        $this->postJson("/api/rooms/{$room->code}/kick/{$otherSeat->id}")->assertNotFound();
+        $this->postJson("/api/rooms/{$room->code}/kick/{$otherSeat->id}")->assertFails(404);
         $this->assertDatabaseCount('room_players', 2);
+    }
+
+    public function test_leaving_mid_match_keeps_the_seat(): void
+    {
+        $room = $this->createRoom(User::factory()->create(), players: 2);
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join");
+        $gameId = $this->actingAs($room->host)->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
+
+        $this->actingAs($guest)->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', 1);
     }
 }
