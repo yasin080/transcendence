@@ -12,7 +12,7 @@ import MainLayoutSidebar from '../components/left-sidebar/MainLayoutSidebar'
 export default function MainLayout() {
   return (
     <div className="flex h-screen bg-void text-white">
-      <aside className="w-67 flex-none border-r border-white/8 bg-surface-1">
+      <aside className="w-19 flex-none border-r border-white/8 bg-surface-1 xl:w-67">
         <MainLayoutSidebar />
       </aside>
 

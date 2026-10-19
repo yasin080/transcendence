@@ -41,12 +41,12 @@ export default function SidebarNav() {
       ))}
 
       {import.meta.env.DEV && (
-        <>
+        <div className="hidden flex-col gap-1 xl:flex">
           <p className="mt-6 mb-1 px-4 text-micro-label text-fg-faint">Dev</p>
           {devItems.map((item) => (
             <SidebarNavLink key={item.to} {...item} />
           ))}
-        </>
+        </div>
       )}
     </nav>
   )
@@ -57,8 +57,10 @@ function SidebarNavLink({ to, label, end, icon }: NavItem) {
     <NavLink
       to={to}
       end={end}
+      aria-label={label}
+      title={label}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-xl px-4 py-2.5 text-base font-semibold transition-colors ${
+        `flex min-h-12 items-center justify-center gap-3 rounded-xl px-4 py-2.5 text-base font-semibold transition-colors xl:justify-start ${
           isActive
             ? 'bg-fuse-600/16 text-white'
             : 'text-fg-secondary hover:bg-fill-strong hover:text-white'
@@ -66,7 +68,7 @@ function SidebarNavLink({ to, label, end, icon }: NavItem) {
       }
     >
       {icon}
-      {label}
+      <span className="hidden xl:inline">{label}</span>
     </NavLink>
   )
 }

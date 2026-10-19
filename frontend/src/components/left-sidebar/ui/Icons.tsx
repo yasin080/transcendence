@@ -100,3 +100,13 @@ export function UserIcon({ className = 'size-5 flex-none' }: IconProps) {
     </svg>
   )
 }
+
+export function LogoutIcon({ className = 'size-5 flex-none' }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="m16 17 5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
+  )
+}
