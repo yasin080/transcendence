@@ -76,6 +76,14 @@ export default function WaitingRoom() {
     navigate('/lobby')
   }
 
+  async function addBot() {
+    if (!roomId) return
+    setStartError(null)
+    const result = await apiPost<Room>(`/api/rooms/${roomId}/bots`)
+    if (result.ok) setRoom(result.data)
+    else setStartError(result.failure.message)
+  }
+
   // Solo pide empezar; la navegación llega por el evento match.started.
   async function startMatch() {
     if (!roomId) return
@@ -113,7 +121,7 @@ export default function WaitingRoom() {
   const playerCount = room.players.length
   const maxPlayers = room.settings.players
   const hasFreeSeat = playerCount < maxPlayers
-  const canStart = playerCount === maxPlayers
+  const canStart = playerCount > 0
   
 
   return (
@@ -122,7 +130,7 @@ export default function WaitingRoom() {
         roomName={room.name}
         isOwner={isOwner}
         hasFreeSeat={hasFreeSeat}
-        onAddBot={() => console.log('add bot')}
+        onAddBot={addBot}
       />
       <MatchPanel
         isOwner={isOwner}

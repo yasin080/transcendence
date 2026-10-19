@@ -12,6 +12,16 @@ import { echo } from '../lib/echo'
 
 const PAGE_SIZE = 6
 
+type CurrentRoom = { code: string | null }
+
+async function leaveCurrentRoom(): Promise<string | null> {
+  const current = await apiGet<CurrentRoom>('/api/rooms/current')
+  if (!current.ok || !current.data.code) return null
+  await apiPost(`/api/rooms/${current.data.code}/leave`)
+  const after = await apiGet<CurrentRoom>('/api/rooms/current')
+  return after.ok ? after.data.code : null
+}
+
 const GAME_MODES = ['Bomberman', 'Snake', 'Other'] as const
 type GameMode = (typeof GAME_MODES)[number]
 
@@ -48,8 +58,8 @@ export default function Lobby() {
       else setError(result.failure.message)
     })
 
-    void apiGet<{ code: string | null }>('/api/rooms/current').then((result) => {
-      if (!cancelled && result.ok) setMyRoomCode(result.data.code)
+    void leaveCurrentRoom().then((code) => {
+      if (!cancelled) setMyRoomCode(code)
     })
 
     echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {

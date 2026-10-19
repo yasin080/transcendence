@@ -6,8 +6,10 @@ type Room = { code: string }
 type GameRecord = { id: number; seat: number; now: number; room: { code: string }; state: Game | null }
 export type Match = { game: Game; seat: number; roomCode: string | null }
 
+// Room names must be unique among active rooms, so each quick match gets its own.
 export async function startQuickMatch(): Promise<number | null> {
-  const room = await apiPost<Room>('/api/rooms', { name: 'Quick match', settings: SNAKE })
+  const name = `Quick match ${Math.random().toString(36).slice(2, 6).toUpperCase()}`
+  const room = await apiPost<Room>('/api/rooms', { name, settings: SNAKE })
   if (!room.ok) return null
 
   const game = await apiPost<GameRecord>(`/api/rooms/${room.data.code}/games`)

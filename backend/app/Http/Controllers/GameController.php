@@ -37,7 +37,10 @@ class GameController extends Controller
         $game = DB::transaction(function () use ($room) {
             $room = Room::lockForUpdate()->find($room->id);
             abort_unless($room->status === 'open', 409, 'This match has already started.');
-            abort_if($room->players()->count() < $room->settings['players'], 409, 'The room is not full yet.');
+
+            foreach ($room->players()->orderBy('seat')->get() as $i => $player) {
+                $player->update(['seat' => $i]);
+            }
 
             $room->update(['status' => 'playing']);
 
@@ -91,7 +94,7 @@ class GameController extends Controller
 
     private function initialState(Room $room): array
     {
-        $state = GameLogic::create($room->settings);
+        $state = GameLogic::create(['players' => $room->players()->count()] + $room->settings);
         foreach ($room->players()->with('user')->get() as $player) {
             if (isset($state['worms'][$player->seat])) {
                 $state['worms'][$player->seat]['name'] = $player->user->name ?? 'Bot';

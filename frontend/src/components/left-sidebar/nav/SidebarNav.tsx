@@ -27,7 +27,6 @@ const devItems: NavItem[] = [
   { to: '/profile/13', label: 'Profile: BombJovi (none)' },
   { to: '/profile/99999', label: 'Profile: not found' },
   { to: '/game/demo', label: 'Game' },
-  { to: '/dev/match', label: 'Multiplayer test' },
 ]
 
 export default function SidebarNav() {
