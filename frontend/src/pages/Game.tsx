@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
 import CountdownOverlay from '../components/game/CountdownOverlay'
+import Scoreboard from '../components/game/Scoreboard'
 import MessageModal from '../components/ui/MessageModal'
 import { loadMatch, type Match } from '../game/api'
 import GameCanvas from '../game/GameCanvas'
@@ -45,9 +46,7 @@ export default function Game() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-void text-white">
-      <header className="flex h-11 flex-none items-center border-b border-line px-4 text-sm text-fg-muted">
-        scoreboard
-      </header>
+      <Scoreboard />
 
       <div className="relative min-h-0 flex-1">
         {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} />}
