@@ -74,7 +74,7 @@ export default function Profile() {
       : data.profile
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8 *:shrink-0">
+    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-4 pt-6 pb-8 *:shrink-0 md:px-7">
       <ProfileHeader
         user={profile}
         isOwn={isOwn}
