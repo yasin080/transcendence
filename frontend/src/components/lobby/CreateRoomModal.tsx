@@ -14,12 +14,13 @@ import {
   type RoomChoices,
 } from './roomOptions.ts'
 import type { Room } from './types.ts'
+import FormField from '../ui/FormField.tsx'
 
 interface CreateRoomModalProps {
   onClose: () => void
 }
 
-const FIELD_LABEL = 'block mb-[7px] text-[11px] font-bold uppercase tracking-[.14em] text-white/45'
+const FIELD_LABEL = 'block mb-[7px] text-micro-label text-fg-secondary'
 
 export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
   const navigate = useNavigate()
@@ -57,19 +58,17 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
       <form onSubmit={onSubmit} noValidate>
         <h3 className="font-display text-xl">Create custom match</h3>
 
-        <label className="block mt-4.5">
-          <span className={FIELD_LABEL}>Room name</span>
-          <input
+        <div className="mt-4.5">
+          <FormField
+            label="Room name"
             name="name"
             autoComplete="off"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={setName}
             maxLength={40}
-            aria-invalid={nameError !== null}
-            className="w-full px-3.5 py-3 rounded-[11px] border border-white/14 bg-surface-input text-sm text-white outline-none"
+            errors={nameError ? [nameError] : undefined}
           />
-          {nameError && <span className="block mt-1.5 text-sm text-fuse-600">{nameError}</span>}
-        </label>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-[18px]">
           <ChipGroup label="Players" options={PLAYER_OPTIONS} value={choices.players} onChange={(v) => choose('players', v)} />
