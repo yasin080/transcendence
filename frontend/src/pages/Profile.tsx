@@ -13,6 +13,8 @@ import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
 import Button from '../components/ui/Button'
 import { onFriendsChanged } from '../components/friends/events'
+import LegalLinks from '../components/LegalLinks'
+import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
@@ -66,7 +68,7 @@ export default function Profile() {
   const { isOwn, friendState, friends, profile } = data
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8 *:shrink-0">
+    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-4 pt-6 pb-8 *:shrink-0 md:px-7">
       <ProfileHeader
         user={profile}
         isOwn={isOwn}
@@ -128,6 +130,15 @@ export default function Profile() {
               {profile.username} has no friends yet
             </p>
           )}
+        </div>
+      )}
+
+      {isOwn && (
+        <div className="mt-auto flex flex-col items-center gap-2 xl:hidden">
+          <div className="w-full md:hidden">
+            <LogoutButton />
+          </div>
+          <LegalLinks />
         </div>
       )}
 

@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router'
 
 import { useAuth } from '../../../auth/useAuth'
 import Button from '../../ui/Button'
+import { LogoutIcon } from '../ui/Icons'
+
+type LogoutButtonProps = {
+  compact?: boolean
+}
 
 /**
  * Log out of the session and return to the landing page.
  */
-export default function LogoutButton() {
+export default function LogoutButton({ compact = false }: LogoutButtonProps) {
   const { logout } = useAuth()
   const navigate = useNavigate()
   const [pending, setPending] = useState(false)
@@ -19,15 +24,19 @@ export default function LogoutButton() {
     void navigate('/', { replace: true })
   }
 
+  const label = pending ? 'Logging out…' : 'Log out'
+
   return (
     <Button
       variant="secondary"
-      size="md"
+      size={compact ? 'iconLg' : 'md'}
       onClick={() => void handleLogout()}
       disabled={pending}
-      className="w-full"
+      aria-label={compact ? label : undefined}
+      title={compact ? label : undefined}
+      className={compact ? '' : 'w-full'}
     >
-      {pending ? 'Logging out…' : 'Log out'}
+      {compact ? <LogoutIcon /> : label}
     </Button>
   )
 }

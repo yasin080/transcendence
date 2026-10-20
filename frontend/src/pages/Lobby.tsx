@@ -9,7 +9,6 @@ import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
 
 
-
 const PAGE_SIZE = 6
 
 type CurrentRoom = { code: string | null }
@@ -99,7 +98,7 @@ export default function Lobby() {
   }
 
 
-  
+
   const roomList = rooms ?? []
   const pageCount = Math.max(1, Math.ceil(roomList.length / PAGE_SIZE))
   const firstIndex = (page - 1) * PAGE_SIZE
@@ -107,15 +106,15 @@ export default function Lobby() {
 
 
   return (
-    <section className="flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8">
+    <section className="flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 md:px-7">
 
       {/* ─── 1. Cabecera: título + buscador ─── */}
       <div className="flex flex-wrap items-center gap-4 mb-[22px]">
         <h1 className="font-display text-[26px] tracking-[0.01em]">Lobby</h1>
 
-        <div className="ml-auto flex items-center gap-2.5">
+        <div className="flex w-full items-center gap-2.5 sm:ml-auto sm:w-auto">
           {/* Caja del buscador */}
-          <div className="flex items-center gap-[9px] px-3.5 py-2.5 rounded-[11px] border border-white/12 bg-white/5">
+          <div className="flex min-w-0 flex-1 items-center gap-[9px] px-3.5 py-2.5 rounded-[11px] border border-white/12 bg-white/5 sm:flex-none">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="2">
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-3.5-3.5" />
@@ -123,7 +122,7 @@ export default function Lobby() {
             <input
               name="room-search"
               placeholder="Search room or code"
-              className="w-[190px] border-0 bg-transparent text-[13px] text-white outline-none"
+              className="w-full min-w-0 border-0 bg-transparent text-[13px] text-white outline-none sm:w-[190px]"
             />
           </div>
 
@@ -185,7 +184,6 @@ export default function Lobby() {
 
 
       {/* Paginador */}
-      
         <div className="flex items-center gap-2.5 mt-3.5">
           {roomList.length > 0 && (
           <span className="text-xs text-white/40">
@@ -196,7 +194,6 @@ export default function Lobby() {
           )}
 
           <div className="ml-auto flex items-center gap-1.5">
-     
           <button
             type="button"
             disabled={page === 1}
@@ -231,9 +228,6 @@ export default function Lobby() {
           </button>
         </div>
       </div>
-
-
-
     </section>
   )
 }

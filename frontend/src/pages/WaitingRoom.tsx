@@ -125,10 +125,10 @@ export default function WaitingRoom() {
   const maxPlayers = room.settings.players
   const hasFreeSeat = playerCount < maxPlayers
   const canStart = playerCount > 0
-  
+
 
   return (
-    <div className="h-full flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8 font-body">
+    <div className="h-full flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 font-body md:px-7">
       <WaitingRoomHeader
         roomName={room.name}
         isOwner={isOwner}

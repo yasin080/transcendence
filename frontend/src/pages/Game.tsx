@@ -59,7 +59,7 @@ export default function Game() {
   }, [over])
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-void text-white">
+    <div className="flex h-dvh flex-col overflow-hidden bg-void text-white">
       {match && (
         <Scoreboard
           rows={scoreboard(match.game, match.seat)}

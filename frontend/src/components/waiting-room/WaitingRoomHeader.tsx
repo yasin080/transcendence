@@ -17,7 +17,7 @@ export default function WaitingRoomHeader({
     <header className="mb-5 flex flex-wrap items-center gap-4">
       <div className="min-w-0">
         <div className="text-eyebrow">Waiting room</div>
-        <h1 className="truncate display-title">{roomName}</h1>
+        <h1 className="display-title max-md:text-3xl md:truncate">{roomName}</h1>
       </div>
 
       <div className="ml-auto flex items-center gap-2.5">

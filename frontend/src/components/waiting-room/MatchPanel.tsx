@@ -32,7 +32,7 @@ export default function MatchPanel({
        aria-hidden="true"
        className="absolute inset-0 bg-linear-to-r from-surface/85 via-surface/45 via-55% to-surface/10"
       />
-      <div className="relative flex flex-wrap items-center gap-x-8 gap-y-5 px-7 py-6.5">
+      <div className="relative flex flex-wrap items-center gap-x-8 gap-y-5 px-5 py-6.5 sm:px-7">
         <div className="min-w-0 flex-1">
           <div className="text-eyebrow">Players in room</div>
           <div className="mt-1.5 flex items-baseline gap-2.5">
@@ -47,17 +47,17 @@ export default function MatchPanel({
           </div>
         </div>
 
-        <div className="flex flex-none items-center gap-3">
+        <div className="flex w-full flex-none flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
           {isOwner && (
           <Button
             onClick={onStart}
             disabled={!canStart}
-            className="motion-safe:enabled:animate-boom-pulse"
+            className="w-full sm:w-auto motion-safe:enabled:animate-boom-pulse"
           >
             Start match
           </Button>
           )}
-          <Button variant="secondary" onClick={onLeave}>
+          <Button variant="secondary" className="w-full sm:w-auto" onClick={onLeave}>
             Leave room
           </Button>
         </div>
