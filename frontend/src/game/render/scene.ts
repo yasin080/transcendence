@@ -9,6 +9,7 @@ import { DefaultRenderingPipeline } from '@babylonjs/core/PostProcesses/RenderPi
 import { Scene } from '@babylonjs/core/scene'
 
 import type { Game } from '../logic/game'
+import { type BombsRender, createBombs } from './bombs'
 import { isTouch } from '../touch'
 import { createFloor } from './floor'
 import { toWorld } from './grid'
@@ -59,10 +60,17 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
   createFloor(scene, board.width + 100, board.height + 100)
   let updateWorms: WormUpdate[] = []
   let updateFood: FoodUpdate = () => {}
-  Promise.all([createWalls(scene, board), createWorms(scene, board, worms), createFood(scene, board, game.food)])
-    .then(([, wormUpdates, foodUpdate]) => {
+  let bombs: BombsRender = { update: () => {}, flash: () => {} }
+  Promise.all([
+    createWalls(scene, board),
+    createWorms(scene, board, worms),
+    createFood(scene, board, game.food),
+    createBombs(scene, board, game),
+  ])
+    .then(([, wormUpdates, foodUpdate, bombsRender]) => {
       updateWorms = wormUpdates
       updateFood = foodUpdate
+      bombs = bombsRender
     })
     .catch((error: unknown) => {
       if (!scene.isDisposed) throw error
@@ -75,8 +83,9 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
   scene.onBeforeRenderObservable.add(() => {
     elapsed += engine.getDeltaTime()
     const t = Math.min(elapsed / game.settings.tickMs, 1)
-    updateWorms.forEach((update, i) => update(previous[i], current[i], t, !!worms[i].away))
+    updateWorms.forEach((update, i) => update(previous[i], current[i], t, !worms[i].alive || !!worms[i].away))
     updateFood(game.food)
+    bombs.update()
     if (follow) {
       const head = Vector3.Lerp(toWorld(board, previous[0][0]), toWorld(board, current[0][0]), t)
       Vector3.LerpToRef(cam.target, head, 0.1, cam.target)
@@ -96,6 +105,7 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
       previous = current
       current = worms.map((worm) => worm.body)
       elapsed = 0
+      bombs.flash(game.blasts)
     },
     dispose() {
       resize.disconnect()

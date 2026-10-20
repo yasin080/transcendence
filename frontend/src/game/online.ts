@@ -5,13 +5,16 @@ import type { Point } from './logic/worms'
 
 export type Input = { side: 'left' | 'right' } | { dir: Point }
 
-type Tick = Pick<Game, 'worms' | 'food'>
+type Tick = Pick<Game, 'worms' | 'food' | 'pickups' | 'bombs' | 'blasts'>
 
 export function listenOnline(gameId: string, game: Game, onTick: () => void) {
   const channel = `game.${gameId}`
   echo.private(channel).listen('.tick', (tick: Tick) => {
     tick.worms.forEach((worm, i) => Object.assign(game.worms[i], worm))
     game.food = tick.food
+    game.pickups = tick.pickups
+    game.bombs = tick.bombs
+    game.blasts = tick.blasts
     onTick()
   })
   return () => echo.leave(channel)

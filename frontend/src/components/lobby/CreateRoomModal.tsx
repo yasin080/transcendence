@@ -5,6 +5,7 @@ import Modal from '../ui/Modal.tsx'
 import ToggleChip from '../ui/ToggleChip.tsx'
 import {
   BOARD_OPTIONS,
+  BOMBS_ON,
   DEFAULT_CHOICES,
   FOOD_OPTIONS,
   PLAYER_OPTIONS,
@@ -84,6 +85,9 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
               </ToggleChip>
               <ToggleChip selected={choices.pillars} onClick={() => choose('pillars', !choices.pillars)}>
                 Pillars
+              </ToggleChip>
+              <ToggleChip selected={choices.bombs > 0} onClick={() => choose('bombs', choices.bombs > 0 ? 0 : BOMBS_ON)}>
+                Bombs
               </ToggleChip>
             </div>
           </div>

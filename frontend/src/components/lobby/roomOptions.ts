@@ -7,7 +7,7 @@ export interface Option<T> {
 
 // Lo que el host elige al crear la sala; el resto de Settings sale de SNAKE.
 // boardSize se convierte en width y height (tablero cuadrado).
-export type RoomChoices = Pick<Settings, 'players' | 'tickMs' | 'food' | 'wrap' | 'pillars'> & {
+export type RoomChoices = Pick<Settings, 'players' | 'tickMs' | 'food' | 'bombs' | 'wrap' | 'pillars'> & {
   boardSize: number
 }
 
@@ -26,6 +26,8 @@ export const SPEED_OPTIONS: Option<number>[] = [
   { label: 'Fast', value: 100 },
 ]
 
+export const BOMBS_ON = 3
+
 export const FOOD_OPTIONS: Option<number>[] = [1, 5, 15].map((n) => ({ label: String(n), value: n }))
 
 export const DEFAULT_CHOICES: RoomChoices = {
@@ -33,6 +35,7 @@ export const DEFAULT_CHOICES: RoomChoices = {
   boardSize: 30,
   tickMs: 150,
   food: 1,
+  bombs: 0,
   wrap: false,
   pillars: false,
 }

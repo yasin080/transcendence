@@ -12,6 +12,7 @@ export type Settings = {
   players: number
   startLength: number
   food: number
+  bombs: number
   wallHit: Hit
   bodyHit: Hit
   controls: Controls
@@ -28,6 +29,7 @@ export const SNAKE: Settings = {
   players: 1,
   startLength: 3,
   food: 3,
+  bombs: 0,
   wallHit: 'die',
   bodyHit: 'die',
   controls: 'turn',

@@ -18,6 +18,7 @@ class GameTest extends TestCase
         'players' => 1,
         'startLength' => 3,
         'food' => 1,
+        'bombs' => 0,
         'wallHit' => 'die',
         'bodyHit' => 'die',
         'controls' => 'turn',
@@ -116,7 +117,7 @@ class GameTest extends TestCase
     {
         $json = json_decode(json_encode(Game::create(self::SNAKE)), true);
 
-        $this->assertSame(['settings', 'board', 'worms', 'food'], array_keys($json));
+        $this->assertSame(['settings', 'board', 'worms', 'food', 'pickups', 'bombs', 'blasts'], array_keys($json));
         $this->assertSame(['width', 'height', 'cells'], array_keys($json['board']));
         $this->assertSame(['name', 'colour', 'body', 'dir', 'wanted', 'alive'], array_keys($json['worms'][0]));
     }

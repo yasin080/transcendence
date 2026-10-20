@@ -32,6 +32,7 @@ class RoomTest extends TestCase
         'players' => 1,
         'startLength' => 3,
         'food' => 1,
+        'bombs' => 0,
         'wallHit' => 'die',
         'bodyHit' => 'die',
         'controls' => 'turn',
