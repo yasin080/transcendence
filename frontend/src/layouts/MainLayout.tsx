@@ -7,12 +7,14 @@ import Button from '../components/ui/Button'
 import TabBar from '../components/TabBar'
 
 /**
- * Marco 2 — chasis de 3 columnas del mainlayout.
+ * Marco 2 — chasis del mainlayout: 3 columnas en escritorio, rail + cajón de
+ * amigos en tablet, y barra de pestañas en móvil.
  *
  * Las tres secciones viven AQUÍ, no dentro de las páginas: así no se
  * desmontan al navegar y el panel de amigos conserva su estado (y, más
  * adelante, su suscripción a Reverb).
  */
+
 export default function MainLayout() {
   const { pathname } = useLocation()
   // Por debajo de xl los amigos no caben como columna: se abren en un cajón

@@ -148,7 +148,6 @@ export default function Profile() {
         </div>
       )}
 
-
       {editOpen && (
         <EditProfileModal
           profile={profile}

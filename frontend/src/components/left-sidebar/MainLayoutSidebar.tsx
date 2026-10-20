@@ -34,7 +34,7 @@ export default function DashboardSidebar({ onOpenFriends }: MainLayoutSidebarPro
       }
     >
       <SidebarNav />
-        <div className="mt-1 px-3 xl:hidden">
+      <div className="mt-1 px-3 xl:hidden">
         <button
           type="button"
           onClick={onOpenFriends}
