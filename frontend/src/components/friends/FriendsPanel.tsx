@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import EmptyState from '../ui/EmptyState.tsx'
+import SectionHeader from '../ui/SectionHeader.tsx'
 import Sidebar from '../ui/Sidebar.tsx'
 import FriendRow from './FriendRow.tsx'
 import { acceptRequest, fetchPanel, removeFriendship, searchPlayers, sendRequest } from './api.ts'
@@ -90,9 +91,7 @@ export default function FriendsPanel() {
           results !== null &&
           (results.length > 0 ? (
             <section className="flex flex-col gap-0.5">
-              <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
-                <SectionLabel title="Results" count={results.length} />
-              </div>
+              <SectionHeader size="sm" className="px-2.5 pb-1.5" title="Results" count={results.length} />
               {results.map((user) => (
                 <FriendRow
                   key={user.id}
@@ -112,9 +111,7 @@ export default function FriendsPanel() {
           <>
             {received.length > 0 && (
               <section className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
-                  <SectionLabel title="Requests" count={received.length} highlight />
-                </div>
+                <SectionHeader size="sm" className="px-2.5 pb-1.5" title="Requests" count={received.length} highlight />
                 {received.map((user) => (
                   <FriendRow
                     key={user.id}
@@ -133,9 +130,7 @@ export default function FriendsPanel() {
 
             {online.length > 0 && (
               <section className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
-                  <SectionLabel title="Online" count={online.length} />
-                </div>
+                <SectionHeader size="sm" className="px-2.5 pb-1.5" title="Online" count={online.length} />
                 {online.map((friend) => (
                   <FriendRow key={friend.id} user={friend} variant="friend" />
                 ))}
@@ -144,9 +139,7 @@ export default function FriendsPanel() {
 
             {offline.length > 0 && (
               <section className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
-                  <SectionLabel title="Offline" count={offline.length} />
-                </div>
+                <SectionHeader size="sm" className="px-2.5 pb-1.5" title="Offline" count={offline.length} />
                 {offline.map((friend) => (
                   <FriendRow key={friend.id} user={friend} variant="friend" />
                 ))}
@@ -155,9 +148,7 @@ export default function FriendsPanel() {
 
             {sent.length > 0 && (
               <section className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
-                  <SectionLabel title="Sent requests" count={sent.length} />
-                </div>
+                <SectionHeader size="sm" className="px-2.5 pb-1.5" title="Sent requests" count={sent.length} />
                 {sent.map((user) => (
                   <FriendRow
                     key={user.id}
@@ -218,22 +209,5 @@ function SearchBox({ value, onChange }: { value: string; onChange: (value: strin
         )}
       </div>
     </div>
-  )
-}
-
-// Título de sección + línea + contador. highlight = estilo de "Requests"
-function SectionLabel({ title, count, highlight = false }: { title: string; count: number; highlight?: boolean }) {
-  return (
-    <>
-      <span className={`text-micro-label ${highlight ? 'text-ember-450' : 'text-fg-muted'}`}>{title}</span>
-      <span aria-hidden="true" className="h-px flex-1 bg-line" />
-      {highlight ? (
-        <span className="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-fuse-600 px-1 text-2xs font-bold text-white">
-          {count}
-        </span>
-      ) : (
-        <span className="text-meta text-fg-muted">{count}</span>
-      )}
-    </>
   )
 }

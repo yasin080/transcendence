@@ -5,6 +5,7 @@ import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
 import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
 import EmptyState from '../components/ui/EmptyState.tsx'
+import SectionHeader from '../components/ui/SectionHeader.tsx'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
@@ -158,9 +159,7 @@ export default function Lobby() {
       {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
 
       {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
-      <div className="flex items-center gap-3.5 mt-[26px] mb-3">
-        <h3 className="text-sm font-bold uppercase tracking-[.16em] text-white/60">Open rooms</h3>
-        <span className="h-px flex-1 bg-white/10" />
+      <SectionHeader size="lg" title="Open rooms" className="mt-[26px] mb-3">
         <span className="text-xs text-white/40">{roomList.length} rooms</span>
 
         <button
@@ -172,7 +171,7 @@ export default function Lobby() {
         >
           + Create room
         </button>
-      </div>
+      </SectionHeader>
 
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 
