@@ -1,5 +1,3 @@
-import { Link } from 'react-router'
-
 // TODO: replace with the team contact emails before the evaluation
 const CONTACT_EMAILS = ['login1@student.42urduliz.com', 'login2@student.42urduliz.com', 'login3@student.42urduliz.com']
 
@@ -16,10 +14,10 @@ export default function Privacy() {
       <section className="space-y-2">
         <h2 className="text-xl font-semibold">Who we are</h2>
         <p className="text-slate-300">
-          Transcendence is a multiplayer worm game built by a team of students at 42 Urduliz
-          (Bizkaia, Spain) for the ft_transcendence project. It is an educational, non-commercial
-          project. The team is responsible for the personal data processed here, and you can
-          contact us at:
+          We are a team of students at 42 Urduliz (Bizkaia, Spain), and this multiplayer worm game
+          is our ft_transcendence project. It is not a public online service: it runs on a machine
+          on campus so the project can be evaluated. If you have any question about your data,
+          write to us:
         </p>
         <ul className="list-disc space-y-1 pl-5 text-slate-300">
           {CONTACT_EMAILS.map((email) => (
@@ -31,137 +29,70 @@ export default function Privacy() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">What we collect</h2>
+        <h2 className="text-xl font-semibold">What we store and why</h2>
         <ul className="list-disc space-y-1 pl-5 text-slate-300">
           <li>
-            <strong>Account:</strong> your username, email address and password. We never store
-            the password itself, only a salted hash (bcrypt).
+            <strong>Account:</strong> your username, email and password, to log you in. The
+            password is stored as a bcrypt hash, never in plain text.
           </li>
           {/* Remove the token sentence if the team stops storing Google tokens */}
           <li>
-            <strong>Google sign-in (optional):</strong> your Google account ID, email and name. We
-            only accept Google accounts with a verified email. Google also gives us access and
-            refresh tokens, which we store linked to your account.
+            <strong>Google sign-in</strong>, if you use it: your Google ID, email and name, to
+            create your account without a password. We also store the access and refresh tokens
+            Google gives us.
           </li>
           <li>
-            <strong>Profile (optional):</strong> a display name, a bio of up to 160 characters and
-            an avatar. Uploaded avatars are cropped and re-encoded on our server, so any metadata
-            in the original file (camera, location…) is discarded.
+            <strong>Profile:</strong> an optional display name, a bio of up to 160 characters and an
+            avatar, to show who you are. Uploaded avatars are cropped and re-encoded, which strips
+            metadata such as the place where the photo was taken.
           </li>
           <li>
-            <strong>Gameplay:</strong> the rooms you create or join, the matches you play, who won,
-            and when each match started and ended.
+            <strong>Games:</strong> the rooms you create or join and the matches you play (who won,
+            when they started and ended), to run the game and show the results.
           </li>
           <li>
             <strong>Friends:</strong> the friend requests you send, receive and accept.
           </li>
           <li>
-            <strong>Technical:</strong> the cookies described below, and your IP address, kept for
-            a short time to limit repeated login and sign-up attempts.
+            <strong>Your IP address</strong>, kept for a short time to block repeated login and
+            sign-up attempts.
           </li>
         </ul>
-        <p className="text-slate-300">We do not use analytics, advertising or tracking tools.</p>
+        <p className="text-slate-300">The game does not use analytics, advertising or tracking tools.</p>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">How we use it</h2>
-        <ul className="list-disc space-y-1 pl-5 text-slate-300">
-          <li>To create your account, keep it secure and keep you logged in.</li>
-          <li>To run matches in real time and show their results.</li>
-          <li>To let you find other players and manage your friends.</li>
-          <li>To protect the service against abuse.</li>
-        </ul>
+        <h2 className="text-xl font-semibold">Who can see what</h2>
         <p className="text-slate-300">
-          We process this data because it is necessary to provide the service you signed up for
-          (art. 6.1.b GDPR) and to keep it secure (art. 6.1.f GDPR). We never sell your data or use
-          it for advertising.
+          Other logged-in players can see your username, avatar, bio, join date, friends list and
+          the names of the rooms you create. Your display name is shown in the lobby next to the
+          rooms you host and inside the rooms you join. If you sign in with Google, it starts as
+          the name on your Google account, and you can change it from your profile. The players in
+          a match see its result. Your email and password are never shown.
         </p>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">What other players can see</h2>
+        <h2 className="text-xl font-semibold">Cookies and Google</h2>
         <p className="text-slate-300">
-          Logged-in players can see your username, avatar, bio, join date, friends list, the names
-          of the rooms you create, and your match results. Your email address and password are
-          never shown to anyone, and your display name is only visible to you.
+          We only use the cookies the login needs: a session cookie that expires after 30 minutes
+          of inactivity, an XSRF-TOKEN cookie that protects forms, and, if you tick “Remember me”, a
+          cookie that keeps you logged in on that device until you log out.
+        </p>
+        <p className="text-slate-300">
+          Google is the only outside service: it handles sign-in if you choose it, and it serves
+          our fonts, which means your browser sends your IP address to Google.
         </p>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Cookies</h2>
+        <h2 className="text-xl font-semibold">Your data</h2>
         <p className="text-slate-300">
-          We only use cookies that are strictly necessary for the site to work, so they do not
-          require your consent:
-        </p>
-        <ul className="list-disc space-y-1 pl-5 text-slate-300">
-          <li>
-            <strong>Session cookie:</strong> keeps you logged in. It expires after 30 minutes of
-            inactivity.
-          </li>
-          <li>
-            <strong>XSRF-TOKEN:</strong> protects forms against cross-site request forgery.
-          </li>
-          <li>
-            <strong>Remember-me cookie:</strong> only if you tick “Remember me”. It keeps you
-            logged in on that device until you log out.
-          </li>
-        </ul>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Third-party services</h2>
-        <ul className="list-disc space-y-1 pl-5 text-slate-300">
-          <li>
-            <strong>Google Sign-In</strong>, only if you choose it. Google’s own privacy policy
-            applies to your Google account.
-          </li>
-          <li>
-            <strong>Google Fonts:</strong> your browser downloads our fonts from Google’s servers,
-            so Google receives your IP address.
-          </li>
-        </ul>
-        <p className="text-slate-300">We do not share your data with anyone else.</p>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Security and retention</h2>
-        <p className="text-slate-300">
-          All traffic is encrypted with HTTPS and passwords are hashed. We keep your account,
-          profile, friends and match data while your account exists. Since this is a student
-          project, the whole database may be deleted when the project ends.
-        </p>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Your rights</h2>
-        <p className="text-slate-300">
-          Under the GDPR you can access, correct, delete or export your data, and object to or
-          restrict how we use it. You can change your username, email, display name, bio, avatar
-          and password at any time from your profile. For anything else, including a copy of your
-          data or deleting your account, write to any of the addresses above from the email linked
-          to your account and we will answer within one month. You can also file a complaint with
-          the Spanish Data Protection Agency (
-          <a href="https://www.aepd.es" target="_blank" rel="noreferrer" className={linkClass}>
-            aepd.es
-          </a>
-          ).
-        </p>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Minimum age</h2>
-        <p className="text-slate-300">
-          You must be at least 14 years old to use Transcendence, the minimum age to consent to the
-          processing of personal data in Spain (art. 7 LOPDGDD). If we learn that an account
-          belongs to someone younger, we will delete it.
-        </p>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Changes</h2>
-        <p className="text-slate-300">
-          If we change this policy, we will update the date at the top of this page. See also our{' '}
-          <Link to="/terms" className={linkClass}>Terms of Service</Link>.
+          Your data stays in the database of that campus machine and is not sent anywhere else. All
+          traffic uses HTTPS. You can change your username, email, display name, bio, avatar and
+          password from your profile at any time. To get a copy of your data or delete your
+          account, email us from the address linked to your account. The database may be deleted
+          once the evaluation is over.
         </p>
       </section>
     </article>

@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router'
 
 import AnimatedWorm from '../components/AnimatedWorm'
 import AuthModal from '../components/AuthModal'
+import LegalLinks from '../components/LegalLinks'
 import Button from '../components/ui/Button'
 import { useAuth } from '../auth/useAuth'
 import './landing.css'
@@ -83,6 +84,12 @@ export default function Landing() {
           <AnimatedWorm variant="hero" />
         </div>
       </main>
+
+      {/* Logged-out visitors only see this page, and the subject requires the legal pages to be reachable */}
+      <footer className="absolute inset-x-0 bottom-0 z-10 flex justify-center">
+        <LegalLinks />
+      </footer>
+
       {modalOpen && (
         <AuthModal
           initialMessage={authError}
