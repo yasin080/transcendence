@@ -7,6 +7,7 @@ import FriendRow from './FriendRow.tsx'
 import { acceptRequest, fetchPanel, removeFriendship, searchPlayers, sendRequest } from './api.ts'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
 import { onFriendsChanged } from './events.ts'
+import { useOnlineIds, withPresence } from './presence.ts'
 
 const MIN_QUERY = 2
 const SEARCH_DELAY_MS = 300
@@ -22,6 +23,7 @@ export default function FriendsPanel() {
   const [failed, setFailed] = useState(false)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[] | null>(null)
+  const onlineIds = useOnlineIds()
 
   const trimmed = query.trim()
   const searching = trimmed.length >= MIN_QUERY
@@ -69,9 +71,9 @@ export default function FriendsPanel() {
     await action(userId)
   }
 
-  const friends = data?.friends ?? []
-  const received = [...(data?.received ?? [])].sort(byName)
-  const sent = [...(data?.sent ?? [])].sort(byName)
+  const friends = withPresence(data?.friends ?? [], onlineIds)
+  const received = withPresence(data?.received ?? [], onlineIds).sort(byName)
+  const sent = withPresence(data?.sent ?? [], onlineIds).sort(byName)
   const online = friends.filter((friend) => friend.status === 'online').sort(byName)
   const offline = friends.filter((friend) => friend.status !== 'online').sort(byName)
 
