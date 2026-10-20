@@ -31,6 +31,7 @@ export default function Lobby() {
   const [playError, setPlayError] = useState(false)
   const [creatingRoom, setCreatingRoom] = useState(false)
   const [page, setPage] = useState(1)
+  const [query, setQuery] = useState('')
 
   async function playNow() {
     setPlayError(false)
@@ -99,7 +100,11 @@ export default function Lobby() {
 
 
 
-  const roomList = rooms ?? []
+  // Filtra por nombre o código, sin distinguir mayúsculas
+  const q = query.trim().toLowerCase()
+  const roomList = (rooms ?? []).filter(
+    (room) => room.name.toLowerCase().includes(q) || room.code.toLowerCase().includes(q),
+  )
   const pageCount = Math.max(1, Math.ceil(roomList.length / PAGE_SIZE))
   const firstIndex = (page - 1) * PAGE_SIZE
   const pageRooms = roomList.slice(firstIndex, firstIndex + PAGE_SIZE)
@@ -122,6 +127,11 @@ export default function Lobby() {
             <input
               name="room-search"
               placeholder="Search room or code"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setPage(1)
+              }}
               className="w-full min-w-0 border-0 bg-transparent text-[13px] text-white outline-none sm:w-[190px]"
             />
           </div>
@@ -170,6 +180,9 @@ export default function Lobby() {
         {joinError && <p className="text-sm text-fuse-600">{joinError}</p>}
         {!error && rooms === null && <p className="text-sm text-white/45">Loading rooms…</p>}
         {rooms?.length === 0 && <p className="text-sm text-white/45">No open rooms yet. Create one!</p>}
+        {rooms && rooms.length > 0 && roomList.length === 0 && (
+          <p className="text-sm text-white/45">No rooms match "{query.trim()}".</p>
+        )}
         {pageRooms.length > 0 && <RoomListHeader />}
         {pageRooms.map((room) => (
           <RoomRow
