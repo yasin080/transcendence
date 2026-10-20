@@ -2,13 +2,21 @@ import { type Board, Cell, cellAt, generateBoard } from './board'
 import type { Settings } from './settings'
 import { applyTurn, isOnWorm, nextCell, type Point, spawnWorms, type Worm } from './worms'
 
+export type Bomb = Point & { fuse: number }
+
 export type Game = {
   settings: Settings
   board: Board
   worms: Worm[]
   food: Point[]
+  pickups: Point[]
+  bombs: Bomb[]
+  blasts: Point[]
   startsAt?: number
 }
+
+/** Ticks a dropped bomb waits before going off. */
+export const FUSE = 8
 
 export type ScoreRow = {
   name: string
@@ -24,9 +32,10 @@ const same = (a: Point, b: Point) => a.x === b.x && a.y === b.y
 
 function freeCell(game: Game): Point | undefined {
   const { width, cells } = game.board
+  const taken = [...game.food, ...game.pickups, ...game.bombs]
   const free = cells
     .map((type, i) => ({ type, cell: { x: i % width, y: Math.floor(i / width) } }))
-    .filter(({ type, cell }) => type === Cell.Empty && !game.food.some((f) => same(f, cell)) && !isOnWorm(game.worms, cell))
+    .filter(({ type, cell }) => type === Cell.Empty && !taken.some((t) => same(t, cell)) && !isOnWorm(game.worms, cell))
   return free[Math.floor(Math.random() * free.length)]?.cell
 }
 
@@ -34,8 +43,9 @@ export function createGame(settings: Settings): Game {
   const board = generateBoard(settings)
   const worms = spawnWorms(board, settings)
   for (const p of worms.flatMap((worm) => worm.body)) board.cells[p.y * board.width + p.x] = Cell.Empty
-  const game: Game = { settings, board, worms, food: [] }
+  const game: Game = { settings, board, worms, food: [], pickups: [], bombs: [], blasts: [] }
   for (let i = 0, cell; i < settings.food && (cell = freeCell(game)); i++) game.food.push(cell)
+  for (let i = 0, cell; i < settings.bombs && (cell = freeCell(game)); i++) game.pickups.push(cell)
   return game
 }
 
@@ -66,12 +76,49 @@ function moveWorm(game: Game, worm: Worm, next: Point) {
     return
   }
 
+  const tail = worm.body[worm.body.length - 1]
   const eaten = game.food.findIndex((f) => same(f, next))
   worm.body = [next, ...(eaten >= 0 ? worm.body : worm.body.slice(0, -1))]
-  if (eaten < 0) return
-  game.food.splice(eaten, 1)
+  if (eaten >= 0) respawn(game, game.food, eaten)
+
+  // A bomb goes in through the mouth and drops at once where the tail was.
+  const swallowed = game.pickups.findIndex((p) => same(p, next))
+  if (swallowed >= 0) {
+    game.bombs.push({ x: tail.x, y: tail.y, fuse: FUSE })
+    respawn(game, game.pickups, swallowed)
+  }
+}
+
+function respawn(game: Game, items: Point[], index: number) {
+  items.splice(index, 1)
   const cell = freeCell(game)
-  if (cell) game.food.push(cell)
+  if (cell) items.push(cell)
+}
+
+export function blastCells(board: Board, cell: Point): Point[] {
+  const cells: Point[] = []
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const x = (cell.x + dx + board.width) % board.width
+      const y = (cell.y + dy + board.height) % board.height
+      if (cellAt(board, x, y) === Cell.Empty) cells.push({ x, y })
+    }
+  }
+  return cells
+}
+
+function explode(game: Game) {
+  for (const bomb of game.bombs) bomb.fuse--
+  game.blasts = game.bombs.filter((bomb) => bomb.fuse <= 0).map(({ x, y }) => ({ x, y }))
+  game.bombs = game.bombs.filter((bomb) => bomb.fuse > 0)
+
+  const hit = game.blasts.flatMap((blast) => blastCells(game.board, blast))
+  for (const worm of game.worms) {
+    const k = worm.body.findIndex((segment) => hit.some((cell) => same(cell, segment)))
+    if (!worm.alive || k < 0) continue
+    if (k === 0) worm.alive = false
+    else worm.body = worm.body.slice(0, k)
+  }
 }
 
 export function tick(game: Game) {
@@ -82,6 +129,7 @@ export function tick(game: Game) {
     if (crashed[i]) worm.alive = false
     else if (moves(worm)) moveWorm(game, worm, next[i])
   })
+  explode(game)
 }
 
 export function isOver(game: Game) {

@@ -10,9 +10,10 @@ import { toWorld } from './grid'
 import { loadModel } from './model'
 
 const BALL = 1.12
-const AWAY = Color3.FromHexString('#6b6b78')
+const GREY = Color3.FromHexString('#6b6b78')
 
-export type WormUpdate = (from: Point[], to: Point[], t: number, away: boolean) => void
+/** `faded`: the worm is dead or its player has gone; it turns grey but keeps a hint of its colour. */
+export type WormUpdate = (from: Point[], to: Point[], t: number, faded: boolean) => void
 
 function paintEyes(scene: Scene, head: Mesh) {
   const eye = new StandardMaterial('eye', scene)
@@ -61,11 +62,12 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormU
     balls.push(clone)
   }
 
+  const greyed = Color3.Lerp(colour, GREY, 0.7)
   let grey = false
-  function paint(away: boolean) {
-    if (away === grey) return
-    grey = away
-    const skin = away ? AWAY : colour
+  function paint(faded: boolean) {
+    if (faded === grey) return
+    grey = faded
+    const skin = faded ? greyed : colour
     for (const material of [headSkin, segmentSkin]) {
       material.diffuseColor = skin
       material.emissiveColor = skin.scale(0.3)
@@ -73,9 +75,11 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormU
     linkSkin.diffuseColor = skin
   }
 
-  function update(from: Point[], to: Point[], t: number, away: boolean) {
-    paint(away)
+  function update(from: Point[], to: Point[], t: number, faded: boolean) {
+    paint(faded)
     while (balls.length < to.length) addSegment()
+    // A blast can cut the tail off: hide the balls the body no longer has.
+    balls.forEach((ball, i) => ball.setEnabled(i < to.length))
     const points = to.map((cell, i) => Vector3.Lerp(toWorld(board, from[i] ?? cell), toWorld(board, cell), t))
     points.forEach((p, i) => {
       const facing = i === 0 ? p.subtract(points[1]) : points[i - 1].subtract(p)

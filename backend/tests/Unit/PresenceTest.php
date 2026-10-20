@@ -18,6 +18,7 @@ class PresenceTest extends TestCase
         'players' => 2,
         'startLength' => 3,
         'food' => 1,
+        'bombs' => 0,
         'wallHit' => 'die',
         'bodyHit' => 'die',
         'controls' => 'turn',

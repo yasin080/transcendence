@@ -4,8 +4,8 @@ namespace App\Game;
 
 /**
  * Bots are just another source of inputs, like a keyboard: they only look
- * one cell ahead and head for the nearest food, so they trap themselves the
- * way people do. Nothing here needs mirroring in the TypeScript logic.
+ * one cell ahead and head for the nearest food or bomb, keeping out of a
+ * blast about to go off, so they trap themselves the way people do.
  */
 class Bot
 {
@@ -23,7 +23,8 @@ class Bot
         $worm = $game['worms'][$seat];
         ['x' => $x, 'y' => $y] = $worm['dir'];
         $options = [$worm['dir'], ['x' => -$y, 'y' => $x], ['x' => $y, 'y' => -$x]];
-        $safe = array_values(array_filter($options, fn ($dir) => self::isSafe($game, $worm, $dir)));
+        $danger = self::danger($game);
+        $safe = array_values(array_filter($options, fn ($dir) => self::isSafe($game, $worm, $dir, $danger)));
         if ($safe === []) {
             return $worm['dir'];
         }
@@ -32,17 +33,32 @@ class Bot
         return $safe[0];
     }
 
-    private static function isSafe(array $game, array $worm, array $dir): bool
+    private static function isSafe(array $game, array $worm, array $dir, array $danger): bool
     {
         $cell = Worms::nextCell(['body' => $worm['body'], 'dir' => $dir], $game['board']);
 
-        return Board::cellAt($game['board'], $cell['x'], $cell['y']) === Board::EMPTY && ! Worms::isOnWorm($game['worms'], $cell);
+        return Board::cellAt($game['board'], $cell['x'], $cell['y']) === Board::EMPTY
+            && ! Worms::isOnWorm($game['worms'], $cell)
+            && ! in_array($cell, $danger);
+    }
+
+    private static function danger(array $game): array
+    {
+        $cells = [];
+        foreach ($game['bombs'] as $bomb) {
+            if ($bomb['fuse'] <= 2) {
+                array_push($cells, ...Game::blastCells($game['board'], $bomb));
+            }
+        }
+
+        return $cells;
     }
 
     private static function foodDistance(array $game, array $worm, array $dir): int
     {
         $cell = Worms::nextCell(['body' => $worm['body'], 'dir' => $dir], $game['board']);
-        $distances = array_map(fn ($food) => abs($food['x'] - $cell['x']) + abs($food['y'] - $cell['y']), $game['food']);
+        $targets = [...$game['food'], ...$game['pickups']];
+        $distances = array_map(fn ($target) => abs($target['x'] - $cell['x']) + abs($target['y'] - $cell['y']), $targets);
 
         return $distances ? min($distances) : 0;
     }
