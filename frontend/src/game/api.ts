@@ -3,8 +3,8 @@ import { createGame, type Game } from './logic/game'
 import { SNAKE } from './logic/settings'
 
 type Room = { code: string }
-type GameRecord = { id: number; seat: number; now: number; room: { code: string }; state: Game | null }
-export type Match = { game: Game; seat: number; roomCode: string | null }
+type GameRecord = { id: number; seat: number | null; now: number; room: { code: string }; state: Game | null }
+export type Match = { game: Game; seat: number | null; roomCode: string | null }
 
 // Room names must be unique among active rooms, so each quick match gets its own.
 export async function startQuickMatch(): Promise<number | null> {
