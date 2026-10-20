@@ -59,7 +59,7 @@ function SidebarHeader() {
       title="Your profile"
       className="flex items-center justify-center gap-3 px-4 py-6 xl:justify-start xl:px-6"
     >
-      <Avatar size={44} src={user?.avatar_url} />
+      <Avatar size={44} src={user?.avatar} />
       <span className="hidden min-w-0 truncate font-semibold xl:block">{user?.username}</span>
     </Link>
   )
