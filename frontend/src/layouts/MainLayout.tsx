@@ -32,7 +32,7 @@ export default function MainLayout() {
   }, [friendsOpen])
 
   return (
-    <div className="flex h-screen flex-col bg-void text-white md:flex-row">
+    <div className="flex h-dvh flex-col bg-void text-white md:flex-row">
       <aside className="hidden w-19 flex-none border-r border-white/8 bg-surface-1 md:block xl:w-67">
         <MainLayoutSidebar onOpenFriends={() => setFriendsOpen(true)} />
       </aside>

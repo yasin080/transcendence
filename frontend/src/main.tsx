@@ -51,7 +51,7 @@ createRoot(root).render(
             <Route
               path="game/:gameId"
               element={
-                <Suspense fallback={<div className="h-screen bg-void" />}>
+                <Suspense fallback={<div className="h-dvh bg-void" />}>
                   <Game />
                 </Suspense>
               }
