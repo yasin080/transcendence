@@ -13,6 +13,8 @@ interface RoomRowProps {
 // Cabecera y filas comparten columnas y relleno para quedar alineadas.
 // La última columna tiene ancho fijo: con auto, cada fila la mediría según su
 // contenido (botón Join o texto "In game") y las demás columnas se moverían.
+// En móvil solo nombre, plazas y botón; desde sm, también comida y velocidad.
+
 const ROW_LAYOUT =
   'grid grid-cols-[minmax(0,1fr)_auto_6.5rem] items-center gap-3 px-4 sm:grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_6.5rem] sm:gap-4 sm:px-[18px]'
 
@@ -38,8 +40,8 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
           <div className="truncate text-xs text-white/45">hosted by {room.host.name}</div>
         </div>
       </div>
-      <div className="hidden text-center text-[13px] text-white/72">{labelFor(FOOD_OPTIONS, room.settings.food)}</div>
-      <div className="hidden text-center text-[13px] text-white/72">{labelFor(SPEED_OPTIONS, room.settings.tickMs)}</div>
+      <div className="hidden text-center text-[13px] text-white/72 sm:block">{labelFor(FOOD_OPTIONS, room.settings.food)}</div>
+      <div className="hidden text-center text-[13px] text-white/72 sm:block">{labelFor(SPEED_OPTIONS, room.settings.tickMs)}</div>
       <div className={`whitespace-nowrap text-center text-[13px] font-bold ${playing ? 'text-ember-600' : 'text-signal-500'}`}>
         {room.players_count} / {room.settings.players}
       </div>
