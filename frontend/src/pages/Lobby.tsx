@@ -5,6 +5,7 @@ import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
 import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
 import EmptyState from '../components/ui/EmptyState.tsx'
+import SearchInput from '../components/ui/SearchInput.tsx'
 import SectionHeader from '../components/ui/SectionHeader.tsx'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
@@ -120,23 +121,16 @@ export default function Lobby() {
         <h1 className="font-display text-[26px] tracking-[0.01em]">Lobby</h1>
 
         <div className="flex w-full items-center gap-2.5 sm:ml-auto sm:w-auto">
-          {/* Caja del buscador */}
-          <div className="flex min-w-0 flex-1 items-center gap-[9px] px-3.5 py-2.5 rounded-[11px] border border-white/12 bg-white/5 sm:flex-none">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="2">
-              <circle cx="11" cy="11" r="7" />
-              <path d="M20 20l-3.5-3.5" />
-            </svg>
-            <input
-              name="room-search"
-              placeholder="Search room or code"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value)
-                setPage(1)
-              }}
-              className="w-full min-w-0 border-0 bg-transparent text-[13px] text-white outline-none sm:w-[190px]"
-            />
-          </div>
+          <SearchInput
+            name="room-search"
+            placeholder="Search room or code"
+            value={query}
+            onChange={(value) => {
+              setQuery(value)
+              setPage(1)
+            }}
+            className="min-w-0 flex-1 sm:w-61 sm:flex-none"
+          />
 
           {/* Botón de notificaciones */}
           <button className="grid place-items-center size-[42px] rounded-[11px] border border-white/12 bg-white/5 text-white cursor-pointer hover:bg-white/12">

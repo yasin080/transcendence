@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import EmptyState from '../ui/EmptyState.tsx'
+import SearchInput from '../ui/SearchInput.tsx'
 import SectionHeader from '../ui/SectionHeader.tsx'
 import Sidebar from '../ui/Sidebar.tsx'
 import FriendRow from './FriendRow.tsx'
 import { acceptRequest, fetchPanel, removeFriendship, searchPlayers, sendRequest } from './api.ts'
-import { SearchIcon, XIcon } from './icons.tsx'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
 import { onFriendsChanged } from './events.ts'
 
@@ -78,7 +78,14 @@ export default function FriendsPanel() {
   const header = (
     <>
       <PanelHeader onlineCount={online.length} />
-      <SearchBox value={query} onChange={setQuery} />
+      <SearchInput
+        name="player-search"
+        placeholder="Search players"
+        value={query}
+        onChange={setQuery}
+        active={searching}
+        className="mx-5 mb-3.5"
+      />
     </>
   )
 
@@ -174,40 +181,6 @@ function PanelHeader({ onlineCount }: { onlineCount: number }) {
         <span aria-hidden="true" className="size-2 rounded-full bg-online" />
         {onlineCount} online
       </span>
-    </div>
-  )
-}
-
-function SearchBox({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  const active = value.trim().length >= MIN_QUERY
-
-  return (
-    <div className="px-5 pb-3.5">
-      <div
-        className={`flex items-center gap-2.5 rounded-xl border bg-fill-strong px-3.5 py-2.5 transition-colors ${
-          active ? 'border-fuse-600/50' : 'border-line-strong'
-        }`}
-      >
-        <SearchIcon className="size-4 flex-none text-fg-muted" />
-        <input
-          name="player-search"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder="Search players"
-          aria-label="Search players"
-          className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-fg-muted"
-        />
-        {value && (
-          <button
-            type="button"
-            aria-label="Clear search"
-            onClick={() => onChange('')}
-            className="grid size-5 flex-none cursor-pointer place-items-center rounded-full bg-fill-strong text-fg-secondary hover:text-white"
-          >
-            <XIcon className="size-3" />
-          </button>
-        )}
-      </div>
     </div>
   )
 }
