@@ -29,6 +29,7 @@ export default function Game() {
   const [countdownEnd, setCountdownEnd] = useState(0)
   const [, setTicks] = useState(0)
   const [leaving, setLeaving] = useState(false)
+  const spectating = match?.seat === null
 
   useEffect(() => {
     let cancelled = false
@@ -48,7 +49,7 @@ export default function Game() {
   }, [gameId])
 
   function backToRoom() {
-    if (!match?.roomCode) return navigate('/lobby')
+    if (!match?.roomCode || spectating) return navigate('/lobby')
     navigate(`/waiting-room/${match.roomCode}`)
   }
 
@@ -62,20 +63,20 @@ export default function Game() {
     <div className="flex h-dvh flex-col overflow-hidden bg-void text-white">
       {match && (
         <Scoreboard
-          rows={scoreboard(match.game, match.seat)}
+          rows={scoreboard(match.game, match.seat ?? -1)}
           alive={match.game.worms.filter((worm) => worm.alive).length}
           total={match.game.worms.length}
           elapsedMs={match.game.startsAt ? Math.max(0, Date.now() - match.game.startsAt) : 0}
-          onLeave={() => setLeaving(true)}
+          onLeave={() => (spectating ? backToRoom() : setLeaving(true))}
         />
       )}
 
       <div className="relative min-h-0 flex-1">
         {match && <GameCanvas game={match.game} gameId={gameId} you={match.seat} onGameOver={() => setOver(true)} onEliminated={() => setEliminated(true)} onUpdate={() => setTicks((n) => n + 1)} />}
-        {eliminated && !over && (
+        {(eliminated || spectating) && !over && (
           <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
             <div className="rounded-xl border border-line bg-void/70 px-4 py-2 text-sm text-fg-secondary backdrop-blur-sm">
-              Eliminated · watching until the end
+              {spectating ? 'Spectating' : 'Eliminated · watching until the end'}
             </div>
           </div>
         )}
@@ -103,8 +104,8 @@ export default function Game() {
       {over && match && (
         <MessageModal
           kicker="Match over"
-          title={resultOf(match.game, match.seat)}
-          message="Back to the room in 3 seconds."
+          title={resultOf(match.game, match.seat ?? -1)}
+          message={spectating ? 'Back to the lobby in 3 seconds.' : 'Back to the room in 3 seconds.'}
           buttonLabel="OK"
           onAction={backToRoom}
         />
@@ -114,7 +115,7 @@ export default function Game() {
         <MessageModal
           kicker="Match not found"
           title="This match is not available"
-          message="It may not exist, or you are not one of its players."
+          message="It may not exist, or it could not be loaded."
           buttonLabel="Back to lobby"
           onAction={() => navigate('/lobby')}
         />

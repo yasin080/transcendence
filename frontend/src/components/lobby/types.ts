@@ -15,6 +15,7 @@ export interface Room {
 export type RoomSummary = Omit<Room, 'players'> & {
   host: { id: number; name: string }
   players_count: number
+  latest_game: { id:number } | null
 }
 
 export interface RoomPlayer {

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Events\GameTicked;
+use App\Events\LobbyRoomUpdated;
 use App\Game\Bot;
 use App\Game\Game as GameLogic;
 use App\Game\LiveGames;
@@ -71,5 +72,8 @@ class GameTick extends Command
         $game = Game::find($id);
         $game?->update(['ended_at' => now()]);
         $game?->room->update(['status' => 'open']);
+        if ($game) {
+            LobbyRoomUpdated::dispatch($game->room);
+        }
     }
 }

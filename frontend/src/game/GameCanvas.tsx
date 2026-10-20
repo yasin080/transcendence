@@ -10,7 +10,7 @@ import { listenToTouch } from './touch'
 type Props = {
   game: Game
   gameId: string
-  you: number
+  you: number | null
   onGameOver: () => void
   onEliminated: () => void
   onUpdate: () => void
@@ -28,10 +28,20 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
       scene.onTick()
       onUpdate()
       if (isOver(game)) onGameOver()
-      else if (!game.worms[you].alive) onEliminated()
+      else if (you !== null && !game.worms[you].alive) onEliminated()
     }
 
     const online = gameId !== 'demo'
+
+    const stopRunning = online ? listenOnline(gameId, game, onTick) : runLocally(game, onTick)
+    // A spectator only watches: no controls, and no pings, since the server only takes them from players.
+    if (you === null) {
+      return () => {
+        stopRunning()
+        scene.dispose()
+      }
+    }
+    
     const applyLocally = (input: Input) =>
       'side' in input ? steer(game, you, input.side) : turn(game, you, input.dir)
     const send = (input: Input) => {
@@ -49,7 +59,6 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
       (side) => send({ side }),
       (dir) => send({ dir }),
     )
-    const stopRunning = online ? listenOnline(gameId, game, onTick) : runLocally(game, onTick)
     const stopReporting = online ? reportPresence(gameId) : () => {}
 
     return () => {
