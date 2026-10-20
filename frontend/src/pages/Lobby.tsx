@@ -4,6 +4,9 @@ import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
 import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
+import EmptyState from '../components/ui/EmptyState.tsx'
+import SearchInput from '../components/ui/SearchInput.tsx'
+import SectionHeader from '../components/ui/SectionHeader.tsx'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
@@ -118,23 +121,16 @@ export default function Lobby() {
         <h1 className="font-display text-[26px] tracking-[0.01em]">Lobby</h1>
 
         <div className="flex w-full items-center gap-2.5 sm:ml-auto sm:w-auto">
-          {/* Caja del buscador */}
-          <div className="flex min-w-0 flex-1 items-center gap-[9px] px-3.5 py-2.5 rounded-[11px] border border-white/12 bg-white/5 sm:flex-none">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="2">
-              <circle cx="11" cy="11" r="7" />
-              <path d="M20 20l-3.5-3.5" />
-            </svg>
-            <input
-              name="room-search"
-              placeholder="Search room or code"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value)
-                setPage(1)
-              }}
-              className="w-full min-w-0 border-0 bg-transparent text-[13px] text-white outline-none sm:w-[190px]"
-            />
-          </div>
+          <SearchInput
+            name="room-search"
+            placeholder="Search room or code"
+            value={query}
+            onChange={(value) => {
+              setQuery(value)
+              setPage(1)
+            }}
+            className="min-w-0 flex-1 sm:w-61 sm:flex-none"
+          />
 
           {/* Botón de notificaciones */}
           <button className="grid place-items-center size-[42px] rounded-[11px] border border-white/12 bg-white/5 text-white cursor-pointer hover:bg-white/12">
@@ -157,9 +153,7 @@ export default function Lobby() {
       {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
 
       {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
-      <div className="flex items-center gap-3.5 mt-[26px] mb-3">
-        <h3 className="text-sm font-bold uppercase tracking-[.16em] text-white/60">Open rooms</h3>
-        <span className="h-px flex-1 bg-white/10" />
+      <SectionHeader size="lg" title="Open rooms" className="mt-[26px] mb-3">
         <span className="text-xs text-white/40">{roomList.length} rooms</span>
 
         <button
@@ -171,7 +165,7 @@ export default function Lobby() {
         >
           + Create room
         </button>
-      </div>
+      </SectionHeader>
 
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 
@@ -179,9 +173,9 @@ export default function Lobby() {
         {error && <p className="text-sm text-fuse-600">{error}</p>}
         {joinError && <p className="text-sm text-fuse-600">{joinError}</p>}
         {!error && rooms === null && <p className="text-sm text-white/45">Loading rooms…</p>}
-        {rooms?.length === 0 && <p className="text-sm text-white/45">No open rooms yet. Create one!</p>}
+        {rooms?.length === 0 && <EmptyState title="No open rooms yet" text="Create one!" />}
         {rooms && rooms.length > 0 && roomList.length === 0 && (
-          <p className="text-sm text-white/45">No rooms match "{query.trim()}".</p>
+          <EmptyState title={`No rooms match "${query.trim()}"`} text="Try another name or code." />
         )}
         {pageRooms.length > 0 && <RoomListHeader />}
         {pageRooms.map((room) => (

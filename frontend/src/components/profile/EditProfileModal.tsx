@@ -3,7 +3,7 @@ import Avatar from '../ui/Avatar.tsx'
 import Button from '../ui/Button.tsx'
 import Modal from '../ui/Modal.tsx'
 import { AVATAR_GALLERY } from './avatars.ts'
-import FormField from './FormField.tsx'
+import FormField from '../ui/FormField.tsx'
 import { updateProfile, uploadAvatar, type ProfileUpdate } from './api.ts'
 import type { ProfileUser } from './types.ts'
 

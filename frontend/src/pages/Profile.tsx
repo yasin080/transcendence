@@ -12,6 +12,8 @@ import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
 import Button from '../components/ui/Button'
+import EmptyState from '../components/ui/EmptyState'
+import SectionHeader from '../components/ui/SectionHeader'
 import { onFriendsChanged } from '../components/friends/events'
 import LegalLinks from '../components/LegalLinks'
 import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
@@ -94,10 +96,7 @@ export default function Profile() {
 
       {/* Estadísticas: título de sección + tarjetas */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-3.5">
-          <h2 className="text-section-title">Stats</h2>
-          <span aria-hidden="true" className="h-px flex-1 bg-line" />
-        </div>
+        <SectionHeader title="Stats" />
 
         <div className="grid grid-cols-3 gap-3.5">
           <StatCard kind="played" value={profile.stats.played} />
@@ -113,11 +112,7 @@ export default function Profile() {
       {/* Solo en el perfil ajeno: sus amigos */}
       {!isOwn && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3.5">
-            <h2 className="whitespace-nowrap text-section-title">Friends of {profile.username}</h2>
-            <span aria-hidden="true" className="h-px flex-1 bg-line" />
-            <span className="text-meta text-fg-muted">{friends.length}</span>
-          </div>
+          <SectionHeader title={`Friends of ${profile.username}`} count={friends.length} />
 
           {friends.length > 0 ? (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(--spacing(21),1fr))] gap-3">
@@ -126,9 +121,7 @@ export default function Profile() {
               ))}
             </div>
           ) : (
-            <p className="rounded-xl border border-dashed border-line-strong p-7 text-center text-body-muted">
-              {profile.username} has no friends yet
-            </p>
+            <EmptyState title={`${profile.username} has no friends yet`} />
           )}
         </div>
       )}
