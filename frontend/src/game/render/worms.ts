@@ -62,7 +62,7 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormU
     balls.push(clone)
   }
 
-  const greyed = Color3.Lerp(colour, GREY, 0.7)
+  const greyed = Color3.Lerp(colour, GREY, 0.75)
   let grey = false
   function paint(faded: boolean) {
     if (faded === grey) return
