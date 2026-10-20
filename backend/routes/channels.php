@@ -16,3 +16,4 @@ Broadcast::channel('room.{code}', function ($user, $code) {
 });
 
 Broadcast::channel('lobby', fn ($user) => true);
+Broadcast::channel('online', fn ($user) => ['id' => $user->id]);

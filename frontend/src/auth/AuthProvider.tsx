@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
-
 import { apiGet, apiPost, type ApiFailure, type User } from '../lib/api'
+import { joinPresence, leavePresence } from '../components/friends/presence'
 import {
   AuthContext,
   type AuthStatus,
@@ -31,6 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true
     }
   }, [])
+
+  // Online mientras haya sesión iniciada, en cualquier página
+  useEffect(() => {
+    if (status === 'authenticated') joinPresence()
+    else if (status === 'guest') leavePresence()
+  }, [status])
 
   const authenticate = useCallback(
     async (path: string, payload: Credentials | Registration): Promise<ApiFailure | null> => {

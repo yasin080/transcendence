@@ -17,6 +17,7 @@ import SectionHeader from '../components/ui/SectionHeader'
 import { onFriendsChanged } from '../components/friends/events'
 import LegalLinks from '../components/LegalLinks'
 import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
+import { useOnlineIds, withPresence } from '../components/friends/presence'
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
@@ -27,7 +28,7 @@ export default function Profile() {
   const [data, setData] = useState<ProfileData | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-  
+  const onlineIds = useOnlineIds()
 
   // Sin id en la URL → mi perfil
   const targetId = userId ?? (user ? String(user.id) : null)
@@ -67,15 +68,15 @@ export default function Profile() {
 
   if (!data) return null // cargando
 
-  const { isOwn, friendState, friends, profile } = data
+  const { isOwn, friendState, profile } = data
+  const friends = withPresence(data.friends, onlineIds)
 
   return (
     <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-4 pt-6 pb-8 *:shrink-0 md:px-7">
       <ProfileHeader
         user={profile}
         isOwn={isOwn}
-        // [RETOMAR] estado online real con Reverb
-        status={isOwn ? undefined : 'offline'}
+        status={isOwn ? undefined : onlineIds.has(profile.id) ? 'online' : 'offline'}
         action={
           isOwn ? (
             <Button variant="ghost" size="sm" onClick={() => setEditOpen(true)}>
