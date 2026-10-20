@@ -20,7 +20,7 @@ class GameController extends Controller
 
     public function show(Request $request, Game $game): JsonResponse
     {
-        $seat = $this->seatOf($request, $game);
+        $seat = $game->room->players()->where('user_id', $request->user()->id)->value('seat');
 
         return response()->json([
             ...$game->load('room:id,code,name,settings')->toArray(),

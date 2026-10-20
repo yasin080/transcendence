@@ -158,13 +158,21 @@ class RoomTest extends TestCase
             ->assertJsonPath('room.settings.tickMs', 150);
     }
 
-    public function test_a_stranger_cannot_load_a_match(): void
+    public function test_a_spectator_can_load_a_match_without_a_seat(): void
     {
         $room = $this->createRoom(User::factory()->create());
         $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
         $this->actingAs(User::factory()->create());
 
-        $this->getJson("/api/games/{$gameId}")->assertFails(403);
+        $this->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', null);
+    }
+
+    public function test_the_room_list_links_the_latest_match(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->getJson('/api/rooms')->assertOk()->assertJsonPath('0.latest_game.id', $gameId);
     }
 
     public function test_a_player_can_rejoin_their_room_even_if_it_is_full(): void

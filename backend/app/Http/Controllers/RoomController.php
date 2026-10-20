@@ -20,6 +20,7 @@ class RoomController extends Controller
     {
         $rooms = Room::whereIn('status', ['open', 'playing'])
             ->with('host:id,name')
+            ->with('latestGame')
             ->withCount('players')
             ->latest()
             ->get();
