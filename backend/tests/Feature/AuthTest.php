@@ -23,14 +23,15 @@ class AuthTest extends TestCase
     public function test_a_visitor_can_register(): void
     {
         $response = $this->postJson('/api/register', [
-            'name' => 'Gusano',
+            'username' => 'Gusano',
             'email' => 'gusano@example.com',
             'password' => 'secret-worm',
             'password_confirmation' => 'secret-worm',
         ]);
 
         $response->assertCreated()
-            ->assertJsonPath('name', 'Gusano')
+            ->assertJsonPath('username', 'Gusano')
+            ->assertJsonPath('name', null)
             ->assertJsonPath('email', 'gusano@example.com')
             ->assertJsonMissingPath('password');
 
@@ -48,6 +49,20 @@ class AuthTest extends TestCase
             'password' => 'secret-worm',
             'password_confirmation' => 'secret-worm',
         ])->assertFails(422)->assertJsonValidationErrors('email');
+
+        $this->assertGuest();
+    }
+
+    public function test_registration_rejects_a_taken_username(): void
+    {
+        User::factory()->create(['username' => 'Gusano']);
+
+        $this->postJson('/api/register', [
+            'username' => 'Gusano',
+            'email' => 'otro@example.com',
+            'password' => 'secret-worm',
+            'password_confirmation' => 'secret-worm',
+        ])->assertFails(422)->assertJsonValidationErrors('username');
 
         $this->assertGuest();
     }
@@ -232,7 +247,7 @@ class AuthTest extends TestCase
         $guestSessionId = $this->app['session']->getId();
 
         $this->postJson('/api/register', [
-            'name' => 'Gusano',
+            'username' => 'Gusano',
             'email' => 'gusano@example.com',
             'password' => 'secret-worm',
             'password_confirmation' => 'secret-worm',

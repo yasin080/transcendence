@@ -11,7 +11,6 @@ import { PencilIcon } from '../components/profile/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
-import type { ProfileEdits, ProfileUser } from '../components/profile/types'
 import Button from '../components/ui/Button'
 import { onFriendsChanged } from '../components/friends/events'
 import LegalLinks from '../components/LegalLinks'
@@ -19,15 +18,14 @@ import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
   const { userId } = useParams()
   const navigate = useNavigate()
 
   const [data, setData] = useState<ProfileData | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-  // Provisional: lo guardado desde Edit profile, hasta conectar el modal (parte B)
-  const [ownEdits, setOwnEdits] = useState<ProfileEdits | null>(null)
+  
 
   // Sin id en la URL → mi perfil
   const targetId = userId ?? (user ? String(user.id) : null)
@@ -67,11 +65,7 @@ export default function Profile() {
 
   if (!data) return null // cargando
 
-  const { isOwn, friendState, friends } = data
-  const profile: ProfileUser =
-    isOwn && ownEdits
-      ? { ...data.profile, username: ownEdits.username, name: ownEdits.name, bio: ownEdits.bio, avatarUrl: ownEdits.avatarUrl }
-      : data.profile
+  const { isOwn, friendState, friends, profile } = data
 
   return (
     <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-4 pt-6 pb-8 *:shrink-0 md:px-7">
@@ -151,8 +145,11 @@ export default function Profile() {
       {editOpen && (
         <EditProfileModal
           profile={profile}
-          email={ownEdits?.email ?? user.email}
-          onSave={setOwnEdits}
+          email={user.email}
+          onSaved={() => {
+            void load()
+            void refreshUser()
+          }}
           onClose={() => setEditOpen(false)}
         />
       )}

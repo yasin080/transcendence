@@ -3,7 +3,7 @@ export type User = {
   username: string
   name: string | null
   email: string
-  avatar_url: string | null
+  avatar: string | null // ruta de la galería o data URL en base64; null = por defecto
   bio: string | null
   created_at: string
 }
@@ -61,7 +61,7 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
   if (method !== 'GET') await ensureCsrfCookie()
 
   const headers: Record<string, string> = { Accept: 'application/json' }
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  if (body !== undefined && !(body instanceof FormData)) headers['Content-Type'] = 'application/json'
 
   const token = readCookie('XSRF-TOKEN')
   if (token) headers['X-XSRF-TOKEN'] = token
@@ -74,7 +74,7 @@ async function request<T>(method: string, path: string, body?: unknown, retry = 
       credentials: 'include',
       headers,
       keepalive,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
     })
   } catch {
     return {
@@ -117,3 +117,4 @@ export const apiGet = <T>(path: string) => request<T>('GET', path)
 export const apiPost = <T>(path: string, body?: unknown) => request<T>('POST', path, body)
 export const apiPostOnClose = (path: string) => request('POST', path, undefined, true, true)
 export const apiDelete = <T>(path: string) => request<T>('DELETE', path)
+export const apiPatch = <T>(path: string, body?: unknown) => request<T>('PATCH', path, body)

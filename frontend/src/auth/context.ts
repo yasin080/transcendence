@@ -11,7 +11,7 @@ export type Credentials = {
 }
 
 export type Registration = Credentials & {
-  name: string
+  username: string
   password_confirmation: string
 }
 
@@ -22,6 +22,8 @@ export type AuthValue = {
   login: (credentials: Credentials) => Promise<ApiFailure | null>
   register: (registration: Registration) => Promise<ApiFailure | null>
   logout: () => Promise<void>
+  /** Re-reads the signed-in user, e.g. after editing the profile. */
+  refreshUser: () => Promise<void>
 }
 
 // Split from the provider on purpose: a module that exports both a component

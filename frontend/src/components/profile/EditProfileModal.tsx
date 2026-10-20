@@ -4,11 +4,13 @@ import Button from '../ui/Button.tsx'
 import Modal from '../ui/Modal.tsx'
 import { AVATAR_GALLERY } from './avatars.ts'
 import FormField from './FormField.tsx'
-import type { ProfileEdits, ProfileUser } from './types.ts'
+import { updateProfile, uploadAvatar, type ProfileUpdate } from './api.ts'
+import type { ProfileUser } from './types.ts'
 
-const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp']
+// Mismos tipos que acepta el backend (POST /api/user/avatar)
+const AVATAR_TYPES = ['image/png', 'image/jpeg']
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024 // 2 MB
-const AVATAR_ERROR = 'That file is not a valid image. Use PNG, JPG or WEBP up to 2 MB.'
+const AVATAR_ERROR = 'That file is not a valid image. Use PNG or JPG up to 2 MB.'
 
 const NICK = /^[A-Za-z0-9_-]{3,20}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -27,7 +29,7 @@ interface FormValues {
 // Mismo formato que Laravel: por campo, una lista de mensajes
 type FormErrors = Partial<Record<keyof FormValues, string[]>>
 
-function validate(values: FormValues, originalEmail: string): FormErrors {
+function validate(values: FormValues): FormErrors {
   const errors: FormErrors = {}
 
   if (!NICK.test(values.username.trim())) {
@@ -51,20 +53,17 @@ function validate(values: FormValues, originalEmail: string): FormErrors {
       errors.password_confirmation = ['Passwords do not match.']
     }
   }
-  if ((changingPassword || email !== originalEmail) && values.current_password === '') {
-    errors.current_password = ['Enter your current password.']
-  }
   return errors
 }
 
 interface EditProfileModalProps {
   profile: ProfileUser
   email: string
-  onSave: (edits: ProfileEdits) => void
+  onSaved: () => void
   onClose: () => void
 }
 
-export default function EditProfileModal({ profile, email, onSave, onClose }: EditProfileModalProps) {
+export default function EditProfileModal({ profile, email, onSaved, onClose }: EditProfileModalProps) {
   const [values, setValues] = useState<FormValues>({
     username: profile.username,
     name: profile.name ?? '',
@@ -81,6 +80,9 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
   const [upload, setUpload] = useState<{ file: File; preview: string } | null>(null)
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
+  const [saving, setSaving] = useState(false)
+  // Error sin campo concreto (p. ej. no se pudo conectar al servidor)
+  const [formError, setFormError] = useState<string | null>(null)
 
   function set(field: keyof FormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }))
@@ -116,22 +118,54 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
   // Lo que se ve en la previsualización: el fichero subido manda sobre la galería
   const preview = upload?.preview ?? avatarUrl
 
-  function onSubmit(event: SubmitEvent) {
+  async function onSubmit(event: SubmitEvent) {
     event.preventDefault()
 
-    const found = validate(values, email)
+    const found = validate(values)
     setErrors(found)
+    setFormError(null)
     if (Object.keys(found).length > 0) return
 
-    onSave({
+    setSaving(true)
+
+    // 1. La foto subida va por su propio endpoint, que ya la guarda
+    if (upload) {
+      const result = await uploadAvatar(upload.file)
+      if (!result.ok) {
+        setAvatarError(result.failure.errors.avatar?.[0] ?? result.failure.message)
+        setSaving(false)
+        return
+      }
+      // Ya está en el servidor: si el PATCH falla, al reintentar no se vuelve a subir
+      setUpload(null)
+      setAvatarUrl(result.data.avatar)
+    }
+
+    // 2. El resto de datos
+    const update: ProfileUpdate = {
       username: values.username.trim(),
       name: values.name.trim(),
       email: values.email.trim(),
       bio: values.bio.trim(),
-      // Provisional: sin backend, la foto subida se guarda como URL temporal del navegador.
-      // Se crea una nueva porque la de la previsualización se libera al cerrar el modal.
-      avatarUrl: upload ? URL.createObjectURL(upload.file) : avatarUrl,
-    })
+    }
+    // El avatar solo viaja si se ha elegido otro de la galería (o el de por defecto)
+    if (!upload && avatarUrl !== profile.avatarUrl) update.avatar = avatarUrl
+    if (values.password !== '') {
+      update.password = values.password
+      update.password_confirmation = values.password_confirmation
+    }
+    if (values.current_password !== '') update.current_password = values.current_password
+
+    const result = await updateProfile(update)
+    setSaving(false)
+
+    if (!result.ok) {
+      setErrors(result.failure.errors as FormErrors)
+      if (Object.keys(result.failure.errors).length === 0) setFormError(result.failure.message)
+      return
+    }
+
+    onSaved()
     onClose()
   }
 
@@ -139,7 +173,7 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
     <Modal size="lg" onClose={onClose}>
       <h3 className="display-heading">Edit profile</h3>
 
-      <form onSubmit={onSubmit} noValidate className="mt-4.5 flex flex-col gap-4.5">
+      <form onSubmit={(event) => void onSubmit(event)} noValidate className="mt-4.5 flex flex-col gap-4.5">
         <div className="flex gap-5 rounded-xl border border-line bg-fill p-4">
           <Avatar size={92} src={preview} />
 
@@ -180,7 +214,7 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
                 <Button variant="ghost" size="sm" onClick={() => fileInput.current?.click()}>
                   Upload your own
                 </Button>
-                <span className="text-meta text-fg-muted">PNG, JPG or WEBP · max 2 MB</span>
+                <span className="text-meta text-fg-muted">PNG or JPG · max 2 MB</span>
               </div>
               {avatarError && (
                 <p role="alert" className="mt-1.5 text-meta text-fuse-600">
@@ -271,12 +305,18 @@ export default function EditProfileModal({ profile, email, onSave, onClose }: Ed
           />
         </div>
 
+        {formError && (
+          <p role="alert" className="text-meta text-fuse-600">
+            {formError}
+          </p>
+        )}
+
         <div className="flex justify-end gap-2.5 border-t border-line pt-4">
           <Button variant="secondary" size="md" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="md">
-            Save
+          <Button type="submit" variant="primary" size="md" disabled={saving}>
+            {saving ? 'Saving…' : 'Save'}
           </Button>
         </div>
       </form>
