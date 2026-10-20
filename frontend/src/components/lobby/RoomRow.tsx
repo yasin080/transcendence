@@ -1,4 +1,5 @@
 import { FOOD_OPTIONS, SPEED_OPTIONS, labelFor } from './roomOptions.ts'
+import { Link } from 'react-router'
 import type { RoomSummary } from './types.ts'
 
 interface RoomRowProps {
@@ -12,14 +13,14 @@ interface RoomRowProps {
 
 // Cabecera y filas comparten columnas y relleno para quedar alineadas.
 // La última columna tiene ancho fijo: con auto, cada fila la mediría según su
-// contenido (botón Join o texto "In game") y las demás columnas se moverían.
+// contenido (botón Join o enlace Spectate) y las demás columnas se moverían.
 // En móvil solo nombre, plazas y botón; desde sm, también comida y velocidad.
 
 const ROW_LAYOUT =
   'grid grid-cols-[minmax(0,1fr)_auto_6.5rem] items-center gap-3 px-4 sm:grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_6.5rem] sm:gap-4 sm:px-[18px]'
 
 // Fila: nombre · tablero · velocidad · plazas + botón.
-// Punto verde = sala abierta (Join), naranja = en partida ("In game", sin botón).
+// Punto verde = sala abierta (Join), naranja = en partida (Spectate, o Enter si es la propia).
 export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) {
   const playing = room.status === 'playing'
   const full = room.players_count >= room.settings.players
@@ -46,7 +47,13 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
         {room.players_count} / {room.settings.players}
       </div>
       {playing ? (
-        <span className="text-center text-[13px] font-bold tracking-[.04em] text-ember-600">In game</span>
+        <Link
+          to={`/game/${room.latest_game?.id}`}
+          className="py-[9px] rounded-[10px] border border-ember-600/60 text-center text-[13px] font-bold tracking-[.04em] text-ember-600 hover:bg-ember-600/15"
+        >
+          {isMine ? 'Enter' : 'Spectate'}
+        </Link>
+
       ) : (
         <button
           type="button"
