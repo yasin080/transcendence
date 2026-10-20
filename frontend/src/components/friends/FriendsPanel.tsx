@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import EmptyState from '../ui/EmptyState.tsx'
 import Sidebar from '../ui/Sidebar.tsx'
 import FriendRow from './FriendRow.tsx'
 import { acceptRequest, fetchPanel, removeFriendship, searchPlayers, sendRequest } from './api.ts'
@@ -83,7 +84,7 @@ export default function FriendsPanel() {
   return (
     <Sidebar header={header}>
       <div className="flex flex-col gap-4 px-2.5 pb-4">
-        {failed && <EmptyBox title="Couldn't load your friends" text="Reload the page to try again." />}
+        {failed && <EmptyState title="Couldn't load your friends" text="Reload the page to try again." />}
 
         {searching ? (
           results !== null &&
@@ -105,7 +106,7 @@ export default function FriendsPanel() {
               ))}
             </section>
           ) : (
-            <EmptyBox title="No player with that name" text="Check the spelling and try again." />
+            <EmptyState title="No player with that name" text="Check the spelling and try again." />
           ))
         ) : (
           <>
@@ -127,7 +128,7 @@ export default function FriendsPanel() {
             )}
 
             {data && friends.length === 0 && (
-              <EmptyBox title="No friends yet" text="Use the search above to find players and send a request." />
+              <EmptyState title="No friends yet" text="Use the search above to find players and send a request." />
             )}
 
             {online.length > 0 && (
@@ -234,14 +235,5 @@ function SectionLabel({ title, count, highlight = false }: { title: string; coun
         <span className="text-meta text-fg-muted">{count}</span>
       )}
     </>
-  )
-}
-
-function EmptyBox({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-xl border border-dashed border-line-strong p-5 text-center">
-      <p className="text-sm font-bold">{title}</p>
-      <p className="mt-1 text-meta text-fg-muted">{text}</p>
-    </div>
   )
 }

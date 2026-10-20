@@ -12,6 +12,7 @@ import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
 import Button from '../components/ui/Button'
+import EmptyState from '../components/ui/EmptyState'
 import { onFriendsChanged } from '../components/friends/events'
 import LegalLinks from '../components/LegalLinks'
 import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
@@ -126,9 +127,7 @@ export default function Profile() {
               ))}
             </div>
           ) : (
-            <p className="rounded-xl border border-dashed border-line-strong p-7 text-center text-body-muted">
-              {profile.username} has no friends yet
-            </p>
+            <EmptyState title={`${profile.username} has no friends yet`} />
           )}
         </div>
       )}

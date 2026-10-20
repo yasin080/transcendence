@@ -4,6 +4,7 @@ import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
 import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
+import EmptyState from '../components/ui/EmptyState.tsx'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
@@ -179,9 +180,9 @@ export default function Lobby() {
         {error && <p className="text-sm text-fuse-600">{error}</p>}
         {joinError && <p className="text-sm text-fuse-600">{joinError}</p>}
         {!error && rooms === null && <p className="text-sm text-white/45">Loading rooms…</p>}
-        {rooms?.length === 0 && <p className="text-sm text-white/45">No open rooms yet. Create one!</p>}
+        {rooms?.length === 0 && <EmptyState title="No open rooms yet" text="Create one!" />}
         {rooms && rooms.length > 0 && roomList.length === 0 && (
-          <p className="text-sm text-white/45">No rooms match "{query.trim()}".</p>
+          <EmptyState title={`No rooms match "${query.trim()}"`} text="Try another name or code." />
         )}
         {pageRooms.length > 0 && <RoomListHeader />}
         {pageRooms.map((room) => (
