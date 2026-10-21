@@ -66,13 +66,13 @@ export default function Landing() {
 
           <h1
             id="landing-title"
-            className="display-hero uppercase text-[clamp(3rem,6.5vw,7.5rem)] max-[800px]:text-[clamp(2.75rem,13vw,5.5rem)]"
+            className="display-hero uppercase"
           >
             <span>Small worm.</span>
             <span>Big boom.</span>
           </h1>
 
-          <Button className="mt-10 animate-boom-pulse max-[800px]:-mt-16" onClick={playNow}>
+          <Button className="landing__play animate-boom-pulse" onClick={playNow}>
             <span aria-hidden="true" className="mr-3">▶</span>
             Play now
           </Button>
@@ -85,8 +85,7 @@ export default function Landing() {
         </div>
       </main>
 
-      {/* Logged-out visitors only see this page, and the subject requires the legal pages to be reachable */}
-      <footer className="absolute inset-x-0 bottom-0 z-10 flex justify-center">
+      <footer className="landing__legal">
         <LegalLinks />
       </footer>
 

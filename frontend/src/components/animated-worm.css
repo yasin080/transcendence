@@ -84,13 +84,21 @@
   50% { translate: 0 5%; rotate: -6deg; }
 }
 
-@media (max-width: 800px) {
+/* Portrait phones and tablets */
+@media (width < 1024px) and (orientation: portrait) {
   .animated-worm--hero {
-    top: 1%;
-    right: -8vw;
-    width: 102vw;
-    height: 80vw;
+    top: 50%;
+    left: 18%;
+    right: auto;
+    translate: 0 -29%;
+    width: min(120cqw, 150cqh);
+    height: auto;
+    aspect-ratio: 102 / 80;
   }
+}
+
+@media (768px <= width < 1024px) and (orientation: portrait) {
+  .animated-worm--hero { width: min(100cqw, 150cqh); }
 }
 
 @media (prefers-reduced-motion: reduce) {
