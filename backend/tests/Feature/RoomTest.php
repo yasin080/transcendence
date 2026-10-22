@@ -455,6 +455,19 @@ class RoomTest extends TestCase
         $this->assertDatabaseCount('room_players', 2);
     }
 
+    public function test_the_host_cannot_kick_once_the_match_has_started(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 2);
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $player = $room->players()->where('user_id', $guest->id)->firstOrFail();
+        $this->actingAs($host)->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+
+        $this->postJson("/api/rooms/{$room->code}/kick/{$player->id}")->assertFails(409);
+        $this->assertSame(2, $room->players()->count());
+    }
+
     public function test_leaving_mid_match_keeps_the_seat(): void
     {
         $room = $this->createRoom(User::factory()->create(), players: 2);
