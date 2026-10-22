@@ -31,6 +31,7 @@ class Worms
                 'dir' => $dir,
                 'wanted' => $dir,
                 'alive' => true,
+                'stuck' => 0,
             ];
         }
 
