@@ -7,6 +7,9 @@ class Game
     /** Ticks a dropped bomb waits before going off. */
     public const FUSE = 8;
 
+    /** Ticks in a row a worm can stay blocked before it dies: 5 s at the medium speed (200 ms). */
+    public const STUCK = 15;
+
     public static function create(array $settings): array
     {
         $board = Board::generate($settings);
@@ -109,12 +112,15 @@ class Game
         $wall = Board::cellAt($game['board'], $next['x'], $next['y']) !== Board::EMPTY;
         if ($wall || Worms::isOnWorm($game['worms'], $next)) {
             $hit = $wall ? $game['settings']['wallHit'] : $game['settings']['bodyHit'];
-            if ($hit === 'die') {
+            $worm['stuck']++;
+            if ($hit === 'die' || $worm['stuck'] >= self::STUCK) {
                 $worm['alive'] = false;
             }
 
             return;
         }
+
+        $worm['stuck'] = 0;
 
         $tail = end($worm['body']);
         $eaten = self::indexAt($game['food'], $next);

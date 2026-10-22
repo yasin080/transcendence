@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import CountdownOverlay from '../components/game/CountdownOverlay'
+import GameOverOverlay from '../components/game/GameOverOverlay'
 import Scoreboard from '../components/game/Scoreboard'
 import Button from '../components/ui/Button'
 import MessageModal from '../components/ui/MessageModal'
@@ -12,11 +13,13 @@ import { type Game, scoreboard } from '../game/logic/game'
 
 const RETURN_DELAY = 3000
 
-function resultOf(game: Game, you: number) {
-  if (game.worms.length === 1) return 'Game over'
+function resultOf(game: Game, you: number | null) {
+  if (game.worms.length === 1) return { title: 'Game over' }
   const winner = game.worms.findIndex((worm) => worm.alive)
-  if (winner === -1) return 'Draw'
-  return winner === you ? 'You win' : `${game.worms[winner].name} wins`
+  if (winner === -1) return { title: 'Draw' }
+  const wins = `${game.worms[winner].name} wins`
+  if (you === null) return { title: wins }
+  return winner === you ? { title: 'You win' } : { kicker: wins, title: 'You lose' }
 }
 
 export default function Game() {
@@ -101,15 +104,7 @@ export default function Game() {
         </Modal>
       )}
 
-      {over && match && (
-        <MessageModal
-          kicker="Match over"
-          title={resultOf(match.game, match.seat ?? -1)}
-          message={spectating ? 'Back to the lobby in 3 seconds.' : 'Back to the room in 3 seconds.'}
-          buttonLabel="OK"
-          onAction={backToRoom}
-        />
-      )}
+      {over && match && <GameOverOverlay {...resultOf(match.game, match.seat)} />}
 
       {missing && (
         <MessageModal

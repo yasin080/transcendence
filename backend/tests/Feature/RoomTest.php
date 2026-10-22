@@ -79,6 +79,44 @@ class RoomTest extends TestCase
             ->assertJsonValidationErrors(['settings']);
     }
 
+    public function test_the_start_length_grows_with_the_board(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        // 30 de ancho: hasta 9 casillas de largo
+        $this->postJson('/api/rooms', ['name' => 'Long', 'settings' => ['startLength' => 10] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.startLength']);
+
+        $this->postJson('/api/rooms', ['name' => 'Long', 'settings' => ['startLength' => 9] + self::SNAKE])
+            ->assertCreated();
+    }
+
+    public function test_pillars_and_deadly_walls_do_not_go_together(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => ['pillars' => true] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.wallHit']);
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => ['pillars' => true, 'wallHit' => 'block'] + self::SNAKE])
+            ->assertCreated();
+    }
+
+    public function test_pillars_and_soft_walls_do_not_go_together(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $pillars = ['pillars' => true, 'wallHit' => 'block'] + self::SNAKE;
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => ['softWalls' => 0.03] + $pillars])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.softWalls']);
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => $pillars])
+            ->assertCreated();
+    }
+
     public function test_a_guest_cannot_create_a_room(): void
     {
         $this->postJson('/api/rooms', ['name' => 'Snake night', 'settings' => self::SNAKE])->assertFails(401);
