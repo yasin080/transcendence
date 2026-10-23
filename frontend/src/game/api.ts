@@ -1,5 +1,5 @@
 import { apiGet, apiPost } from '../lib/api'
-import { createGame, type Game } from './logic/game'
+import { type Game } from './logic/game'
 import { SNAKE } from './logic/settings'
 
 type Room = { code: string }
@@ -17,8 +17,6 @@ export async function startQuickMatch(): Promise<number | null> {
 }
 
 export async function loadMatch(gameId: string): Promise<Match | null> {
-  if (gameId === 'demo') return { game: createGame(SNAKE), seat: 0, roomCode: null }
-
   const record = await apiGet<GameRecord>(`/api/games/${gameId}`)
   if (!record.ok || !record.data.state) return null
   const { state, seat, now, room } = record.data

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import WaitingRoomHeader from '../components/waiting-room/WaitingRoomHeader.tsx'
 import MatchPanel from '../components/waiting-room/MatchPanel.tsx'
 import PlayerGrid from '../components/waiting-room/PlayerGrid.tsx'
@@ -23,7 +23,6 @@ const MOCK_SETTINGS: MatchSetting[] = [
 ]
 
 export default function WaitingRoom() {
-  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
   const { user } = useAuth()
@@ -31,10 +30,7 @@ export default function WaitingRoom() {
   const [room, setRoom] = useState<Room | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [startError, setStartError] = useState<string | null>(null)
-
-  const preview = searchParams.get('preview')
-  const initialPhase = preview === 'closed' || preview === 'kicked' ? preview : 'waiting'
-  const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>(initialPhase)
+  const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>('waiting')
 
 
   // Se une al entrar (no solo lee la sala): así entrar por URL también ocupa
