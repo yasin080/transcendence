@@ -128,8 +128,6 @@ export default function WaitingRoom() {
       <WaitingRoomHeader roomName={room.name} isOwner={isOwner} />
       <MatchPanel
         isOwner={isOwner}
-        playerCount={playerCount}
-        maxPlayers={maxPlayers}
         settings={settingChips(room.settings)}
         canStart={canStart}
         onStart={startMatch}
