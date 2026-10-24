@@ -105,7 +105,6 @@ export default function WaitingRoom() {
         name: `BOT_${p.seat + 1}`,
         isOwner: false,
         isBot: true,
-        difficulty: p.bot_difficulty ?? 'medium',
       }
     : {
         id: String(p.id),

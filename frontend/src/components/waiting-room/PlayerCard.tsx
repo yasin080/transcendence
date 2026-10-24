@@ -11,7 +11,7 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
   const roleLabel = player.isOwner
     ? 'Room owner'
     : player.isBot
-      ? `Bot · ${player.difficulty}`
+      ? 'Bot'
       : 'Player'
   const roleColor = player.isOwner
     ? 'text-gold'
