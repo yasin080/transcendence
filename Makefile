@@ -9,7 +9,7 @@ HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2
 
 # --- Lifecycle --------------------------------------------------------------
 
-all: build up
+all: up
 
 ## Start the whole stack (the "one command" the subject asks for)
 up: .env
