@@ -62,7 +62,7 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormU
     balls.push(clone)
   }
 
-  const greyed = Color3.Lerp(colour, GREY, 0.7)
+  const greyed = Color3.Lerp(colour, GREY, 0.75)
   let grey = false
   function paint(faded: boolean) {
     if (faded === grey) return
@@ -78,13 +78,13 @@ async function createWorm(scene: Scene, board: Board, worm: Worm): Promise<WormU
   function update(from: Point[], to: Point[], t: number, faded: boolean) {
     paint(faded)
     while (balls.length < to.length) addSegment()
-    // A blast can cut the tail off: hide the balls the body no longer has.
     balls.forEach((ball, i) => ball.setEnabled(i < to.length))
     const points = to.map((cell, i) => Vector3.Lerp(toWorld(board, from[i] ?? cell), toWorld(board, cell), t))
     points.forEach((p, i) => {
-      const facing = i === 0 ? p.subtract(points[1]) : points[i - 1].subtract(p)
+      const behind = i === 0 ? (points[1] ?? toWorld(board, from[0] ?? to[0])) : p
+      const facing = i === 0 ? p.subtract(behind) : points[i - 1].subtract(p)
       balls[i].position.set(p.x, BALL / 2, p.z)
-      balls[i].rotation.y = Math.atan2(facing.x, facing.z)
+      if (facing.lengthSquared() > 0) balls[i].rotation.y = Math.atan2(facing.x, facing.z)
     })
   }
 

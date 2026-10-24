@@ -56,12 +56,12 @@ export default function StackStatus() {
   }, [])
 
   return (
-    <details className="group rounded-lg border border-slate-800 text-sm">
-      <summary className="cursor-pointer select-none px-4 py-2 text-slate-500 hover:text-slate-300">
+    <details className="group rounded-xl border border-line-strong bg-fill text-sm">
+      <summary className="cursor-pointer select-none px-4 py-2 text-fg-muted hover:text-fg-secondary">
         Stack status
       </summary>
 
-      <div className="divide-y divide-slate-800 border-t border-slate-800">
+      <div className="divide-y divide-line border-t border-line">
         <StatusRow
           label="API (Laravel)"
           value={
@@ -92,8 +92,8 @@ export default function StackStatus() {
 function StatusRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
   return (
     <div className="flex items-center justify-between px-4 py-2">
-      <span className="text-slate-400">{label}</span>
-      <span className={ok ? 'font-mono text-emerald-400' : 'font-mono text-amber-400'}>
+      <span className="text-fg-secondary">{label}</span>
+      <span className={ok ? 'font-mono text-online' : 'font-mono text-ember-300'}>
         {value}
       </span>
     </div>

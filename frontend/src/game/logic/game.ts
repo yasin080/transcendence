@@ -18,6 +18,9 @@ export type Game = {
 /** Ticks a dropped bomb waits before going off. */
 export const FUSE = 8
 
+/** Ticks in a row a worm can stay blocked before it dies: 5 s at the medium speed (200 ms). */
+export const STUCK = 25
+
 export type ScoreRow = {
   name: string
   colour: string
@@ -72,10 +75,12 @@ function moveWorm(game: Game, worm: Worm, next: Point) {
   const wall = cellAt(game.board, next.x, next.y) !== Cell.Empty
   if (wall || isOnWorm(game.worms, next)) {
     const hit = wall ? game.settings.wallHit : game.settings.bodyHit
-    if (hit === 'die') worm.alive = false
+    worm.stuck++
+    if (hit === 'die' || worm.stuck >= STUCK) worm.alive = false
     return
   }
 
+  worm.stuck = 0
   const tail = worm.body[worm.body.length - 1]
   const eaten = game.food.findIndex((f) => same(f, next))
   worm.body = [next, ...(eaten >= 0 ? worm.body : worm.body.slice(0, -1))]
