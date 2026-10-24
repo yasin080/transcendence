@@ -41,8 +41,6 @@ export default function WaitingRoom() {
   const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>('waiting')
 
 
-  // Se une al entrar (no solo lee la sala): así entrar por URL también ocupa
-  // asiento. Si ya estabas dentro, join devuelve la sala sin tocar nada.
   useEffect(() => {
   if (!roomId) return
     let cancelled = false
@@ -74,8 +72,6 @@ export default function WaitingRoom() {
   }, [roomId, joined, user?.id, navigate])
 
 
-
-  // Libera el asiento (o cierra la sala si eres el host).
   async function leaveRoom() {
     if (!roomId) return
     echo.leave(`room.${roomId}`)
@@ -91,7 +87,6 @@ export default function WaitingRoom() {
     else setStartError(result.failure.message)
   }
 
-  // Solo pide empezar; la navegación llega por el evento match.started.
   async function startMatch() {
     if (!roomId) return
     setStartError(null)
@@ -125,18 +120,12 @@ export default function WaitingRoom() {
   const isOwner = room.host_id === user?.id
   const playerCount = room.players.length
   const maxPlayers = room.settings.players
-  const hasFreeSeat = playerCount < maxPlayers
   const canStart = playerCount > 0
 
 
   return (
     <div className="h-full flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 font-body md:px-7">
-      <WaitingRoomHeader
-        roomName={room.name}
-        isOwner={isOwner}
-        hasFreeSeat={hasFreeSeat}
-        onAddBot={addBot}
-      />
+      <WaitingRoomHeader roomName={room.name} isOwner={isOwner} />
       <MatchPanel
         isOwner={isOwner}
         playerCount={playerCount}
@@ -152,6 +141,7 @@ export default function WaitingRoom() {
         maxPlayers={maxPlayers}
         isOwner={isOwner}
         onKick={(playerId) => void apiPost(`/api/rooms/${roomId}/kick/${playerId}`)}
+        onAddBot={addBot}
       />
       <BackstageBanner>
          <img src={backstage} alt="" className="size-full object-cover" />
