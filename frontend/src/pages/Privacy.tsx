@@ -6,8 +6,8 @@ export default function Privacy() {
   return (
     <article className="max-w-prose space-y-6">
       <header className="space-y-1">
-        <h1 className="display-heading">Privacy Policy</h1>
-        <p className="text-sm text-fg-muted">Last updated: 23 October 2026</p>
+        <h1 className="text-3xl font-bold tracking-tight">Privacy Policy</h1>
+        <p className="text-sm text-slate-400">Last updated: 24 October 2026</p>
       </header>
 
       <section className="space-y-2">
@@ -36,7 +36,8 @@ export default function Privacy() {
           </li>
           <li>
             <strong>Google sign-in</strong>, if you use it: your Google ID, email and name, to
-            create your account without a password.
+            create your account without a password. We do not keep the access tokens Google
+            gives us.
           </li>
           <li>
             <strong>Profile:</strong> an optional display name, a bio of up to 160 characters and an
