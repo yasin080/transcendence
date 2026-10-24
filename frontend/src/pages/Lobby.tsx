@@ -123,6 +123,7 @@ export default function Lobby() {
         <div className="flex w-full items-center gap-2.5 sm:ml-auto sm:w-auto">
           <SearchInput
             name="room-search"
+            maxLength={40}
             placeholder="Search room or code"
             value={query}
             onChange={(value) => {
@@ -145,7 +146,7 @@ export default function Lobby() {
       {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
 
       {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
-      <SectionHeader size="lg" title="Open rooms" className="mt-[26px] mb-3">
+      <SectionHeader size="lg" title="Open rooms" className="mt-6.5 mb-3">
         <span className="text-xs text-white/40">{roomList.length} rooms</span>
 
         <button
@@ -197,7 +198,7 @@ export default function Lobby() {
             type="button"
             disabled={page === 1}
             onClick={() => setPage(page - 1)}
-            className="grid place-items-center size-[34px] rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
+            className="grid place-items-center size-8.5 rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
               <path d="M15 5l-7 7 7 7" />
@@ -208,7 +209,7 @@ export default function Lobby() {
               key={n}
               type="button"
               onClick={() => setPage(n)}
-              className={`min-w-[34px] h-[34px] px-2.5 rounded-[10px] border text-[13px] font-bold cursor-pointer ${
+              className={`min-w-8.5 h-8.5 px-2.5 rounded-[10px] border text-[13px] font-bold cursor-pointer ${
                 n === page ? 'border-fuse-600 bg-fuse-600 text-white' : 'border-white/12 bg-white/5 text-white/60'
               }`}
             >
@@ -219,7 +220,7 @@ export default function Lobby() {
             type="button"
             disabled={page === pageCount}
             onClick={() => setPage(page + 1)}
-            className="grid place-items-center size-[34px] rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
+            className="grid place-items-center size-8.5 rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
               <path d="M9 5l7 7-7 7" />

@@ -44,6 +44,7 @@ class FriendController extends Controller
     // GET /api/users/search?q=bo — jugadores por username, con mi relación con cada uno
     public function search(Request $request): JsonResponse
     {
+        $request->validate(['q' => ['nullable', 'string', 'max:20']]);
         $me = $request->user();
         $query = trim((string) $request->query('q', ''));
 
