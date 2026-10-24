@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
-import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
 import EmptyState from '../components/ui/EmptyState.tsx'
 import SearchInput from '../components/ui/SearchInput.tsx'
@@ -11,6 +10,7 @@ import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
+import duel from '../assets/duel.webp'
 
 
 type CurrentRoom = { code: string | null }
@@ -129,9 +129,14 @@ export default function Lobby() {
       />
       {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
 
-      <SectionHeader size="lg" title="Open rooms" className="mt-[26px] mb-3">
+      <section className="relative mt-6.5 overflow-hidden rounded-[20px] border border-line">
+        <img src={duel} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover object-center" />
+        <div aria-hidden="true" className="absolute inset-0 bg-radial from-void/90 via-void/65 to-void/20" />
 
-        <Button
+        <div className="relative flex flex-col items-center gap-3 px-5 py-8 text-center">
+          <p className="text-eyebrow">Custom match</p>
+          <h2 className="font-display text-2xl sm:text-[28px]">Call your rivals</h2>
+          <Button
             variant="primary"
             size="md"
             disabled={myRoomCode !== null}
@@ -140,7 +145,10 @@ export default function Lobby() {
           >
             + Create room
           </Button>
-      </SectionHeader>
+        </div>
+      </section>
+
+      <SectionHeader size="lg" title="Open rooms" className="mt-6 mb-3" />
 
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 
