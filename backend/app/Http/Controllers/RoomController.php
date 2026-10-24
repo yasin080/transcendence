@@ -155,7 +155,7 @@ class RoomController extends Controller
         return $room->load([
             'host:id,username',
             'players' => fn ($q) => $q->orderBy('seat'),
-            'players.user:id,username',
+            'players.user:id,username,avatar',
         ]);
     }
 

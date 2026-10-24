@@ -10,8 +10,7 @@ export interface HumanPlayer extends PlayerBase {
   isBot: false
   winPct: string
   avgScore: string
-  background: string
-  color: string
+  avatar: string | null
 }
 
 export interface BotPlayer extends PlayerBase {
