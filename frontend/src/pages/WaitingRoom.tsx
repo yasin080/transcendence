@@ -10,7 +10,7 @@ import type { MatchSetting, Player } from '../components/waiting-room/types.ts'
 import type { Room } from '../components/lobby/types.ts'
 import { BOARD_OPTIONS, FOOD_OPTIONS, SOFT_WALL_OPTIONS, SPEED_OPTIONS, labelFor } from '../components/lobby/roomOptions.ts'
 import type { Settings } from '../game/logic/settings.ts'
-import { apiPost } from '../lib/api.ts'
+import { apiGet, apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { echo } from '../lib/echo'
 
@@ -58,17 +58,17 @@ export default function WaitingRoom() {
   useEffect(() => {
     if (!roomId || !joined) return
     const channel = echo.private(`room.${roomId}`)
-    channel.listen('.players.updated', (e: { room: Room }) => {
-      setRoom(e.room)
-      // Si ya no estoy en la lista, el host me ha expulsado.
-      const stillIn = e.room.players.some((p) => p.user_id === user?.id)
-      if (stillIn) return
-      // Kicked
-      echo.leave(`room.${roomId}`)
-      setPhase('kicked')
-    })
-    channel.listen('.match.started', (e: { gameId: number }) => {
-      navigate(`/game/${e.gameId}`)
+    // El evento solo avisa: la sala actualizada se pide por HTTP
+    channel.listen('.players.updated', () => {
+      void apiGet<Room>(`/api/rooms/${roomId}`).then((result) => {
+        if (!result.ok) return
+        setRoom(result.data)
+        const stillIn = result.data.players.some((p) => p.user_id === user?.id)
+        if (stillIn) return
+        // Kicked
+        echo.leave(`room.${roomId}`)
+        setPhase('kicked')
+      })
     })
     return () => echo.leave(`room.${roomId}`)
   }, [roomId, joined, user?.id, navigate])
@@ -109,18 +109,16 @@ export default function WaitingRoom() {
         name: `BOT_${p.seat + 1}`,
         isOwner: false,
         isBot: true,
-        difficulty: p.bot_difficulty ?? 'medium',
       }
     : {
         id: String(p.id),
-        name: p.user?.name ?? 'Player',
+        name: p.user?.username ?? 'Player',
         isOwner: p.user_id === room.host_id,
         isBot: false,
         // [RETOMAR] Aún no hay estadísticas ni colores en el backend
         winPct: '—',
         avgScore: '—',
-        background: 'linear-gradient(150deg,#3b2f7a,#1b1636)',
-        color: '#ff89a5',
+        avatar: p.user?.avatar ?? null,
       },
 )
 
