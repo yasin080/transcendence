@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 import { listenToDpad, listenToTurns } from './keyboard'
-import { runLocally } from './local'
-import { type Game, isOver, steer, turn } from './logic/game'
+import { type Game, isOver } from './logic/game'
 import { type Input, listenOnline, reportPresence, sendInput } from './online'
 import { createGameScene } from './render/scene'
 import { listenToTouch } from './touch'
@@ -31,9 +30,7 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
       else if (you !== null && !game.worms[you].alive) onEliminated()
     }
 
-    const online = gameId !== 'demo'
-
-    const stopRunning = online ? listenOnline(gameId, game, onTick) : runLocally(game, onTick)
+    const stopRunning = listenOnline(gameId, game, onTick)
     // A spectator only watches: no controls, and no pings, since the server only takes them from players.
     if (you === null) {
       return () => {
@@ -41,13 +38,10 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
         scene.dispose()
       }
     }
-    
-    const applyLocally = (input: Input) =>
-      'side' in input ? steer(game, you, input.side) : turn(game, you, input.dir)
+
     const send = (input: Input) => {
       if (!game.worms[you].alive) return
-      if (online) sendInput(gameId, input)
-      else applyLocally(input)
+      sendInput(gameId, input)
     }
 
     const stopListening =
@@ -59,7 +53,7 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
       (side) => send({ side }),
       (dir) => send({ dir }),
     )
-    const stopReporting = online ? reportPresence(gameId) : () => {}
+    const stopReporting = reportPresence(gameId)
 
     return () => {
       stopRunning()

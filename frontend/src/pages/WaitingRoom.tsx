@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import WaitingRoomHeader from '../components/waiting-room/WaitingRoomHeader.tsx'
 import MatchPanel from '../components/waiting-room/MatchPanel.tsx'
 import PlayerGrid from '../components/waiting-room/PlayerGrid.tsx'
@@ -8,22 +8,29 @@ import MessageModal from '../components/ui/MessageModal.tsx'
 import backstage from '../assets/salon.jpg'
 import type { MatchSetting, Player } from '../components/waiting-room/types.ts'
 import type { Room } from '../components/lobby/types.ts'
+import { BOARD_OPTIONS, FOOD_OPTIONS, SOFT_WALL_OPTIONS, SPEED_OPTIONS, labelFor } from '../components/lobby/roomOptions.ts'
+import type { Settings } from '../game/logic/settings.ts'
 import { apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { echo } from '../lib/echo'
 
 
-const MOCK_SETTINGS: MatchSetting[] = [
-  { label: 'Arena', value: 'Neon Grid' },
-  { label: 'Mode', value: 'Free-for-all' },
-  { label: 'Rounds', value: 'Best of 3' },
-  { label: 'Bomb fuse', value: '2.5 s' },
-  { label: 'Speed', value: 'Fast' },
-  { label: 'Power-ups', value: 'On' },
-]
+// Lo que el host eligió al crear la sala, con las mismas etiquetas del modal.
+function settingChips(s: Settings): MatchSetting[] {
+  return [
+    { label: 'Board', value: labelFor(BOARD_OPTIONS, s.width) },
+    { label: 'Speed', value: labelFor(SPEED_OPTIONS, s.tickMs) },
+    { label: 'Food', value: labelFor(FOOD_OPTIONS, s.food) },
+    { label: 'Start length', value: String(s.startLength) },
+    { label: 'Pillars', value: s.pillars ? 'On' : 'Off' },
+    { label: 'Soft walls', value: labelFor(SOFT_WALL_OPTIONS, s.softWalls) },
+    { label: 'Wall hit', value: s.wallHit === 'die' ? 'Deadly' : 'Blocks' },
+    { label: 'Body hit', value: s.bodyHit === 'die' ? 'Deadly' : 'Blocks' },
+    { label: 'Bombs', value: s.bombs > 0 ? String(s.bombs) : 'Off' },
+  ]
+}
 
 export default function WaitingRoom() {
-  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
   const { user } = useAuth()
@@ -31,10 +38,7 @@ export default function WaitingRoom() {
   const [room, setRoom] = useState<Room | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [startError, setStartError] = useState<string | null>(null)
-
-  const preview = searchParams.get('preview')
-  const initialPhase = preview === 'closed' || preview === 'kicked' ? preview : 'waiting'
-  const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>(initialPhase)
+  const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>('waiting')
 
 
   useEffect(() => {
@@ -124,7 +128,9 @@ export default function WaitingRoom() {
       <WaitingRoomHeader roomName={room.name} isOwner={isOwner} />
       <MatchPanel
         isOwner={isOwner}
-        settings={MOCK_SETTINGS}
+        playerCount={playerCount}
+        maxPlayers={maxPlayers}
+        settings={settingChips(room.settings)}
         canStart={canStart}
         onStart={startMatch}
         onLeave={leaveRoom}
