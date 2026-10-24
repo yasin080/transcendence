@@ -18,6 +18,7 @@ class GameTest extends TestCase
         'players' => 1,
         'startLength' => 3,
         'food' => 1,
+        'bombs' => 0,
         'wallHit' => 'die',
         'bodyHit' => 'die',
         'controls' => 'turn',
@@ -112,13 +113,30 @@ class GameTest extends TestCase
         $this->assertSame(['x' => 28, 'y' => 1], $game['worms'][0]['body'][0]);
     }
 
+    public function test_a_worm_blocked_for_too_long_dies(): void
+    {
+        $game = Game::create(['wallHit' => 'block'] + self::SNAKE);
+        $game['food'] = [['x' => 20, 'y' => 20]];
+        while ($game['worms'][0]['body'][0]['x'] < 28) {
+            Game::tick($game);
+        }
+
+        for ($i = 1; $i < Game::STUCK; $i++) {
+            Game::tick($game);
+        }
+        $this->assertTrue($game['worms'][0]['alive']);
+
+        Game::tick($game);
+        $this->assertFalse($game['worms'][0]['alive']);
+    }
+
     public function test_the_state_serialises_to_the_shape_the_browser_draws(): void
     {
         $json = json_decode(json_encode(Game::create(self::SNAKE)), true);
 
-        $this->assertSame(['settings', 'board', 'worms', 'food'], array_keys($json));
+        $this->assertSame(['settings', 'board', 'worms', 'food', 'pickups', 'bombs', 'blasts'], array_keys($json));
         $this->assertSame(['width', 'height', 'cells'], array_keys($json['board']));
-        $this->assertSame(['name', 'colour', 'body', 'dir', 'wanted', 'alive'], array_keys($json['worms'][0]));
+        $this->assertSame(['name', 'colour', 'body', 'dir', 'wanted', 'alive', 'stuck'], array_keys($json['worms'][0]));
     }
 
     public function test_four_worms_start_in_their_corners_without_touching(): void

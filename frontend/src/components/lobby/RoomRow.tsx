@@ -1,4 +1,5 @@
 import { FOOD_OPTIONS, SPEED_OPTIONS, labelFor } from './roomOptions.ts'
+import { Link } from 'react-router'
 import type { RoomSummary } from './types.ts'
 
 interface RoomRowProps {
@@ -12,11 +13,14 @@ interface RoomRowProps {
 
 // Cabecera y filas comparten columnas y relleno para quedar alineadas.
 // La última columna tiene ancho fijo: con auto, cada fila la mediría según su
-// contenido (botón Join o texto "In game") y las demás columnas se moverían.
-const ROW_LAYOUT = 'grid grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_6.5rem] items-center gap-4 px-[18px]'
+// contenido (botón Join o enlace Spectate) y las demás columnas se moverían.
+// En móvil solo nombre, plazas y botón; desde sm, también comida y velocidad.
+
+const ROW_LAYOUT =
+  'grid grid-cols-[minmax(0,1fr)_auto_6.5rem] items-center gap-3 px-4 sm:grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_6.5rem] sm:gap-4 sm:px-[18px]'
 
 // Fila: nombre · tablero · velocidad · plazas + botón.
-// Punto verde = sala abierta (Join), naranja = en partida ("In game", sin botón).
+// Punto verde = sala abierta (Join), naranja = en partida (Spectate, o Enter si es la propia).
 export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) {
   const playing = room.status === 'playing'
   const full = room.players_count >= room.settings.players
@@ -33,24 +37,29 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
         />
         <div className="min-w-0">
           <div className="truncate text-[15px] font-bold">{room.name}</div>
-          {/* [RETOMAR] CAMBIAR EL NAME DEL HOST POR EL NICK */}
-          <div className="text-xs text-white/45">hosted by {room.host.name}</div>
+          <div className="truncate text-xs text-white/45">hosted by {room.host.username}</div>
         </div>
       </div>
-      <div className="text-center text-[13px] text-white/72">{labelFor(FOOD_OPTIONS, room.settings.food)}</div>
-      <div className="text-center text-[13px] text-white/72">{labelFor(SPEED_OPTIONS, room.settings.tickMs)}</div>
-      <div className={`text-center text-[13px] font-bold ${playing ? 'text-ember-600' : 'text-signal-500'}`}>
+      <div className="hidden text-center text-[13px] text-white/72 sm:block">{labelFor(FOOD_OPTIONS, room.settings.food)}</div>
+      <div className="hidden text-center text-[13px] text-white/72 sm:block">{labelFor(SPEED_OPTIONS, room.settings.tickMs)}</div>
+      <div className={`whitespace-nowrap text-center text-[13px] font-bold ${playing ? 'text-ember-600' : 'text-signal-500'}`}>
         {room.players_count} / {room.settings.players}
       </div>
       {playing ? (
-        <span className="text-center text-[13px] font-bold tracking-[.04em] text-ember-600">In game</span>
+        <Link
+          to={`/game/${room.latest_game?.id}`}
+          className="py-2.25 rounded-[10px] border border-ember-600/60 text-center text-[13px] font-bold tracking-[.04em] text-ember-600 hover:bg-ember-600/15"
+        >
+          {isMine ? 'Enter' : 'Spectate'}
+        </Link>
+
       ) : (
         <button
           type="button"
           disabled={!isMine && (full || locked)}
           title={locked ? 'You are already in another room' : undefined}
           onClick={() => onJoin(room)}
-          className="py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+          className="py-2.25 rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isMine ? 'Enter' : 'Join'}
         </button>
@@ -59,15 +68,14 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
   )
 }
 
-// Títulos de columna sobre la lista. El borde transparente iguala el de las
-// filas para que el texto caiga en la misma posición.
+// Títulos de columna sobre la lista.
+// El borde transparente iguala el de las filas para que el texto caiga en la misma posición.
 export function RoomListHeader() {
   return (
     <div className={`${ROW_LAYOUT} border border-transparent text-[11px] font-bold uppercase tracking-[.14em] text-white/45`}>
-      {/* 22px = punto de estado (10px) + su separación (12px): alinea con el nombre */}
-      <span className="pl-[22px]">Room</span>
-      <span className="text-center">Food</span>
-      <span className="text-center">Speed</span>
+      <span className="pl-5.5">Room</span>
+      <span className="hidden text-center sm:block">Food</span>
+      <span className="hidden text-center sm:block">Speed</span>
       <span className="text-center">Players</span>
     </div>
   )

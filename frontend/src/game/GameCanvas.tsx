@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 import { listenToDpad, listenToTurns } from './keyboard'
-import { runLocally } from './local'
-import { type Game, isOver, steer, turn } from './logic/game'
+import { type Game, isOver } from './logic/game'
 import { type Input, listenOnline, reportPresence, sendInput } from './online'
 import { createGameScene } from './render/scene'
 import { listenToTouch } from './touch'
@@ -10,7 +9,7 @@ import { listenToTouch } from './touch'
 type Props = {
   game: Game
   gameId: string
-  you: number
+  you: number | null
   onGameOver: () => void
   onEliminated: () => void
   onUpdate: () => void
@@ -28,16 +27,21 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
       scene.onTick()
       onUpdate()
       if (isOver(game)) onGameOver()
-      else if (!game.worms[you].alive) onEliminated()
+      else if (you !== null && !game.worms[you].alive) onEliminated()
     }
 
-    const online = gameId !== 'demo'
-    const applyLocally = (input: Input) =>
-      'side' in input ? steer(game, you, input.side) : turn(game, you, input.dir)
+    const stopRunning = listenOnline(gameId, game, onTick)
+    // A spectator only watches: no controls, and no pings, since the server only takes them from players.
+    if (you === null) {
+      return () => {
+        stopRunning()
+        scene.dispose()
+      }
+    }
+
     const send = (input: Input) => {
       if (!game.worms[you].alive) return
-      if (online) sendInput(gameId, input)
-      else applyLocally(input)
+      sendInput(gameId, input)
     }
 
     const stopListening =
@@ -49,8 +53,7 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
       (side) => send({ side }),
       (dir) => send({ dir }),
     )
-    const stopRunning = online ? listenOnline(gameId, game, onTick) : runLocally(game, onTick)
-    const stopReporting = online ? reportPresence(gameId) : () => {}
+    const stopReporting = reportPresence(gameId)
 
     return () => {
       stopRunning()

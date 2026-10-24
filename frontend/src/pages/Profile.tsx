@@ -12,7 +12,12 @@ import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
 import StatCard from '../components/profile/StatCard'
 import Button from '../components/ui/Button'
+import EmptyState from '../components/ui/EmptyState'
+import SectionHeader from '../components/ui/SectionHeader'
 import { onFriendsChanged } from '../components/friends/events'
+import LegalLinks from '../components/LegalLinks'
+import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
+import { useOnlineIds, withPresence } from '../components/friends/presence'
 
 // Vive bajo RequireAuth: aquí siempre hay sesión.
 export default function Profile() {
@@ -23,7 +28,7 @@ export default function Profile() {
   const [data, setData] = useState<ProfileData | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-  
+  const onlineIds = useOnlineIds()
 
   // Sin id en la URL → mi perfil
   const targetId = userId ?? (user ? String(user.id) : null)
@@ -63,15 +68,15 @@ export default function Profile() {
 
   if (!data) return null // cargando
 
-  const { isOwn, friendState, friends, profile } = data
+  const { isOwn, friendState, profile } = data
+  const friends = withPresence(data.friends, onlineIds)
 
   return (
-    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-7 pt-6 pb-8 *:shrink-0">
+    <section className="flex min-w-0 flex-1 flex-col gap-6.5 overflow-y-auto px-4 pt-6 pb-8 *:shrink-0 md:px-7">
       <ProfileHeader
         user={profile}
         isOwn={isOwn}
-        // [RETOMAR] estado online real con Reverb
-        status={isOwn ? undefined : 'offline'}
+        status={isOwn ? undefined : onlineIds.has(profile.id) ? 'online' : 'offline'}
         action={
           isOwn ? (
             <Button variant="ghost" size="sm" onClick={() => setEditOpen(true)}>
@@ -92,10 +97,7 @@ export default function Profile() {
 
       {/* Estadísticas: título de sección + tarjetas */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-3.5">
-          <h2 className="text-section-title">Stats</h2>
-          <span aria-hidden="true" className="h-px flex-1 bg-line" />
-        </div>
+        <SectionHeader title="Stats" />
 
         <div className="grid grid-cols-3 gap-3.5">
           <StatCard kind="played" value={profile.stats.played} />
@@ -111,11 +113,7 @@ export default function Profile() {
       {/* Solo en el perfil ajeno: sus amigos */}
       {!isOwn && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3.5">
-            <h2 className="whitespace-nowrap text-section-title">Friends of {profile.username}</h2>
-            <span aria-hidden="true" className="h-px flex-1 bg-line" />
-            <span className="text-meta text-fg-muted">{friends.length}</span>
-          </div>
+          <SectionHeader title={`Friends of ${profile.username}`} count={friends.length} />
 
           {friends.length > 0 ? (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(--spacing(21),1fr))] gap-3">
@@ -124,10 +122,17 @@ export default function Profile() {
               ))}
             </div>
           ) : (
-            <p className="rounded-xl border border-dashed border-line-strong p-7 text-center text-body-muted">
-              {profile.username} has no friends yet
-            </p>
+            <EmptyState title={`${profile.username} has no friends yet`} />
           )}
+        </div>
+      )}
+
+      {isOwn && (
+        <div className="mt-auto flex flex-col items-center gap-2 xl:hidden">
+          <div className="w-full md:hidden">
+            <LogoutButton />
+          </div>
+          <LegalLinks />
         </div>
       )}
 

@@ -44,6 +44,8 @@ fi
 if [ "${RUN_MIGRATIONS}" = "true" ]; then
     echo "[entrypoint] running migrations..."
     php artisan migrate --force
+    echo "[entrypoint] seeding..."
+    php artisan db:seed --force
 fi
 
 mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs

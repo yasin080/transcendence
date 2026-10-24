@@ -21,6 +21,12 @@ class GameTicked implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        return ['worms' => $this->state['worms'], 'food' => $this->state['food']];
+        return [
+            'worms' => $this->state['worms'],
+            'food' => $this->state['food'],
+            'pickups' => $this->state['pickups'],
+            'bombs' => $this->state['bombs'],
+            'blasts' => $this->state['blasts'],
+        ];
     }
 }

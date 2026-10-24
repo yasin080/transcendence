@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import WaitingRoomHeader from '../components/waiting-room/WaitingRoomHeader.tsx'
 import MatchPanel from '../components/waiting-room/MatchPanel.tsx'
 import PlayerGrid from '../components/waiting-room/PlayerGrid.tsx'
@@ -8,22 +8,29 @@ import MessageModal from '../components/ui/MessageModal.tsx'
 import backstage from '../assets/salon.jpg'
 import type { MatchSetting, Player } from '../components/waiting-room/types.ts'
 import type { Room } from '../components/lobby/types.ts'
-import { apiPost } from '../lib/api.ts'
+import { BOARD_OPTIONS, FOOD_OPTIONS, SOFT_WALL_OPTIONS, SPEED_OPTIONS, labelFor } from '../components/lobby/roomOptions.ts'
+import type { Settings } from '../game/logic/settings.ts'
+import { apiGet, apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { echo } from '../lib/echo'
 
 
-const MOCK_SETTINGS: MatchSetting[] = [
-  { label: 'Arena', value: 'Neon Grid' },
-  { label: 'Mode', value: 'Free-for-all' },
-  { label: 'Rounds', value: 'Best of 3' },
-  { label: 'Bomb fuse', value: '2.5 s' },
-  { label: 'Speed', value: 'Fast' },
-  { label: 'Power-ups', value: 'On' },
-]
+// Lo que el host eligió al crear la sala, con las mismas etiquetas del modal.
+function settingChips(s: Settings): MatchSetting[] {
+  return [
+    { label: 'Board', value: labelFor(BOARD_OPTIONS, s.width) },
+    { label: 'Speed', value: labelFor(SPEED_OPTIONS, s.tickMs) },
+    { label: 'Food', value: labelFor(FOOD_OPTIONS, s.food) },
+    { label: 'Start length', value: String(s.startLength) },
+    { label: 'Pillars', value: s.pillars ? 'On' : 'Off' },
+    { label: 'Soft walls', value: labelFor(SOFT_WALL_OPTIONS, s.softWalls) },
+    { label: 'Wall hit', value: s.wallHit === 'die' ? 'Deadly' : 'Blocks' },
+    { label: 'Body hit', value: s.bodyHit === 'die' ? 'Deadly' : 'Blocks' },
+    { label: 'Bombs', value: s.bombs > 0 ? String(s.bombs) : 'Off' },
+  ]
+}
 
 export default function WaitingRoom() {
-  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
   const { user } = useAuth()
@@ -31,10 +38,7 @@ export default function WaitingRoom() {
   const [room, setRoom] = useState<Room | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [startError, setStartError] = useState<string | null>(null)
-
-  const preview = searchParams.get('preview')
-  const initialPhase = preview === 'closed' || preview === 'kicked' ? preview : 'waiting'
-  const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>(initialPhase)
+  const [phase, setPhase] = useState<'waiting' | 'closed' | 'kicked'>('waiting')
 
 
   // Se une al entrar (no solo lee la sala): así entrar por URL también ocupa
@@ -54,17 +58,17 @@ export default function WaitingRoom() {
   useEffect(() => {
     if (!roomId || !joined) return
     const channel = echo.private(`room.${roomId}`)
-    channel.listen('.players.updated', (e: { room: Room }) => {
-      setRoom(e.room)
-      // Si ya no estoy en la lista, el host me ha expulsado.
-      const stillIn = e.room.players.some((p) => p.user_id === user?.id)
-      if (stillIn) return
-      // Kicked
-      echo.leave(`room.${roomId}`)
-      setPhase('kicked')
-    })
-    channel.listen('.match.started', (e: { gameId: number }) => {
-      navigate(`/game/${e.gameId}`)
+    // El evento solo avisa: la sala actualizada se pide por HTTP
+    channel.listen('.players.updated', () => {
+      void apiGet<Room>(`/api/rooms/${roomId}`).then((result) => {
+        if (!result.ok) return
+        setRoom(result.data)
+        const stillIn = result.data.players.some((p) => p.user_id === user?.id)
+        if (stillIn) return
+        // Kicked
+        echo.leave(`room.${roomId}`)
+        setPhase('kicked')
+      })
     })
     return () => echo.leave(`room.${roomId}`)
   }, [roomId, joined, user?.id, navigate])
@@ -105,18 +109,16 @@ export default function WaitingRoom() {
         name: `BOT_${p.seat + 1}`,
         isOwner: false,
         isBot: true,
-        difficulty: p.bot_difficulty ?? 'medium',
       }
     : {
         id: String(p.id),
-        name: p.user?.name ?? 'Player',
+        name: p.user?.username ?? 'Player',
         isOwner: p.user_id === room.host_id,
         isBot: false,
         // [RETOMAR] Aún no hay estadísticas ni colores en el backend
         winPct: '—',
         avgScore: '—',
-        background: 'linear-gradient(150deg,#3b2f7a,#1b1636)',
-        color: '#ff89a5',
+        avatar: p.user?.avatar ?? null,
       },
 )
 
@@ -125,10 +127,10 @@ export default function WaitingRoom() {
   const maxPlayers = room.settings.players
   const hasFreeSeat = playerCount < maxPlayers
   const canStart = playerCount > 0
-  
+
 
   return (
-    <div className="h-full flex-1 min-w-0 overflow-y-auto px-7 pt-6 pb-8 font-body">
+    <div className="h-full flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 font-body md:px-7">
       <WaitingRoomHeader
         roomName={room.name}
         isOwner={isOwner}
@@ -139,7 +141,7 @@ export default function WaitingRoom() {
         isOwner={isOwner}
         playerCount={playerCount}
         maxPlayers={maxPlayers}
-        settings={MOCK_SETTINGS}
+        settings={settingChips(room.settings)}
         canStart={canStart}
         onStart={startMatch}
         onLeave={leaveRoom}

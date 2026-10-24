@@ -32,6 +32,7 @@ class RoomTest extends TestCase
         'players' => 1,
         'startLength' => 3,
         'food' => 1,
+        'bombs' => 0,
         'wallHit' => 'die',
         'bodyHit' => 'die',
         'controls' => 'turn',
@@ -76,6 +77,44 @@ class RoomTest extends TestCase
         $this->postJson('/api/rooms', ['name' => 'Extra', 'settings' => self::SNAKE + ['cheat' => true]])
             ->assertFails(422)
             ->assertJsonValidationErrors(['settings']);
+    }
+
+    public function test_the_start_length_grows_with_the_board(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        // 30 de ancho: hasta 9 casillas de largo
+        $this->postJson('/api/rooms', ['name' => 'Long', 'settings' => ['startLength' => 10] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.startLength']);
+
+        $this->postJson('/api/rooms', ['name' => 'Long', 'settings' => ['startLength' => 9] + self::SNAKE])
+            ->assertCreated();
+    }
+
+    public function test_pillars_and_deadly_walls_do_not_go_together(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => ['pillars' => true] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.wallHit']);
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => ['pillars' => true, 'wallHit' => 'block'] + self::SNAKE])
+            ->assertCreated();
+    }
+
+    public function test_pillars_and_soft_walls_do_not_go_together(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $pillars = ['pillars' => true, 'wallHit' => 'block'] + self::SNAKE;
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => ['softWalls' => 0.03] + $pillars])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.softWalls']);
+
+        $this->postJson('/api/rooms', ['name' => 'Pillars', 'settings' => $pillars])
+            ->assertCreated();
     }
 
     public function test_a_guest_cannot_create_a_room(): void
@@ -158,13 +197,21 @@ class RoomTest extends TestCase
             ->assertJsonPath('room.settings.tickMs', 150);
     }
 
-    public function test_a_stranger_cannot_load_a_match(): void
+    public function test_a_spectator_can_load_a_match_without_a_seat(): void
     {
         $room = $this->createRoom(User::factory()->create());
         $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
         $this->actingAs(User::factory()->create());
 
-        $this->getJson("/api/games/{$gameId}")->assertFails(403);
+        $this->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', null);
+    }
+
+    public function test_the_room_list_links_the_latest_match(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+
+        $this->getJson('/api/rooms')->assertOk()->assertJsonPath('0.latest_game.id', $gameId);
     }
 
     public function test_a_player_can_rejoin_their_room_even_if_it_is_full(): void
@@ -406,6 +453,19 @@ class RoomTest extends TestCase
         $this->postJson("/api/rooms/{$room->code}/kick/{$hostSeat->id}")->assertFails(422);
         $this->postJson("/api/rooms/{$room->code}/kick/{$otherSeat->id}")->assertFails(404);
         $this->assertDatabaseCount('room_players', 2);
+    }
+
+    public function test_the_host_cannot_kick_once_the_match_has_started(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 2);
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $player = $room->players()->where('user_id', $guest->id)->firstOrFail();
+        $this->actingAs($host)->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+
+        $this->postJson("/api/rooms/{$room->code}/kick/{$player->id}")->assertFails(409);
+        $this->assertSame(2, $room->players()->count());
     }
 
     public function test_leaving_mid_match_keeps_the_seat(): void

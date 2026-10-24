@@ -19,7 +19,8 @@ class RoomController extends Controller
     public function index(): JsonResponse
     {
         $rooms = Room::whereIn('status', ['open', 'playing'])
-            ->with('host:id,name')
+            ->with('host:id,username')
+            ->with('latestGame')
             ->withCount('players')
             ->latest()
             ->get();
@@ -152,9 +153,9 @@ class RoomController extends Controller
     private function withPlayers(Room $room): Room
     {
         return $room->load([
-            'host:id,name',
+            'host:id,username',
             'players' => fn ($q) => $q->orderBy('seat'),
-            'players.user:id,name',
+            'players.user:id,username,avatar',
         ]);
     }
 
@@ -163,6 +164,7 @@ class RoomController extends Controller
         abort_unless($room->host_id === $request->user()->id, 403);
         abort_unless($player->room_id === $room->id, 404);
         abort_if($player->user_id === $room->host_id, 422);
+        abort_unless($room->status === 'open', 409, 'This match has already started.');
 
         $player->delete();
 

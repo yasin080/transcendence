@@ -16,9 +16,7 @@ class GoogleAuthController extends Controller
 
     public function redirect(): RedirectResponse
     {
-        return Socialite::driver('google')
-            ->with(['access_type' => 'offline'])
-            ->redirect();
+        return Socialite::driver('google')->redirect();
     }
 
     public function callback(Request $request): RedirectResponse
@@ -39,11 +37,6 @@ class GoogleAuthController extends Controller
 
         if ($account) {
             $user = $account->user;
-
-            $account->update([
-                'access_token' => $googleUser->token,
-                'refresh_token' => $googleUser->refreshToken ?? $account->refresh_token,
-            ]);
         } else {
             $user = User::where('email', $googleUser->getEmail())->first();
 
@@ -58,8 +51,6 @@ class GoogleAuthController extends Controller
             $user->oauthAccounts()->create([
                 'provider' => 'google',
                 'provider_id' => $googleUser->getId(),
-                'access_token' => $googleUser->token,
-                'refresh_token' => $googleUser->refreshToken,
             ]);
         }
 
