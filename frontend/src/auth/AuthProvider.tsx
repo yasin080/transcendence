@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { apiGet, apiPost, type ApiFailure, type User } from '../lib/api'
 import { joinPresence, leavePresence } from '../components/friends/presence'
+import { listenFriendsChanged } from '../components/friends/events'
 import {
   AuthContext,
   type AuthStatus,
@@ -37,6 +38,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (status === 'authenticated') joinPresence()
     else if (status === 'guest') leavePresence()
   }, [status])
+
+  // Avisos de amistad en tiempo real mientras haya sesión iniciada
+  const userId = user?.id
+  useEffect(() => {
+    if (userId === undefined) return
+    return listenFriendsChanged(userId)
+  }, [userId])
 
   const authenticate = useCallback(
     async (path: string, payload: Credentials | Registration): Promise<ApiFailure | null> => {
