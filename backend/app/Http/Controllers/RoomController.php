@@ -164,6 +164,7 @@ class RoomController extends Controller
         abort_unless($room->host_id === $request->user()->id, 403);
         abort_unless($player->room_id === $room->id, 404);
         abort_if($player->user_id === $room->host_id, 422);
+        abort_unless($room->status === 'open', 409, 'This match has already started.');
 
         $player->delete();
 

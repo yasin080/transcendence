@@ -131,14 +131,6 @@ export default function Lobby() {
             }}
             className="min-w-0 flex-1 sm:w-61 sm:flex-none"
           />
-
-          {/* Botón de notificaciones */}
-          <button className="grid place-items-center size-[42px] rounded-[11px] border border-white/12 bg-white/5 text-white cursor-pointer hover:bg-white/12">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8" />
-              <path d="M10.5 21h3" />
-            </svg>
-          </button>
         </div>
       </div>
 
