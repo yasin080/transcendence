@@ -109,7 +109,7 @@ export default function WaitingRoom() {
       }
     : {
         id: String(p.id),
-        name: p.user?.name ?? 'Player',
+        name: p.user?.username ?? 'Player',
         isOwner: p.user_id === room.host_id,
         isBot: false,
         // [RETOMAR] Aún no hay estadísticas ni colores en el backend
