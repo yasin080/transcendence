@@ -11,6 +11,7 @@ import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
 import duel from '../assets/duel.webp'
+import RoomRow from '../components/lobby/RoomRow.tsx'
 
 
 type CurrentRoom = { code: string | null }
@@ -32,7 +33,6 @@ export default function Lobby() {
   const navigate = useNavigate()
   const [playError, setPlayError] = useState(false)
   const [creatingRoom, setCreatingRoom] = useState(false)
-  const [page, setPage] = useState(1)
   const [query, setQuery] = useState('')
 
   async function playNow() {
@@ -113,7 +113,6 @@ export default function Lobby() {
             value={query}
             onChange={(value) => {
               setQuery(value)
-              setPage(1)
             }}
             className="min-w-0 flex-1 sm:w-61 sm:flex-none"
           />
