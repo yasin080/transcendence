@@ -101,7 +101,7 @@ export default function FriendsPanel() {
           (results.length > 0 ? (
             <section className="flex flex-col gap-0.5">
               <SectionHeader size="sm" className="px-2.5 pb-1.5" title="Results" count={results.length} />
-              {results.map((user) => (
+              {withPresence(results, onlineIds).map((user) => (
                 <FriendRow
                   key={user.id}
                   user={user}
