@@ -37,8 +37,7 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
         />
         <div className="min-w-0">
           <div className="truncate text-[15px] font-bold">{room.name}</div>
-          {/* [RETOMAR] CAMBIAR EL NAME DEL HOST POR EL NICK */}
-          <div className="truncate text-xs text-white/45">hosted by {room.host.name}</div>
+          <div className="truncate text-xs text-white/45">hosted by {room.host.username}</div>
         </div>
       </div>
       <div className="hidden text-center text-[13px] text-white/72 sm:block">{labelFor(FOOD_OPTIONS, room.settings.food)}</div>
@@ -49,7 +48,7 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
       {playing ? (
         <Link
           to={`/game/${room.latest_game?.id}`}
-          className="py-[9px] rounded-[10px] border border-ember-600/60 text-center text-[13px] font-bold tracking-[.04em] text-ember-600 hover:bg-ember-600/15"
+          className="py-2.25 rounded-[10px] border border-ember-600/60 text-center text-[13px] font-bold tracking-[.04em] text-ember-600 hover:bg-ember-600/15"
         >
           {isMine ? 'Enter' : 'Spectate'}
         </Link>
@@ -60,7 +59,7 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
           disabled={!isMine && (full || locked)}
           title={locked ? 'You are already in another room' : undefined}
           onClick={() => onJoin(room)}
-          className="py-[9px] rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+          className="py-2.25 rounded-[10px] bg-fuse-600 text-[13px] font-bold tracking-[.04em] text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isMine ? 'Enter' : 'Join'}
         </button>
@@ -69,13 +68,12 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
   )
 }
 
-// Títulos de columna sobre la lista. El borde transparente iguala el de las
-// filas para que el texto caiga en la misma posición.
+// Títulos de columna sobre la lista.
+// El borde transparente iguala el de las filas para que el texto caiga en la misma posición.
 export function RoomListHeader() {
   return (
     <div className={`${ROW_LAYOUT} border border-transparent text-[11px] font-bold uppercase tracking-[.14em] text-white/45`}>
-      {/* 22px = punto de estado (10px) + su separación (12px): alinea con el nombre */}
-      <span className="pl-[22px]">Room</span>
+      <span className="pl-5.5">Room</span>
       <span className="hidden text-center sm:block">Food</span>
       <span className="hidden text-center sm:block">Speed</span>
       <span className="text-center">Players</span>

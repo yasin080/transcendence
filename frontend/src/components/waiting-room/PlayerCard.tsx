@@ -1,4 +1,5 @@
 import { BotIcon, CrownIcon, XIcon } from '../left-sidebar/ui/Icons.tsx'
+import Avatar from '../ui/Avatar.tsx'
 import type { Player } from './types.ts'
 
 interface PlayerCardProps {
@@ -10,7 +11,7 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
   const roleLabel = player.isOwner
     ? 'Room owner'
     : player.isBot
-      ? `Bot · ${player.difficulty}`
+      ? 'Bot'
       : 'Player'
   const roleColor = player.isOwner
     ? 'text-gold'
@@ -40,7 +41,7 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
         {player.isBot ? (
           <BotAvatar />
         ) : (
-          <Avatar name={player.name} background={player.background} color={player.color} />
+          <Avatar size={52} src={player.avatar} />
         )}
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-1.75">
@@ -59,19 +60,6 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
           <Stat value={player.avgScore} label="Avg score" />
         </div>
       )}
-    </div>
-  )
-}
-
-function Avatar({ name, background, color }: { name: string; background: string; color: string }) {
-  const initials = name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '?'
-
-  return (
-    <div
-      className="grid size-13 flex-none place-items-center rounded-2xl display-stat-sm"
-      style={{ background, color }}
-    >
-      {initials}
     </div>
   )
 }

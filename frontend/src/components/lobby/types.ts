@@ -13,7 +13,7 @@ export interface Room {
 
 // Sala tal como la devuelve GET /api/rooms
 export type RoomSummary = Omit<Room, 'players'> & {
-  host: { id: number; name: string }
+  host: { id: number; username: string }
   players_count: number
   latest_game: { id:number } | null
 }
@@ -24,5 +24,5 @@ export interface RoomPlayer {
   user_id: number | null
   seat: number
   bot_difficulty: 'easy' | 'medium' | 'hard' | null
-  user?: { id: number; name: string } | null
+  user?: { id: number; username: string; avatar: string | null } | null
 }

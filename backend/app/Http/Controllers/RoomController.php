@@ -19,7 +19,7 @@ class RoomController extends Controller
     public function index(): JsonResponse
     {
         $rooms = Room::whereIn('status', ['open', 'playing'])
-            ->with('host:id,name')
+            ->with('host:id,username')
             ->with('latestGame')
             ->withCount('players')
             ->latest()
@@ -153,9 +153,9 @@ class RoomController extends Controller
     private function withPlayers(Room $room): Room
     {
         return $room->load([
-            'host:id,name',
+            'host:id,username',
             'players' => fn ($q) => $q->orderBy('seat'),
-            'players.user:id,name',
+            'players.user:id,username,avatar',
         ]);
     }
 
