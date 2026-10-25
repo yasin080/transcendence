@@ -10,6 +10,9 @@ then every 6 hours, into `./backups/<date>.sql.gz` on the host. The newest 28
 dumps (one week) are kept. A dump only counts if it finished, so a broken one
 never replaces a good one. `make backup` makes one on the spot.
 
+**Where it shows.** `/health` lists every service and the time of the last
+backup. `GET /api/health` returns the same data as JSON.
+
 **Recovery.** `./backups` lives outside Docker, so it survives even
 `make fclean`. To rebuild everything from scratch:
 

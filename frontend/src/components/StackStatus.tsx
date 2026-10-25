@@ -7,7 +7,10 @@ type Health = {
   database: string
   redis: string
   laravel: string
+  last_backup: string | null
 }
+
+const BACKUP_MAX_AGE_MS = 7 * 60 * 60 * 1000
 
 type Probe =
   | { state: 'loading' }
@@ -55,6 +58,9 @@ export default function StackStatus() {
     }
   }, [])
 
+  const lastBackup =
+    api.state === 'ok' && api.health.last_backup ? new Date(api.health.last_backup) : null
+
   return (
     <details className="group rounded-xl border border-line-strong bg-fill text-sm">
       <summary className="cursor-pointer select-none px-4 py-2 text-fg-muted hover:text-fg-secondary">
@@ -84,6 +90,11 @@ export default function StackStatus() {
           ok={api.state === 'ok' && api.health.redis === 'ok'}
         />
         <StatusRow label="WebSocket (Reverb)" value={socket} ok={socket === 'connected'} />
+        <StatusRow
+          label="Last backup"
+          value={lastBackup ? lastBackup.toLocaleString('en-US') : 'none'}
+          ok={lastBackup !== null && Date.now() - lastBackup.getTime() < BACKUP_MAX_AGE_MS}
+        />
       </div>
     </details>
   )

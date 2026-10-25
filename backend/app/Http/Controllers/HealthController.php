@@ -27,7 +27,16 @@ class HealthController extends Controller
             'database' => $database,
             'redis' => $redis,
             'laravel' => app()->version(),
+            'last_backup' => $this->lastBackup(),
         ], $healthy ? 200 : 503);
+    }
+
+    /** When the newest dump in ./backups was written, or null if there is none. */
+    private function lastBackup(): ?string
+    {
+        $times = array_map('filemtime', glob('/var/www/backups/*.sql.gz'));
+
+        return $times ? date(DATE_ATOM, max($times)) : null;
     }
 
     private function probe(callable $check): string
