@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import QuickMatchHero from '../components/lobby/QuickMatchHero.tsx'
 import CreateRoomModal from '../components/lobby/CreateRoomModal.tsx'
-import RoomRow, { RoomListHeader } from '../components/lobby/RoomRow.tsx'
 import type { RoomSummary } from '../components/lobby/types.ts'
 import EmptyState from '../components/ui/EmptyState.tsx'
 import SearchInput from '../components/ui/SearchInput.tsx'
@@ -10,9 +9,10 @@ import SectionHeader from '../components/ui/SectionHeader.tsx'
 import { startQuickMatch } from '../game/api.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
+import Button from '../components/ui/Button.tsx'
+import duel from '../assets/duel.webp'
+import RoomRow from '../components/lobby/RoomRow.tsx'
 
-
-const PAGE_SIZE = 6
 
 type CurrentRoom = { code: string | null }
 
@@ -33,7 +33,6 @@ export default function Lobby() {
   const navigate = useNavigate()
   const [playError, setPlayError] = useState(false)
   const [creatingRoom, setCreatingRoom] = useState(false)
-  const [page, setPage] = useState(1)
   const [query, setQuery] = useState('')
 
   async function playNow() {
@@ -44,14 +43,10 @@ export default function Lobby() {
   }
 
 
-
-  // null = todavía cargando
   const [rooms, setRooms] = useState<RoomSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  // Código de la sala en la que ya tengo asiento (null = en ninguna)
   const [myRoomCode, setMyRoomCode] = useState<string | null>(null)
 
-  // Pide las salas y mi sala actual una vez, al entrar en el lobby
   useEffect(() => {
     let cancelled = false
 
@@ -66,7 +61,6 @@ export default function Lobby() {
     })
 
     echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {
-    // Si cierran o termina mi sala, ya no estoy en ninguna
     if (room.status === 'closed' || room.status === 'finished') {
       setMyRoomCode((prev) => (prev === room.code ? null : prev))
     }
@@ -88,8 +82,6 @@ export default function Lobby() {
 
   const [joinError, setJoinError] = useState<string | null>(null)
 
-  // Primero ocupa un asiento en el backend; solo si lo consigue entra en la sala.
-  // Si ya tengo asiento en ella, entro directamente.
   async function joinRoom(room: RoomSummary) {
     setJoinError(null)
     if (room.code === myRoomCode) {
@@ -102,21 +94,15 @@ export default function Lobby() {
   }
 
 
-
-  // Filtra por nombre o código, sin distinguir mayúsculas
   const q = query.trim().toLowerCase()
   const roomList = (rooms ?? []).filter(
     (room) => room.name.toLowerCase().includes(q) || room.code.toLowerCase().includes(q),
   )
-  const pageCount = Math.max(1, Math.ceil(roomList.length / PAGE_SIZE))
-  const firstIndex = (page - 1) * PAGE_SIZE
-  const pageRooms = roomList.slice(firstIndex, firstIndex + PAGE_SIZE)
 
 
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 md:px-7">
 
-      {/* ─── 1. Cabecera: título + buscador ─── */}
       <div className="flex flex-wrap items-center gap-4 mb-[22px]">
         <h1 className="font-display text-[26px] tracking-[0.01em]">Lobby</h1>
 
@@ -128,14 +114,12 @@ export default function Lobby() {
             value={query}
             onChange={(value) => {
               setQuery(value)
-              setPage(1)
             }}
             className="min-w-0 flex-1 sm:w-61 sm:flex-none"
           />
         </div>
       </div>
 
-      {/* ─── 2. Partida rápida (hero): Play now → cuenta atrás → /game ─── */}
       <QuickMatchHero
         modes={GAME_MODES}
         selectedMode={selectedMode}
@@ -145,20 +129,26 @@ export default function Lobby() {
       />
       {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
 
-      {/* ─── 3. Salas abiertas (máx. 6 por página) + paginador ─── */}
-      <SectionHeader size="lg" title="Open rooms" className="mt-6.5 mb-3">
-        <span className="text-xs text-white/40">{roomList.length} rooms</span>
+      <section className="relative mt-6.5 overflow-hidden rounded-[20px] border border-line">
+        <img src={duel} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover object-center" />
+        <div aria-hidden="true" className="absolute inset-0 bg-radial from-void/90 via-void/65 to-void/20" />
 
-        <button
-          type="button"
-          disabled={myRoomCode !== null}
-          title={myRoomCode ? 'You are already in another room' : undefined}
-          onClick={() => setCreatingRoom(true)}
-          className="px-4 py-2 rounded-[10px] border border-white/12 bg-white/5 text-[13px] font-bold text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          + Create room
-        </button>
-      </SectionHeader>
+        <div className="relative flex flex-col items-center gap-3 px-5 py-8 text-center">
+          <p className="text-eyebrow">Custom match</p>
+          <h2 className="font-display text-2xl sm:text-[28px]">Call your rivals</h2>
+          <Button
+            variant="primary"
+            size="md"
+            disabled={myRoomCode !== null}
+            title={myRoomCode ? 'You are already in another room' : undefined}
+            onClick={() => setCreatingRoom(true)}
+          >
+            + Create room
+          </Button>
+        </div>
+      </section>
+
+      <SectionHeader size="lg" title="Open rooms" className="mt-6 mb-3" />
 
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 
@@ -170,8 +160,7 @@ export default function Lobby() {
         {rooms && rooms.length > 0 && roomList.length === 0 && (
           <EmptyState title={`No rooms match "${query.trim()}"`} text="Try another name or code." />
         )}
-        {pageRooms.length > 0 && <RoomListHeader />}
-        {pageRooms.map((room) => (
+        {roomList.map((room) => (
           <RoomRow
             key={room.id}
             room={room}
@@ -183,51 +172,6 @@ export default function Lobby() {
       </div>
 
 
-      {/* Paginador */}
-        <div className="flex items-center gap-2.5 mt-3.5">
-          {roomList.length > 0 && (
-          <span className="text-xs text-white/40">
-
-              Showing {firstIndex + 1}–{firstIndex + pageRooms.length} of {roomList.length}
-
-          </span>
-          )}
-
-          <div className="ml-auto flex items-center gap-1.5">
-          <button
-            type="button"
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-            className="grid place-items-center size-8.5 rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
-          {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setPage(n)}
-              className={`min-w-8.5 h-8.5 px-2.5 rounded-[10px] border text-[13px] font-bold cursor-pointer ${
-                n === page ? 'border-fuse-600 bg-fuse-600 text-white' : 'border-white/12 bg-white/5 text-white/60'
-              }`}
-            >
-              {n}
-            </button>
-          ))}
-          <button
-            type="button"
-            disabled={page === pageCount}
-            onClick={() => setPage(page + 1)}
-            className="grid place-items-center size-8.5 rounded-[10px] border border-white/12 bg-white/5 text-white cursor-pointer enabled:hover:bg-white/12 disabled:cursor-not-allowed disabled:text-white/25"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-              <path d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </section>
+      </section>
   )
 }

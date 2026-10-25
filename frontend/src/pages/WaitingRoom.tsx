@@ -13,9 +13,9 @@ import type { Settings } from '../game/logic/settings.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { echo } from '../lib/echo'
+import Button from '../components/ui/Button.tsx'
 
 
-// Lo que el host eligió al crear la sala, con las mismas etiquetas del modal.
 function settingChips(s: Settings): MatchSetting[] {
   return [
     { label: 'Board', value: labelFor(BOARD_OPTIONS, s.width) },
@@ -56,17 +56,18 @@ export default function WaitingRoom() {
   useEffect(() => {
     if (!roomId || !joined) return
     const channel = echo.private(`room.${roomId}`)
-    // El evento solo avisa: la sala actualizada se pide por HTTP
     channel.listen('.players.updated', () => {
       void apiGet<Room>(`/api/rooms/${roomId}`).then((result) => {
         if (!result.ok) return
         setRoom(result.data)
         const stillIn = result.data.players.some((p) => p.user_id === user?.id)
         if (stillIn) return
-        // Kicked
         echo.leave(`room.${roomId}`)
         setPhase('kicked')
       })
+    })
+    channel.listen('.match.started', (e: { gameId: number }) => {
+      navigate(`/game/${e.gameId}`)
     })
     return () => echo.leave(`room.${roomId}`)
   }, [roomId, joined, user?.id, navigate])
@@ -94,8 +95,25 @@ export default function WaitingRoom() {
     if (!result.ok) setStartError(result.failure.message)
   }
 
-  if (error) return <p>{error}</p>
-  if (!room) return <p>Loading…</p>
+  if (error) {
+    return (
+      <div className="h-full flex-1 min-w-0 px-4 pt-6 pb-8 font-body md:px-7">
+        <div className="flex flex-col items-start gap-3">
+          <p className="text-sm text-fuse-600">{error}</p>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/lobby')}>
+            Back to lobby
+          </Button>
+        </div>
+      </div>
+    )
+  }
+  if (!room) {
+    return (
+      <div className="h-full flex-1 min-w-0 px-4 pt-6 pb-8 font-body md:px-7">
+        <p className="text-sm text-white/45">Loading room…</p>
+      </div>
+    )
+  }
 
   const players: Player[] = room.players.map((p) =>
   p.user_id === null
@@ -148,9 +166,9 @@ export default function WaitingRoom() {
       {(phase === 'closed' || (room.status === 'closed' && !isOwner)) && (
         <MessageModal
           kicker="Room closed"
-          title="The host closed the room"
+          title="The host left the room"
           message="The room creator disconnected, so the match was cancelled for everyone. Nothing counted towards your rank."
-          buttonLabel="Back to home"
+          buttonLabel="Back to lobby"
           onAction={() => navigate('/lobby')}
         />
       )}
@@ -159,7 +177,7 @@ export default function WaitingRoom() {
           kicker="Removed"
           title="The host removed you from this room"
           message="You can join another room or start your own match whenever you're ready."
-          buttonLabel="Back to home"
+          buttonLabel="Back to lobby"
           onAction={() => navigate('/lobby')}
         />
       )}
