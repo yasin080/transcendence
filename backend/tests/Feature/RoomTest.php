@@ -77,6 +77,11 @@ class RoomTest extends TestCase
         $this->postJson('/api/rooms', ['name' => 'Extra', 'settings' => self::SNAKE + ['cheat' => true]])
             ->assertFails(422)
             ->assertJsonValidationErrors(['settings']);
+
+        // Only spaces is not a name
+        $this->postJson('/api/rooms', ['name' => '   ', 'settings' => self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['name']);
     }
 
     public function test_the_start_length_grows_with_the_board(): void

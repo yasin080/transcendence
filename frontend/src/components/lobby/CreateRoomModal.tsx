@@ -50,11 +50,16 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
-    setBusy(true)
     setNameError(null)
     setMessage(null)
 
-    const result = await apiPost<Room>('/api/rooms', { name, settings: toSettings(choices) })
+    // Same rules as the backend: required and at most 40 characters
+    const trimmed = name.trim()
+    if (trimmed === '') return setNameError('Enter a room name.')
+    if (trimmed.length > 40) return setNameError('Keep the room name under 40 characters.')
+
+    setBusy(true)
+    const result = await apiPost<Room>('/api/rooms', { name: trimmed, settings: toSettings(choices) })
 
     if (!result.ok) {
       setBusy(false)
