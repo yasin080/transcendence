@@ -24,6 +24,7 @@ class BombTest extends TestCase
         'bodyHit' => 'die',
         'controls' => 'turn',
         'camera' => 'board',
+        'botMistakes' => 50,
     ];
 
     /** Worm 0 heads right along row 5, head at x = $head. */

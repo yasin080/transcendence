@@ -37,6 +37,7 @@ class RoomTest extends TestCase
         'bodyHit' => 'die',
         'controls' => 'turn',
         'camera' => 'board',
+        'botMistakes' => 50,
     ];
 
     // El nombre tiene que ser único entre las salas activas
@@ -70,13 +71,24 @@ class RoomTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        $this->postJson('/api/rooms', ['name' => '', 'settings' => ['players' => 9, 'wallHit' => 'explode'] + self::SNAKE])
+        $this->postJson('/api/rooms', ['name' => '', 'settings' => ['players' => 9, 'wallHit' => 'explode', 'botMistakes' => 90] + self::SNAKE])
             ->assertFails(422)
-            ->assertJsonValidationErrors(['name', 'settings.players', 'settings.wallHit']);
+            ->assertJsonValidationErrors(['name', 'settings.players', 'settings.wallHit', 'settings.botMistakes']);
 
         $this->postJson('/api/rooms', ['name' => 'Extra', 'settings' => self::SNAKE + ['cheat' => true]])
             ->assertFails(422)
             ->assertJsonValidationErrors(['settings']);
+
+        $this->postJson('/api/rooms', ['name' => 'Odd camera', 'settings' => ['camera' => 'drone'] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.camera']);
+        $this->postJson('/api/rooms', ['name' => 'Head camera', 'settings' => ['camera' => 'head'] + self::SNAKE])
+            ->assertCreated();
+
+        // Only spaces is not a name
+        $this->postJson('/api/rooms', ['name' => '   ', 'settings' => self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['name']);
     }
 
     public function test_the_start_length_grows_with_the_board(): void
@@ -204,6 +216,17 @@ class RoomTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $this->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', null);
+    }
+
+    public function test_quick_matches_are_not_listed_in_the_lobby(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Quick match AB12', 'settings' => self::SNAKE, 'quick' => true])
+            ->assertCreated()
+            ->assertJsonPath('quick', true);
+
+        $this->getJson('/api/rooms')->assertOk()->assertJsonCount(0);
     }
 
     public function test_the_room_list_links_the_latest_match(): void
@@ -403,6 +426,18 @@ class RoomTest extends TestCase
         $this->postJson("/api/games/{$gameId}/ping")->assertFails(403);
     }
 
+    public function test_presence_is_ignored_once_the_match_is_over(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $game = $room->games()->findOrFail($this->postJson("/api/rooms/{$room->code}/games")->json('id'));
+        LiveGames::finish($game->id);
+        $game->update(['ended_at' => now()]);
+
+        $this->postJson("/api/games/{$game->id}/ping")->assertFails(409);
+        $this->postJson("/api/games/{$game->id}/leave")->assertFails(409);
+        $this->assertSame([], LiveGames::lastSeen($game->id));
+    }
+
     public function test_show_returns_the_players_and_games(): void
     {
         $host = User::factory()->create(['name' => 'Host']);
@@ -466,6 +501,39 @@ class RoomTest extends TestCase
 
         $this->postJson("/api/rooms/{$room->code}/kick/{$player->id}")->assertFails(409);
         $this->assertSame(2, $room->players()->count());
+    }
+
+    public function test_the_host_leaving_mid_match_hands_the_room_to_the_next_player(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 3);
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertOk();
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $this->actingAs($host)->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+
+        $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
+
+        $this->assertSame($guest->id, $room->fresh()->host_id);
+        $this->assertFalse($room->players()->where('user_id', $host->id)->exists());
+
+        // Once the match is over they can come back, as a player
+        $room->update(['status' => 'open']);
+        $this->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $this->assertSame($guest->id, $room->fresh()->host_id);
+    }
+
+    public function test_the_host_alone_with_bots_keeps_the_seat_mid_match(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 2);
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertOk();
+        $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+
+        $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
+
+        $this->assertSame($host->id, $room->fresh()->host_id);
+        $this->assertTrue($room->players()->where('user_id', $host->id)->exists());
     }
 
     public function test_leaving_mid_match_keeps_the_seat(): void

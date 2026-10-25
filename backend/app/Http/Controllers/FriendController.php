@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Friendship;
 use App\Models\User;
+use App\Events\FriendshipChanged;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 
 class FriendController extends Controller
 {
@@ -42,6 +44,7 @@ class FriendController extends Controller
     // GET /api/users/search?q=bo — jugadores por username, con mi relación con cada uno
     public function search(Request $request): JsonResponse
     {
+        $request->validate(['q' => ['nullable', 'string', 'max:20']]);
         $me = $request->user();
         $query = trim((string) $request->query('q', ''));
 
@@ -91,6 +94,7 @@ class FriendController extends Controller
             // Él ya me la había enviado: añadirle equivale a aceptar
             $friendship->update(['status' => 'accepted']);
         }
+        FriendshipChanged::dispatch($user->id);
 
         return response()->json(['friend_state' => Friendship::stateFor($friendship, $me)]);
     }
@@ -104,6 +108,7 @@ class FriendController extends Controller
             ->firstOrFail();
 
         $friendship->update(['status' => 'accepted']);
+        FriendshipChanged::dispatch($user->id);
 
         return response()->json(['friend_state' => 'friends']);
     }
@@ -112,6 +117,7 @@ class FriendController extends Controller
     public function destroy(Request $request, User $user): JsonResponse
     {
         Friendship::between($request->user(), $user)?->delete();
+        FriendshipChanged::dispatch($user->id);
 
         return response()->json(['friend_state' => 'none']);
     }

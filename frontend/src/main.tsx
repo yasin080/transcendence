@@ -15,7 +15,6 @@ import Privacy from './pages/Privacy.tsx'
 import Profile from './pages/Profile.tsx'
 import Terms from './pages/Terms.tsx'
 import NotFound from './pages/NotFound.tsx'
-import Leaderboard from './pages/Leaderboard.tsx'
 
 const Game = lazy(() => import('./pages/Game.tsx'))
 
@@ -38,10 +37,9 @@ createRoot(root).render(
           </Route>
 
           <Route element={<RequireAuth />}>
-            {/* MARCO 2 — app con sidebar (lobby, ranking, perfil, sala)*/}
+            {/* MARCO 2 — app con sidebar (lobby, perfil, sala)*/}
             <Route element={<MainLayout />}>
               <Route path="lobby" element={<Lobby />} />
-              <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="profile" element={<Profile />} />
               <Route path="profile/:userId" element={<Profile />} />
               <Route path="waiting-room/:roomId" element={<WaitingRoom />} />

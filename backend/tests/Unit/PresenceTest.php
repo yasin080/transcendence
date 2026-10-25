@@ -23,6 +23,7 @@ class PresenceTest extends TestCase
         'bodyHit' => 'die',
         'controls' => 'turn',
         'camera' => 'board',
+        'botMistakes' => 50,
     ];
 
     private function game(): array

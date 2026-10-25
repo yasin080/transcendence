@@ -1,4 +1,3 @@
-
 interface PlayerBase {
   id: string
   name: string
@@ -17,12 +16,6 @@ export interface BotPlayer extends PlayerBase {
 }
 
 export type Player = HumanPlayer | BotPlayer
-
-export interface Room {
-  name: string
-  hostName: string
-  modeLabel: string
-}
 
 export interface MatchSetting {
   label: string

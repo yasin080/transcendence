@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['code', 'name', 'host_id', 'status', 'settings'])]
+#[Fillable(['code', 'name', 'host_id', 'status', 'quick', 'settings'])]
 class Room extends Model
 {
     protected $attributes = ['status' => 'open'];
@@ -36,6 +36,7 @@ class Room extends Model
     protected function casts(): array
     {
         return [
+            'quick' => 'boolean',
             'settings' => 'array',
         ];
     }

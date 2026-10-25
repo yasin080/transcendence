@@ -67,16 +67,3 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
     </div>
   )
 }
-
-// Títulos de columna sobre la lista.
-// El borde transparente iguala el de las filas para que el texto caiga en la misma posición.
-export function RoomListHeader() {
-  return (
-    <div className={`${ROW_LAYOUT} border border-transparent text-[11px] font-bold uppercase tracking-[.14em] text-white/45`}>
-      <span className="pl-5.5">Room</span>
-      <span className="hidden text-center sm:block">Food</span>
-      <span className="hidden text-center sm:block">Speed</span>
-      <span className="text-center">Players</span>
-    </div>
-  )
-}
