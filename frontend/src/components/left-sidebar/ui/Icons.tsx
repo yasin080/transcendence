@@ -50,24 +50,6 @@ export function XIcon({ className = 'size-3 text-white/70' }: IconProps) {
   )
 }
 
-// ANALIZE: está en uso?
-export function BackIcon({ className = 'size-4 text-white/70' }: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      fill="none"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M15 5l-7 7 7 7" />
-    </svg>
-  )
-}
-
 export function LobbyIcon({ className = 'size-5 flex-none' }: IconProps) {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
