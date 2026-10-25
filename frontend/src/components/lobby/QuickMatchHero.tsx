@@ -5,7 +5,6 @@ interface QuickMatchHeroProps<M extends string> {
   modes: readonly M[]
   selectedMode: M
   onSelectMode: (mode: M) => void
-  canPlay?: boolean
   onPlay: () => void
 }
 
@@ -13,7 +12,6 @@ export default function QuickMatchHero<M extends string>({
   modes,
   selectedMode,
   onSelectMode,
-  canPlay = true,
   onPlay,
 }: QuickMatchHeroProps<M>) {
   return (
@@ -36,7 +34,7 @@ export default function QuickMatchHero<M extends string>({
           </div>
         </div>
 
-        <Button variant="arcade" size="xl" pulse className="w-full flex-none sm:w-auto" disabled={!canPlay} onClick={onPlay}>
+        <Button variant="arcade" size="xl" pulse className="w-full flex-none sm:w-auto" onClick={onPlay}>
           Play now
         </Button>
       </div>

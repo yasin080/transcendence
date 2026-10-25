@@ -7,6 +7,7 @@ export interface Room {
   name: string
   host_id: number
   status: 'open' | 'playing' | 'finished' | 'closed'
+  quick: boolean
   settings: Settings
   players: RoomPlayer[]
 }

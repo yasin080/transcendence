@@ -17,6 +17,7 @@ export type Settings = {
   bodyHit: Hit
   controls: Controls
   camera: Camera
+  botMistakes: number
 }
 
 export const SNAKE: Settings = {
@@ -34,4 +35,5 @@ export const SNAKE: Settings = {
   bodyHit: 'die',
   controls: 'turn',
   camera: 'board',
+  botMistakes: 50,
 }

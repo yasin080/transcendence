@@ -6,13 +6,15 @@ namespace App\Game;
  * Bots are just another source of inputs, like a keyboard: they only look
  * one cell ahead and head for the nearest food or bomb, keeping out of a
  * blast about to go off, so they trap themselves the way people do.
+ * On some ticks (the botMistakes setting, a percentage) they don't look at all
+ * and just keep going, so they can be beaten.
  */
 class Bot
 {
     public static function play(array &$game): void
     {
         foreach ($game['worms'] as $seat => $worm) {
-            if (! empty($worm['bot']) && $worm['alive']) {
+            if (! empty($worm['bot']) && $worm['alive'] && random_int(1, 100) > $game['settings']['botMistakes']) {
                 Game::turn($game, $seat, self::choose($game, $seat));
             }
         }

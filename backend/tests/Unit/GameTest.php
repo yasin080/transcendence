@@ -23,6 +23,7 @@ class GameTest extends TestCase
         'bodyHit' => 'die',
         'controls' => 'turn',
         'camera' => 'board',
+        'botMistakes' => 50,
     ];
 
     public function test_a_new_game_has_a_walled_board_a_worm_and_food(): void

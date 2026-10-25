@@ -6,10 +6,13 @@ import {
   BOARD_OPTIONS,
   BOMB_OPTIONS,
   BOMBS_ON,
+  BOT_MISTAKE_OPTIONS,
   DEFAULT_CHOICES,
   FOOD_OPTIONS,
   maxStartLength,
   PLAYER_OPTIONS,
+  PRESETS,
+  presetOf,
   SOFT_WALL_OPTIONS,
   SPEED_OPTIONS,
   startLengthOptions,
@@ -19,6 +22,7 @@ import {
 } from './roomOptions.ts'
 import type { Room } from './types.ts'
 import FormField from '../ui/FormField.tsx'
+import ToggleChip from '../ui/ToggleChip.tsx'
 
 interface CreateRoomModalProps {
   onClose: () => void
@@ -50,11 +54,16 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
-    setBusy(true)
     setNameError(null)
     setMessage(null)
 
-    const result = await apiPost<Room>('/api/rooms', { name, settings: toSettings(choices) })
+    // Same rules as the backend: required and at most 40 characters
+    const trimmed = name.trim()
+    if (trimmed === '') return setNameError('Enter a room name.')
+    if (trimmed.length > 40) return setNameError('Keep the room name under 40 characters.')
+
+    setBusy(true)
+    const result = await apiPost<Room>('/api/rooms', { name: trimmed, settings: toSettings(choices) })
 
     if (!result.ok) {
       setBusy(false)
@@ -85,6 +94,21 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           />
         </div>
 
+        <div className="mt-[18px]">
+          <span className={FIELD_LABEL}>Preset</span>
+          <div className="flex flex-wrap gap-2">
+            {PRESETS.map((preset) => (
+              <ToggleChip
+                key={preset.label}
+                selected={presetOf(choices) === preset}
+                onClick={() => setChoices({ ...choices, ...preset.choices })}
+              >
+                {preset.label}
+              </ToggleChip>
+            ))}
+          </div>
+        </div>
+
         <div className="flex flex-col gap-4 mt-[18px]">
           <Slider label="Players" options={PLAYER_OPTIONS} value={choices.players} onChange={(v) => choose('players', v)} />
           <Slider label="Board size" options={BOARD_OPTIONS} value={choices.boardSize} onChange={chooseBoard} />
@@ -96,6 +120,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           />
           <Slider label="Speed" options={SPEED_OPTIONS} value={choices.tickMs} onChange={(v) => choose('tickMs', v)} />
           <Slider label="Food" options={FOOD_OPTIONS} value={choices.food} onChange={(v) => choose('food', v)} />
+          <Slider label="Bot mistakes" options={BOT_MISTAKE_OPTIONS} value={choices.botMistakes} onChange={(v) => choose('botMistakes', v)} />
           {!choices.pillars && (
             <Slider label="Soft walls" options={SOFT_WALL_OPTIONS} value={choices.softWalls} onChange={(v) => choose('softWalls', v)} />
           )}

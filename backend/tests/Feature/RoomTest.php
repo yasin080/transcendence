@@ -37,6 +37,7 @@ class RoomTest extends TestCase
         'bodyHit' => 'die',
         'controls' => 'turn',
         'camera' => 'board',
+        'botMistakes' => 50,
     ];
 
     // El nombre tiene que ser único entre las salas activas
@@ -70,13 +71,18 @@ class RoomTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        $this->postJson('/api/rooms', ['name' => '', 'settings' => ['players' => 9, 'wallHit' => 'explode'] + self::SNAKE])
+        $this->postJson('/api/rooms', ['name' => '', 'settings' => ['players' => 9, 'wallHit' => 'explode', 'botMistakes' => 90] + self::SNAKE])
             ->assertFails(422)
-            ->assertJsonValidationErrors(['name', 'settings.players', 'settings.wallHit']);
+            ->assertJsonValidationErrors(['name', 'settings.players', 'settings.wallHit', 'settings.botMistakes']);
 
         $this->postJson('/api/rooms', ['name' => 'Extra', 'settings' => self::SNAKE + ['cheat' => true]])
             ->assertFails(422)
             ->assertJsonValidationErrors(['settings']);
+
+        // Only spaces is not a name
+        $this->postJson('/api/rooms', ['name' => '   ', 'settings' => self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['name']);
     }
 
     public function test_the_start_length_grows_with_the_board(): void
@@ -204,6 +210,17 @@ class RoomTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $this->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', null);
+    }
+
+    public function test_quick_matches_are_not_listed_in_the_lobby(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Quick match AB12', 'settings' => self::SNAKE, 'quick' => true])
+            ->assertCreated()
+            ->assertJsonPath('quick', true);
+
+        $this->getJson('/api/rooms')->assertOk()->assertJsonCount(0);
     }
 
     public function test_the_room_list_links_the_latest_match(): void

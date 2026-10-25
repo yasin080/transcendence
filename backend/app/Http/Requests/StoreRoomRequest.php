@@ -19,7 +19,8 @@ class StoreRoomRequest extends FormRequest
                 'max:40',
                 Rule::unique('rooms', 'name')->whereIn('status', ['open', 'playing']),
             ],
-            'settings' => ['required', 'array:width,height,pillars,softWalls,wrap,tickMs,players,startLength,food,bombs,wallHit,bodyHit,controls,camera'],
+            'quick' => ['sometimes', 'boolean'],
+            'settings' => ['required', 'array:width,height,pillars,softWalls,wrap,tickMs,players,startLength,food,bombs,wallHit,bodyHit,controls,camera,botMistakes'],
             'settings.width' => ['required', 'integer', 'between:10,75'],
             'settings.height' => ['required', 'integer', 'between:10,75'],
             'settings.pillars' => ['required', 'boolean'],
@@ -37,6 +38,8 @@ class StoreRoomRequest extends FormRequest
             'settings.bodyHit' => ['required', 'in:block,die'],
             'settings.controls' => ['required', 'in:turn,dpad'],
             'settings.camera' => ['required', 'in:board,follow'],
+            // Porcentaje de ticks en que un bot no mira por dónde va
+            'settings.botMistakes' => ['required', 'integer', 'between:20,80'],
         ];
     }
 }

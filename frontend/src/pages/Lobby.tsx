@@ -7,6 +7,7 @@ import EmptyState from '../components/ui/EmptyState.tsx'
 import SearchInput from '../components/ui/SearchInput.tsx'
 import SectionHeader from '../components/ui/SectionHeader.tsx'
 import { startQuickMatch } from '../game/api.ts'
+import { PRESETS, quickMatchSettings } from '../components/lobby/roomOptions.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
@@ -24,12 +25,8 @@ async function leaveCurrentRoom(): Promise<string | null> {
   return after.ok ? after.data.code : null
 }
 
-const GAME_MODES = ['Bomberman', 'Snake', 'Other'] as const
-type GameMode = (typeof GAME_MODES)[number]
-
-
 export default function Lobby() {
-  const [selectedMode, setSelectedMode] = useState<GameMode>(GAME_MODES[0])
+  const [preset, setPreset] = useState(PRESETS[0])
   const navigate = useNavigate()
   const [playError, setPlayError] = useState(false)
   const [creatingRoom, setCreatingRoom] = useState(false)
@@ -37,7 +34,7 @@ export default function Lobby() {
 
   async function playNow() {
     setPlayError(false)
-    const id = await startQuickMatch()
+    const id = await startQuickMatch(quickMatchSettings(preset))
     if (id) navigate(`/game/${id}`)
     else setPlayError(true)
   }
@@ -121,10 +118,9 @@ export default function Lobby() {
       </div>
 
       <QuickMatchHero
-        modes={GAME_MODES}
-        selectedMode={selectedMode}
-        onSelectMode={setSelectedMode}
-        canPlay={selectedMode !== 'Other'}
+        modes={PRESETS.map((p) => p.label)}
+        selectedMode={preset.label}
+        onSelectMode={(label) => setPreset(PRESETS.find((p) => p.label === label) ?? PRESETS[0])}
         onPlay={playNow}
       />
       {playError && <p className="mt-2 text-sm text-fuse-400">Could not start a match. Try again.</p>}
