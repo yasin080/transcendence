@@ -6,8 +6,8 @@ export default function NotFound() {
       <p aria-hidden="true" className="display-hero text-8xl text-fuse-600">404</p>
       <h1 className="display-heading">Page not found</h1>
       <p className="text-fg-secondary">There is nothing at this address.</p>
-      <Link to="/" className="inline-block text-fuse-400 hover:text-white">
-        Back to the home page
+      <Link to="/lobby" className="inline-block text-fuse-400 hover:text-white">
+        Back to the lobby
       </Link>
     </article>
   )

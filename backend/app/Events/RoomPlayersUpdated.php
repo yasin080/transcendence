@@ -26,10 +26,6 @@ class RoomPlayersUpdated implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        return ['room' => $this->room->load([
-            'host:id,name',
-            'players' => fn ($q) => $q->orderBy('seat'),
-            'players.user:id,name',
-        ])];
+        return [];
     }
 }

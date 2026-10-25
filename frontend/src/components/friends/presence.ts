@@ -50,9 +50,9 @@ export function useOnlineIds() {
   return useSyncExternalStore(subscribe, () => onlineIds)
 }
 
-// Sustituye el status de la API por el de la sala de presencia
-export function withPresence(list: FriendSummary[], onlineIds: Set<string>) {
-  return list.map((user): FriendSummary => ({
+// Conserva los campos extra de cada lista (p. ej. friendState).
+export function withPresence<T extends FriendSummary>(list: T[], onlineIds: Set<string>): T[] {
+  return list.map((user) => ({
     ...user,
     status: onlineIds.has(user.id) ? 'online' : 'offline',
   }))

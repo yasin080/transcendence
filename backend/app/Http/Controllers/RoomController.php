@@ -20,7 +20,7 @@ class RoomController extends Controller
     {
         $rooms = Room::whereIn('status', ['open', 'playing'])
             ->where('quick', false)
-            ->with('host:id,name')
+            ->with('host:id,username')
             ->with('latestGame')
             ->withCount('players')
             ->latest()
@@ -134,8 +134,19 @@ class RoomController extends Controller
     {
         $userId = $request->user()->id;
 
-        // Mid-match you keep your seat, so you can still go back to the game.
         if ($room->status === 'playing') {
+            // El host que se va a mitad de partida pasa el mando al siguiente jugador
+            // y pierde su asiento; puede volver a entrar como jugador cuando acabe.
+            $heir = $room->players()->whereNotNull('user_id')->where('user_id', '!=', $userId)->orderBy('seat')->first();
+            if ($room->host_id !== $userId || ! $heir) {
+                // Mid-match you keep your seat, so you can still go back to the game.
+                return response()->json(null, 204);
+            }
+            $room->update(['host_id' => $heir->user_id]);
+            $room->players()->where('user_id', $userId)->delete();
+
+            RoomPlayersUpdated::dispatch($room);
+            LobbyRoomUpdated::dispatch($room);
             return response()->json(null, 204);
         }
 
@@ -155,9 +166,9 @@ class RoomController extends Controller
     private function withPlayers(Room $room): Room
     {
         return $room->load([
-            'host:id,name',
+            'host:id,username',
             'players' => fn ($q) => $q->orderBy('seat'),
-            'players.user:id,name',
+            'players.user:id,username,avatar',
         ]);
     }
 

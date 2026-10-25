@@ -97,7 +97,7 @@ class GameController extends Controller
         $state = GameLogic::create(['players' => $room->players()->count()] + $room->settings);
         foreach ($room->players()->with('user')->get() as $player) {
             if (isset($state['worms'][$player->seat])) {
-                $state['worms'][$player->seat]['name'] = $player->user->name ?? 'Bot';
+                $state['worms'][$player->seat]['name'] = $player->user->username ?? 'Bot';
                 $state['worms'][$player->seat]['bot'] = $player->isBot();
             }
         }

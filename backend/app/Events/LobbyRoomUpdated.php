@@ -34,7 +34,7 @@ class LobbyRoomUpdated implements ShouldBroadcastNow
     {
         return ['room' => $this->room
             ->withoutRelations()
-            ->load('host:id,name', 'latestGame')
+            ->load('host:id,username', 'latestGame')
             ->loadCount('players')];
     }
 

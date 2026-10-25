@@ -20,9 +20,6 @@ export default function App() {
               Transcend<span className="text-fuse-600">ence</span>
             </span>
           </Link>
-
-          {/* Nothing is rendered while the session is still unknown, so the
-              header does not flip from button to badge on every load. */}
           {status === 'authenticated' && user ? (
             <UserMenu user={user} />
           ) : status === 'guest' ? (
