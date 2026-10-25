@@ -20,7 +20,7 @@ export default function StatCard({ kind, value }: StatCardProps) {
   const { label, accent, icon } = KINDS[kind]
 
   return (
-    <div className="relative flex min-w-0 flex-col gap-6.5 overflow-hidden rounded-2xl border border-line bg-fill px-6 pt-6 pb-7">
+    <div className="relative flex min-w-0 flex-row items-center justify-between gap-4 overflow-hidden rounded-2xl border border-line bg-fill px-5 py-4 sm:flex-col sm:items-stretch sm:gap-6.5 sm:px-6 sm:pt-6 sm:pb-7">
       {/* Brillo decorativo. Literal: 14 % del color de acento, sin token (efecto puntual) */}
       <div
         aria-hidden="true"
