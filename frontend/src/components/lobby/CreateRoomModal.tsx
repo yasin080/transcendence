@@ -10,6 +10,8 @@ import {
   FOOD_OPTIONS,
   maxStartLength,
   PLAYER_OPTIONS,
+  PRESETS,
+  presetOf,
   SOFT_WALL_OPTIONS,
   SPEED_OPTIONS,
   startLengthOptions,
@@ -19,6 +21,7 @@ import {
 } from './roomOptions.ts'
 import type { Room } from './types.ts'
 import FormField from '../ui/FormField.tsx'
+import ToggleChip from '../ui/ToggleChip.tsx'
 
 interface CreateRoomModalProps {
   onClose: () => void
@@ -88,6 +91,21 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
             maxLength={40}
             errors={nameError ? [nameError] : undefined}
           />
+        </div>
+
+        <div className="mt-[18px]">
+          <span className={FIELD_LABEL}>Preset</span>
+          <div className="flex flex-wrap gap-2">
+            {PRESETS.map((preset) => (
+              <ToggleChip
+                key={preset.label}
+                selected={presetOf(choices) === preset}
+                onClick={() => setChoices({ ...choices, ...preset.choices })}
+              >
+                {preset.label}
+              </ToggleChip>
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 mt-[18px]">

@@ -5,7 +5,7 @@ export interface Option<T> {
   value: T
 }
 
-// Lo que el host elige al crear la sala; el resto de Settings sale de SNAKE.
+// Lo que el host elige al crear la sala; el resto de Settings sale de los de base.
 // boardSize se convierte en width y height (tablero cuadrado).
 export type RoomChoices = Pick<
   Settings,
@@ -45,17 +45,42 @@ export const SOFT_WALL_OPTIONS = range(0, 5, 1, (n) => `${n}%`).map(({ label, va
 export const maxStartLength = (boardSize: number) => Math.floor((boardSize * 3) / 10)
 export const startLengthOptions = (boardSize: number) => range(1, maxStartLength(boardSize))
 
-export const DEFAULT_CHOICES: RoomChoices = {
-  players: 2,
-  boardSize: 35,
-  tickMs: 150,
-  food: 1,
-  bombs: 0,
-  pillars: false,
-  softWalls: 0,
-  startLength: 3,
-  wallHit: 'die',
-  bodyHit: 'die',
+// Un preset fija todo menos el número de jugadores; luego se puede retocar cada valor.
+export interface Preset {
+  label: string
+  choices: Omit<RoomChoices, 'players'>
+}
+
+export const PRESETS: Preset[] = [
+  {
+    // El clásico: una comida, sin bombas ni obstáculos, cualquier choque mata
+    label: 'Classic',
+    choices: { boardSize: 35, tickMs: 175, food: 1, bombs: 0, pillars: false, softWalls: 0, startLength: 3, wallHit: 'die', bodyHit: 'die' },
+  },
+  {
+    // Intermedio: algo de comida y bombas, y chocar con otro gusano solo frena
+    label: 'Arena',
+    choices: { boardSize: 35, tickMs: 175, food: 3, bombs: 2, pillars: false, softWalls: 0.02, startLength: 3, wallHit: 'die', bodyHit: 'block' },
+  },
+  {
+    // Intermedio con pilares: los muros frenan, así que se gana con bombas
+    label: 'Maze',
+    choices: { boardSize: 35, tickMs: 125, food: 5, bombs: 4, pillars: true, softWalls: 0, startLength: 3, wallHit: 'block', bodyHit: 'block' },
+  },
+  {
+    // Todo al máximo: rápido, lleno de bombas, comida y paredes, y todo mata
+    label: 'Hardcore',
+    choices: { boardSize: 35, tickMs: 125, food: 15, bombs: 10, pillars: false, softWalls: 0.05, startLength: 6, wallHit: 'die', bodyHit: 'die' },
+  },
+]
+
+export const DEFAULT_CHOICES: RoomChoices = { players: 2, ...PRESETS[0].choices }
+
+// El preset que coincide con lo elegido; ninguno si se ha retocado algo
+export function presetOf(choices: RoomChoices): Preset | undefined {
+  return PRESETS.find((preset) =>
+    Object.entries(preset.choices).every(([key, value]) => choices[key as keyof RoomChoices] === value),
+  )
 }
 
 // Etiqueta de un valor guardado: labelFor(BOARD_OPTIONS, 35) → 'Medium'
@@ -63,7 +88,10 @@ export function labelFor<T>(options: Option<T>[], value: T): string {
   return options.find((option) => option.value === value)?.label ?? String(value)
 }
 
-// Settings completos que exige el backend: SNAKE de base y encima lo elegido
+// Settings completos que exige el backend: los de base y encima lo elegido
 export function toSettings({ boardSize, ...rest }: RoomChoices): Settings {
   return { ...SNAKE, ...rest, width: boardSize, height: boardSize }
 }
+
+// Partida rápida: el preset elegido con la sala llena, tú y tres bots
+export const quickMatchSettings = (preset: Preset): Settings => toSettings({ players: 4, ...preset.choices })
