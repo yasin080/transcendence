@@ -1,17 +1,22 @@
 COMPOSE := docker compose
 
-.DEFAULT_GOAL := up
-.PHONY: up down build re logs ps prod shell-php shell-front shell-db \
+# Port HTTPS published (from .env; 1443 si no está)
+HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2),1443)
+
+.DEFAULT_GOAL := all
+.PHONY: up down build rebuild re logs ps prod shell-php shell-front shell-db \
         migrate fresh test clean fclean
 
 # --- Lifecycle --------------------------------------------------------------
+
+all: up
 
 ## Start the whole stack (the "one command" the subject asks for)
 up: .env
 	$(COMPOSE) up -d
 	@echo ""
-	@echo "  https://localhost              → app"
-	@echo "  https://localhost/api/health   → backend health"
+	@echo "  https://localhost:$(HTTPS_PORT)              → app"
+	@echo "  https://localhost:$(HTTPS_PORT)/api/health   → backend health"
 	@echo ""
 	@echo "  The browser will warn about the self-signed certificate. Expected."
 

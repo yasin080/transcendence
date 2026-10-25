@@ -10,6 +10,7 @@ import { onFriendsChanged } from './events.ts'
 import { useOnlineIds, withPresence } from './presence.ts'
 
 const MIN_QUERY = 2
+const MAX_QUERY = 20
 const SEARCH_DELAY_MS = 300
 
 // Orden alfabético sin distinguir mayúsculas
@@ -86,6 +87,7 @@ export default function FriendsPanel() {
         value={query}
         onChange={setQuery}
         active={searching}
+        maxLength={MAX_QUERY}
         className="mx-5 mb-3.5"
       />
     </>

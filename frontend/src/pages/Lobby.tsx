@@ -109,6 +109,7 @@ export default function Lobby() {
         <div className="flex w-full items-center gap-2.5 sm:ml-auto sm:w-auto">
           <SearchInput
             name="room-search"
+            maxLength={40}
             placeholder="Search room or code"
             value={query}
             onChange={(value) => {
