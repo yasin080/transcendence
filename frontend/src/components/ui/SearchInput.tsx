@@ -7,6 +7,7 @@ interface SearchInputProps {
   placeholder: string
   active?: boolean
   className?: string
+  maxLength?: number
 }
 
 export default function SearchInput({
@@ -16,6 +17,7 @@ export default function SearchInput({
   placeholder,
   active = false,
   className = '',
+  maxLength,
 }: SearchInputProps) {
   return (
     <div
@@ -26,6 +28,7 @@ export default function SearchInput({
       <SearchIcon className="size-4 flex-none text-fg-muted" />
       <input
         name={name}
+        maxLength={maxLength}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
