@@ -22,6 +22,7 @@ class GameTick extends Command
     public function handle(): void
     {
         while (true) {
+            LiveGames::heartbeat();
             foreach (LiveGames::active() as $id) {
                 $this->advance($id);
             }

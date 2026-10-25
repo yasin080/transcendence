@@ -8,6 +8,8 @@ class LiveGames
 {
     private const ACTIVE = 'games:active';
 
+    private const HEARTBEAT = 'gameloop:heartbeat';
+
     public static function start(int $id, array $state): void
     {
         self::save($id, $state);
@@ -17,6 +19,16 @@ class LiveGames
     public static function active(): array
     {
         return array_map('intval', Redis::smembers(self::ACTIVE));
+    }
+
+    public static function heartbeat(): void
+    {
+        Redis::set(self::HEARTBEAT, time());
+    }
+
+    public static function lastHeartbeat(): int
+    {
+        return (int) Redis::get(self::HEARTBEAT);
     }
 
     public static function load(int $id): ?array
