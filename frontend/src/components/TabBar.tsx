@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router'
 
-import { LobbyIcon, TrophyIcon, UserIcon, UsersIcon } from './left-sidebar/ui/Icons'
+import { LobbyIcon, UserIcon, UsersIcon } from './left-sidebar/ui/Icons'
 
 type TabBarProps = {
   friendsOpen: boolean
@@ -16,9 +16,8 @@ export default function TabBar({ friendsOpen, onFriendsOpenChange }: TabBarProps
   const closeFriends = () => onFriendsOpenChange(false)
 
   return (
-    <nav className="grid h-16 flex-none grid-cols-4 border-t border-white/8 bg-surface-1 md:hidden">
+    <nav className="grid h-16 flex-none grid-cols-3 border-t border-white/8 bg-surface-1 md:hidden">
       <TabLink to="/lobby" label="Lobby" icon={<LobbyIcon />} friendsOpen={friendsOpen} onClick={closeFriends} />
-      <TabLink to="/leaderboard" label="Leaderboard" icon={<TrophyIcon />} friendsOpen={friendsOpen} onClick={closeFriends} />
       <button
         type="button"
         aria-pressed={friendsOpen}
