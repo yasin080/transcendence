@@ -93,8 +93,7 @@ export default function Lobby() {
 
   const q = query.trim().toLowerCase()
   const roomList = (rooms ?? []).filter(
-    (room) => room.name.toLowerCase().includes(q) || room.code.toLowerCase().includes(q),
-  )
+    (room) => room.name.toLowerCase().includes(q))
 
 
   return (
@@ -107,7 +106,7 @@ export default function Lobby() {
           <SearchInput
             name="room-search"
             maxLength={40}
-            placeholder="Search room or code"
+            placeholder="Search room name"
             value={query}
             onChange={(value) => {
               setQuery(value)
@@ -154,7 +153,7 @@ export default function Lobby() {
         {!error && rooms === null && <p className="text-sm text-white/45">Loading rooms…</p>}
         {rooms?.length === 0 && <EmptyState title="No open rooms yet" text="Create one!" />}
         {rooms && rooms.length > 0 && roomList.length === 0 && (
-          <EmptyState title={`No rooms match "${query.trim()}"`} text="Try another name or code." />
+          <EmptyState title={`No rooms match "${query.trim()}"`} text="Try another name." />
         )}
         {roomList.map((room) => (
           <RoomRow
