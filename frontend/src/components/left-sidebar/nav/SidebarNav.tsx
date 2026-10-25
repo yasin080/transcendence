@@ -35,7 +35,7 @@ function SidebarNavLink({ to, label, end, icon }: NavItem) {
       aria-label={label}
       title={label}
       className={({ isActive }) =>
-        `flex min-h-12 items-center justify-center gap-3 rounded-xl px-4 py-2.5 text-base font-semibold transition-colors xl:justify-start ${
+        `flex min-h-12 items-center justify-center gap-3 rounded-xl px-4 py-2.5 text-base font-semibold transition-colors xl:group-hover:justify-start ${
           isActive
             ? 'bg-fuse-600/16 text-white'
             : 'text-fg-secondary hover:bg-fill-strong hover:text-white'
@@ -43,7 +43,7 @@ function SidebarNavLink({ to, label, end, icon }: NavItem) {
       }
     >
       {icon}
-      <span className="hidden xl:inline">{label}</span>
+      <span className="hidden xl:group-hover:inline">{label}</span>
     </NavLink>
   )
 }

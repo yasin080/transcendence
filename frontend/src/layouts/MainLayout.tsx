@@ -6,14 +6,6 @@ import { XIcon } from '../components/friends/icons'
 import Button from '../components/ui/Button'
 import TabBar from '../components/TabBar'
 
-/**
- * Marco 2 — chasis del mainlayout: 3 columnas en escritorio, rail + cajón de
- * amigos en tablet, y barra de pestañas en móvil.
- *
- * Las tres secciones viven AQUÍ, no dentro de las páginas: así no se
- * desmontan al navegar y el panel de amigos conserva su estado (y, más
- * adelante, su suscripción a Reverb).
- */
 
 export default function MainLayout() {
   const { pathname } = useLocation()
@@ -35,13 +27,11 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-dvh flex-col bg-void text-white md:flex-row">
-      <aside className="hidden w-19 flex-none border-r border-white/8 bg-surface-1 md:block xl:w-67">
+      <aside className="group hidden w-19 flex-none overflow-hidden border-r border-white/8 bg-surface-1 transition-[width] duration-150 md:block xl:hover:w-67">
         <MainLayoutSidebar onOpenFriends={() => setFriendsOpen(true)} />
       </aside>
 
       <div className="flex flex-1 min-w-0 min-h-0">
-        {/* La página de turno (Lobby, sala de espera...). La sala de espera
-            no es un modal: sustituye al Lobby en este hueco. */}
         <Outlet />
       </div>
 

@@ -21,13 +21,13 @@ export default function DashboardSidebar({ onOpenFriends }: MainLayoutSidebarPro
       header={<SidebarHeader />}
       footer={
         <>
-          <div className="hidden xl:block">
+          <div className="hidden xl:group-hover:block">
             <LogoutButton />
           </div>
-          <div className="flex justify-center xl:hidden">
+          <div className="flex justify-center xl:group-hover:hidden">
             <LogoutButton compact />
           </div>
-          <div className="mt-3 hidden xl:block">
+          <div className="mt-3 hidden xl:group-hover:block">
             <LegalLinks/>
           </div>
         </>
@@ -57,10 +57,10 @@ function SidebarHeader() {
       to="/profile"
       aria-label="Your profile"
       title="Your profile"
-      className="flex items-center justify-center gap-3 px-4 py-6 xl:justify-start xl:px-6"
+      className="flex items-center justify-center gap-3 px-4 py-6 xl:group-hover:justify-start xl:group-hover:px-6"
     >
       <Avatar size={44} src={user?.avatar} />
-      <span className="hidden min-w-0 truncate font-semibold xl:block">{user?.username}</span>
+      <span className="hidden min-w-0 truncate font-semibold xl:group-hover:block">{user?.username}</span>
     </Link>
   )
 }
