@@ -7,6 +7,7 @@ import {
   BOMB_OPTIONS,
   BOMBS_ON,
   BOT_MISTAKE_OPTIONS,
+  CAMERA_OPTIONS,
   DEFAULT_CHOICES,
   FOOD_OPTIONS,
   maxStartLength,
@@ -124,6 +125,17 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           {!choices.pillars && (
             <Slider label="Soft walls" options={SOFT_WALL_OPTIONS} value={choices.softWalls} onChange={(v) => choose('softWalls', v)} />
           )}
+        </div>
+
+        <div className="mt-[18px]">
+          <span className={FIELD_LABEL}>Camera</span>
+          <div className="flex flex-wrap gap-2">
+            {CAMERA_OPTIONS.map((option) => (
+              <ToggleChip key={option.value} selected={choices.camera === option.value} onClick={() => choose('camera', option.value)}>
+                {option.label}
+              </ToggleChip>
+            ))}
+          </div>
         </div>
 
         <div className="mt-[18px]">

@@ -1,4 +1,4 @@
-import { SNAKE, type Settings } from '../../game/logic/settings.ts'
+import { SNAKE, type Camera, type Settings } from '../../game/logic/settings.ts'
 
 export interface Option<T> {
   label: string
@@ -9,7 +9,7 @@ export interface Option<T> {
 // boardSize se convierte en width y height (tablero cuadrado).
 export type RoomChoices = Pick<
   Settings,
-  'players' | 'tickMs' | 'food' | 'bombs' | 'pillars' | 'softWalls' | 'startLength' | 'wallHit' | 'bodyHit' | 'botMistakes'
+  'players' | 'tickMs' | 'food' | 'bombs' | 'pillars' | 'softWalls' | 'startLength' | 'wallHit' | 'bodyHit' | 'botMistakes' | 'camera'
 > & {
   boardSize: number
 }
@@ -23,6 +23,13 @@ function range(min: number, max: number, step = 1, label: (n: number) => string 
 }
 
 export const PLAYER_OPTIONS = range(1, 4)
+
+// Lo que ve cada jugador; el espectador ve siempre el tablero entero
+export const CAMERA_OPTIONS: Option<Camera>[] = [
+  { label: 'Whole board', value: 'board' },
+  { label: 'Follow', value: 'follow' },
+  { label: 'Behind the head', value: 'head' },
+]
 
 export const BOARD_OPTIONS: Option<number>[] = [
   { label: 'Small', value: 20 },
@@ -48,10 +55,10 @@ export const SOFT_WALL_OPTIONS = range(0, 5, 1, (n) => `${n}%`).map(({ label, va
 export const maxStartLength = (boardSize: number) => Math.floor((boardSize * 3) / 10)
 export const startLengthOptions = (boardSize: number) => range(1, maxStartLength(boardSize))
 
-// Un preset fija todo menos el número de jugadores; luego se puede retocar cada valor.
+// Un preset fija todo menos los jugadores y la cámara; luego se puede retocar cada valor.
 export interface Preset {
   label: string
-  choices: Omit<RoomChoices, 'players'>
+  choices: Omit<RoomChoices, 'players' | 'camera'>
 }
 
 export const PRESETS: Preset[] = [
@@ -77,7 +84,7 @@ export const PRESETS: Preset[] = [
   },
 ]
 
-export const DEFAULT_CHOICES: RoomChoices = { players: 2, ...PRESETS[0].choices }
+export const DEFAULT_CHOICES: RoomChoices = { players: 2, camera: 'board', ...PRESETS[0].choices }
 
 // El preset que coincide con lo elegido; ninguno si se ha retocado algo
 export function presetOf(choices: RoomChoices): Preset | undefined {
@@ -97,4 +104,4 @@ export function toSettings({ boardSize, ...rest }: RoomChoices): Settings {
 }
 
 // Partida rápida: el preset elegido con la sala llena, tú y tres bots
-export const quickMatchSettings = (preset: Preset): Settings => toSettings({ players: 4, ...preset.choices })
+export const quickMatchSettings = (preset: Preset): Settings => toSettings({ players: 4, camera: 'board', ...preset.choices })
