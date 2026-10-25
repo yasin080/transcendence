@@ -71,28 +71,24 @@ export default function StackStatus() {
   }, [])
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-3xl font-bold tracking-tight">Status</h1>
-
-      <div className="divide-y divide-line rounded-xl border border-line-strong bg-fill text-sm">
-        <StatusRow
-          label="API (Laravel)"
-          value={
-            api.state === 'loading'
-              ? 'checking…'
-              : api.state === 'error'
-                ? `error: ${api.message}`
-                : api.health.status
-          }
-          ok={api.state === 'ok' && api.health.status === 'ok'}
-        />
-        {Object.entries(LABELS).map(([key, label]) => {
-          const check = api.state === 'ok' ? api.health.checks[key] : undefined
-          return <StatusRow key={key} label={label} value={check?.value ?? '—'} ok={check?.ok ?? false} />
-        })}
-        <StatusRow label="WebSocket (Reverb)" value={socket} ok={socket === 'connected'} />
-      </div>
-    </section>
+    <div className="divide-y divide-line rounded-xl border border-line-strong bg-fill text-sm">
+      <StatusRow
+        label="API (Laravel)"
+        value={
+          api.state === 'loading'
+            ? 'checking…'
+            : api.state === 'error'
+              ? `error: ${api.message}`
+              : api.health.status
+        }
+        ok={api.state === 'ok' && api.health.status === 'ok'}
+      />
+      {Object.entries(LABELS).map(([key, label]) => {
+        const check = api.state === 'ok' ? api.health.checks[key] : undefined
+        return <StatusRow key={key} label={label} value={check?.value ?? '—'} ok={check?.ok ?? false} />
+      })}
+      <StatusRow label="WebSocket (Reverb)" value={socket} ok={socket === 'connected'} />
+    </div>
   )
 }
 
