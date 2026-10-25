@@ -22,7 +22,7 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const scene = createGameScene(canvas, game)
+    const scene = createGameScene(canvas, game, you)
     const onTick = () => {
       scene.onTick()
       onUpdate()

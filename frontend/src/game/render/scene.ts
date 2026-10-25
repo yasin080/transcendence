@@ -17,8 +17,14 @@ import { createFood, type FoodUpdate } from './food'
 import { createWalls } from './walls'
 import { createWorms, type WormUpdate } from './worms'
 
-export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
+// Ángulo más corto para ir de `from` a `to`, para girar la cámara sin dar la vuelta larga
+const turn = (from: number, to: number) => Math.atan2(Math.sin(to - from), Math.cos(to - from))
+
+export function createGameScene(canvas: HTMLCanvasElement, game: Game, you: number | null) {
   const { board, worms } = game
+  // Un espectador no tiene gusano que seguir: ve siempre el tablero entero
+  const view = you === null ? 'board' : game.settings.camera
+  const seat = you ?? 0
 
   // Keep Babylon's warnings and errors, drop its version banner from the console.
   Logger.LogLevels = Logger.WarningLogLevel | Logger.ErrorLogLevel
@@ -26,23 +32,28 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
   const scene = new Scene(engine)
   scene.clearColor = new Color4(0.045, 0.04, 0.085, 1)
 
-  const cam = new ArcRotateCamera('cam', -Math.PI / 2, 0.62, 1, Vector3.Zero(), scene)
+  // Detrás de la cabeza: la cámara mira hacia donde va el gusano
+  const behindHead = () => Math.atan2(-worms[seat].dir.y, -worms[seat].dir.x)
+  const head = view === 'head'
+  const cam = new ArcRotateCamera('cam', head ? behindHead() : -Math.PI / 2, head ? 1.15 : 0.62, 1, Vector3.Zero(), scene)
   cam.attachControl(canvas, true)
   cam.fov = 0.38
-  const follow = game.settings.camera === 'follow'
   function fitBoard() {
     const narrow = Math.min(1, engine.getAspectRatio(cam))
-    cam.radius = follow ? 40 : (Math.max(board.width, board.height) * 0.6) / (Math.tan(cam.fov / 2) * narrow)
-    cam.lowerRadiusLimit = cam.radius / 2
+    const wholeBoard = (Math.max(board.width, board.height) * 0.6) / (Math.tan(cam.fov / 2) * narrow)
+    // Siguiendo al gusano se ve al menos el 20 % del tablero: el 45 % de cada lado
+    cam.radius = view === 'board' ? wholeBoard : wholeBoard * 0.45
+    cam.lowerRadiusLimit = view === 'board' ? cam.radius / 2 : cam.radius
     cam.upperRadiusLimit = cam.radius * 1.5
   }
   fitBoard()
   cam.lowerBetaLimit = 0.05
-  cam.upperBetaLimit = 0.8
+  cam.upperBetaLimit = head ? 1.3 : 0.8
   cam.wheelPrecision = 6
   cam.inputs.removeByType('ArcRotateCameraKeyboardMoveInput')
   // On touch screens a drag steers the worm, so it must not also orbit the camera.
-  if (isTouch) cam.inputs.removeByType('ArcRotateCameraPointersInput')
+  // Behind the head the camera turns with the worm, so it can't be orbited either.
+  if (isTouch || head) cam.inputs.removeByType('ArcRotateCameraPointersInput')
 
   const sky = new HemisphericLight('sky', new Vector3(0, 1, 0), scene)
   sky.intensity = 0.5
@@ -86,10 +97,11 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game) {
     updateWorms.forEach((update, i) => update(previous[i], current[i], t, !worms[i].alive || !!worms[i].away))
     updateFood(game.food)
     bombs.update()
-    if (follow) {
-      const head = Vector3.Lerp(toWorld(board, previous[0][0]), toWorld(board, current[0][0]), t)
-      Vector3.LerpToRef(cam.target, head, 0.1, cam.target)
+    if (view !== 'board') {
+      const target = Vector3.Lerp(toWorld(board, previous[seat][0]), toWorld(board, current[seat][0]), t)
+      Vector3.LerpToRef(cam.target, target, 0.1, cam.target)
     }
+    if (head) cam.alpha += turn(cam.alpha, behindHead()) * 0.1
   })
 
   engine.runRenderLoop(() => scene.render())

@@ -37,7 +37,7 @@ class StoreRoomRequest extends FormRequest
             'settings.wallHit' => ['required', Rule::in($this->boolean('settings.pillars') ? ['block'] : ['block', 'die'])],
             'settings.bodyHit' => ['required', 'in:block,die'],
             'settings.controls' => ['required', 'in:turn,dpad'],
-            'settings.camera' => ['required', 'in:board,follow'],
+            'settings.camera' => ['required', 'in:board,follow,head'],
             // Porcentaje de ticks en que un bot no mira por dónde va
             'settings.botMistakes' => ['required', 'integer', 'between:20,80'],
         ];

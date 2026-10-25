@@ -1,6 +1,6 @@
 export type Hit = 'block' | 'die'
 export type Controls = 'turn' | 'dpad'
-export type Camera = 'board' | 'follow'
+export type Camera = 'board' | 'follow' | 'head'
 
 export type Settings = {
   width: number

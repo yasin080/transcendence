@@ -8,7 +8,7 @@ import MessageModal from '../components/ui/MessageModal.tsx'
 import backstage from '../assets/salon.jpg'
 import type { MatchSetting, Player } from '../components/waiting-room/types.ts'
 import type { Room } from '../components/lobby/types.ts'
-import { BOARD_OPTIONS, FOOD_OPTIONS, SOFT_WALL_OPTIONS, SPEED_OPTIONS, labelFor } from '../components/lobby/roomOptions.ts'
+import { BOARD_OPTIONS, CAMERA_OPTIONS, FOOD_OPTIONS, SOFT_WALL_OPTIONS, SPEED_OPTIONS, labelFor } from '../components/lobby/roomOptions.ts'
 import type { Settings } from '../game/logic/settings.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
@@ -28,6 +28,7 @@ function settingChips(s: Settings): MatchSetting[] {
     { label: 'Body hit', value: s.bodyHit === 'die' ? 'Deadly' : 'Blocks' },
     { label: 'Bombs', value: s.bombs > 0 ? String(s.bombs) : 'Off' },
     { label: 'Bot mistakes', value: `${s.botMistakes}%` },
+    { label: 'Camera', value: labelFor(CAMERA_OPTIONS, s.camera) },
   ]
 }
 

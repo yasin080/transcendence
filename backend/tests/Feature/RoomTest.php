@@ -79,6 +79,12 @@ class RoomTest extends TestCase
             ->assertFails(422)
             ->assertJsonValidationErrors(['settings']);
 
+        $this->postJson('/api/rooms', ['name' => 'Odd camera', 'settings' => ['camera' => 'drone'] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.camera']);
+        $this->postJson('/api/rooms', ['name' => 'Head camera', 'settings' => ['camera' => 'head'] + self::SNAKE])
+            ->assertCreated();
+
         // Only spaces is not a name
         $this->postJson('/api/rooms', ['name' => '   ', 'settings' => self::SNAKE])
             ->assertFails(422)
