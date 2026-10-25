@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import FriendsPanel from '../components/friends/FriendsPanel'
 import MainLayoutSidebar from '../components/left-sidebar/MainLayoutSidebar'
 import { XIcon } from '../components/friends/icons'
 import Button from '../components/ui/Button'
 import TabBar from '../components/TabBar'
+import { apiPost } from '../lib/api'
 
 /**
  * Marco 2 — chasis del mainlayout: 3 columnas en escritorio, rail + cajón de
@@ -22,6 +23,17 @@ export default function MainLayout() {
 
   useEffect(() => {
     setFriendsOpen(false)
+  }, [pathname])
+
+  // Salir de la sala de espera a otra página es dejar la sala (el host la cierra).
+  // Ir a la partida no cuenta: la partida no vive en este layout.
+  const previousPath = useRef(pathname)
+  useEffect(() => {
+    const room = previousPath.current.match(/^\/waiting-room\/([^/]+)/)?.[1]
+    previousPath.current = pathname
+    if (room && pathname !== `/waiting-room/${room}`) {
+      void apiPost(`/api/rooms/${room}/leave`)
+    }
   }, [pathname])
 
   useEffect(() => {

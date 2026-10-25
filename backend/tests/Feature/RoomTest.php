@@ -468,6 +468,39 @@ class RoomTest extends TestCase
         $this->assertSame(2, $room->players()->count());
     }
 
+    public function test_the_host_leaving_mid_match_hands_the_room_to_the_next_player(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 3);
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertOk();
+        $guest = User::factory()->create();
+        $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $this->actingAs($host)->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+
+        $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
+
+        $this->assertSame($guest->id, $room->fresh()->host_id);
+        $this->assertFalse($room->players()->where('user_id', $host->id)->exists());
+
+        // Once the match is over they can come back, as a player
+        $room->update(['status' => 'open']);
+        $this->postJson("/api/rooms/{$room->code}/join")->assertOk();
+        $this->assertSame($guest->id, $room->fresh()->host_id);
+    }
+
+    public function test_the_host_alone_with_bots_keeps_the_seat_mid_match(): void
+    {
+        $host = User::factory()->create();
+        $room = $this->createRoom($host, players: 2);
+        $this->postJson("/api/rooms/{$room->code}/bots")->assertOk();
+        $this->postJson("/api/rooms/{$room->code}/games")->assertCreated();
+
+        $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
+
+        $this->assertSame($host->id, $room->fresh()->host_id);
+        $this->assertTrue($room->players()->where('user_id', $host->id)->exists());
+    }
+
     public function test_leaving_mid_match_keeps_the_seat(): void
     {
         $room = $this->createRoom(User::factory()->create(), players: 2);
