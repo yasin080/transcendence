@@ -23,7 +23,7 @@ export default function StackStatus() {
 
     fetch('/api/health')
       .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        if (!res.ok && res.status !== 503) throw new Error(`HTTP ${res.status}`)
         return res.json() as Promise<Health>
       })
       .then((health) => {
@@ -56,36 +56,31 @@ export default function StackStatus() {
   }, [])
 
   return (
-    <details className="group rounded-xl border border-line-strong bg-fill text-sm">
-      <summary className="cursor-pointer select-none px-4 py-2 text-fg-muted hover:text-fg-secondary">
-        Stack status
-      </summary>
+    <div className="divide-y divide-line rounded-xl border border-line-strong bg-fill text-sm">
 
-      <div className="divide-y divide-line border-t border-line">
-        <StatusRow
-          label="API (Laravel)"
-          value={
-            api.state === 'loading'
-              ? 'checking…'
-              : api.state === 'error'
-                ? `error: ${api.message}`
-                : api.health.status
-          }
-          ok={api.state === 'ok' && api.health.status === 'ok'}
-        />
-        <StatusRow
-          label="Database (MariaDB)"
-          value={api.state === 'ok' ? api.health.database : '—'}
-          ok={api.state === 'ok' && api.health.database === 'ok'}
-        />
-        <StatusRow
-          label="Redis"
-          value={api.state === 'ok' ? api.health.redis : '—'}
-          ok={api.state === 'ok' && api.health.redis === 'ok'}
-        />
-        <StatusRow label="WebSocket (Reverb)" value={socket} ok={socket === 'connected'} />
-      </div>
-    </details>
+      <StatusRow
+        label="API (Laravel)"
+        value={
+          api.state === 'loading'
+            ? 'checking…'
+             : api.state === 'error'
+              ? `error: ${api.message}`
+              : api.health.status
+        }
+        ok={api.state === 'ok' && api.health.status === 'ok'}
+      />
+      <StatusRow
+        label="Database (MariaDB)"
+        value={api.state === 'ok' ? api.health.database : '—'}
+        ok={api.state === 'ok' && api.health.database === 'ok'}
+      />
+      <StatusRow
+        label="Redis"
+        value={api.state === 'ok' ? api.health.redis : '—'}
+        ok={api.state === 'ok' && api.health.redis === 'ok'}
+      />
+      <StatusRow label="WebSocket (Reverb)" value={socket} ok={socket === 'connected'} />
+    </div>
   )
 }
 

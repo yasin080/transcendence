@@ -29,7 +29,6 @@ createRoot(root).render(
           {/* MARCO 1 — landing, login, legal */}
           <Route index element={<Landing />} />
           <Route element={<App />}>
-            {/* Antes la raíz mostraba la salud de las conexiones; ahora tiene ruta propia */}
             <Route path="health" element={<Health />} />
             <Route path="privacy" element={<Privacy />} />
             <Route path="terms" element={<Terms />} />
