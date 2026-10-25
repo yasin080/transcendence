@@ -27,6 +27,7 @@ function settingChips(s: Settings): MatchSetting[] {
     { label: 'Wall hit', value: s.wallHit === 'die' ? 'Deadly' : 'Blocks' },
     { label: 'Body hit', value: s.bodyHit === 'die' ? 'Deadly' : 'Blocks' },
     { label: 'Bombs', value: s.bombs > 0 ? String(s.bombs) : 'Off' },
+    { label: 'Bot mistakes', value: `${s.botMistakes}%` },
   ]
 }
 

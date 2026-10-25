@@ -6,6 +6,7 @@ import {
   BOARD_OPTIONS,
   BOMB_OPTIONS,
   BOMBS_ON,
+  BOT_MISTAKE_OPTIONS,
   DEFAULT_CHOICES,
   FOOD_OPTIONS,
   maxStartLength,
@@ -119,6 +120,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           />
           <Slider label="Speed" options={SPEED_OPTIONS} value={choices.tickMs} onChange={(v) => choose('tickMs', v)} />
           <Slider label="Food" options={FOOD_OPTIONS} value={choices.food} onChange={(v) => choose('food', v)} />
+          <Slider label="Bot mistakes" options={BOT_MISTAKE_OPTIONS} value={choices.botMistakes} onChange={(v) => choose('botMistakes', v)} />
           {!choices.pillars && (
             <Slider label="Soft walls" options={SOFT_WALL_OPTIONS} value={choices.softWalls} onChange={(v) => choose('softWalls', v)} />
           )}

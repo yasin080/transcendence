@@ -9,7 +9,7 @@ export interface Option<T> {
 // boardSize se convierte en width y height (tablero cuadrado).
 export type RoomChoices = Pick<
   Settings,
-  'players' | 'tickMs' | 'food' | 'bombs' | 'pillars' | 'softWalls' | 'startLength' | 'wallHit' | 'bodyHit'
+  'players' | 'tickMs' | 'food' | 'bombs' | 'pillars' | 'softWalls' | 'startLength' | 'wallHit' | 'bodyHit' | 'botMistakes'
 > & {
   boardSize: number
 }
@@ -38,6 +38,9 @@ export const FOOD_OPTIONS = range(1, 50)
 export const BOMB_OPTIONS = range(1, 10)
 export const BOMBS_ON = 3
 
+// Porcentaje de ticks en que un bot no mira por dónde va: más alto, más fácil de ganar
+export const BOT_MISTAKE_OPTIONS = range(20, 80, 5, (n) => `${n}%`)
+
 // Proporción de muros rompibles: de 0 a 0.05
 export const SOFT_WALL_OPTIONS = range(0, 5, 1, (n) => `${n}%`).map(({ label, value }) => ({ label, value: value / 100 }))
 
@@ -55,22 +58,22 @@ export const PRESETS: Preset[] = [
   {
     // El clásico: una comida, sin bombas ni obstáculos, cualquier choque mata
     label: 'Classic',
-    choices: { boardSize: 35, tickMs: 175, food: 1, bombs: 0, pillars: false, softWalls: 0, startLength: 3, wallHit: 'die', bodyHit: 'die' },
+    choices: { boardSize: 35, tickMs: 175, food: 1, bombs: 0, pillars: false, softWalls: 0, startLength: 3, wallHit: 'die', bodyHit: 'die', botMistakes: 50 },
   },
   {
     // Intermedio: algo de comida y bombas, y chocar con otro gusano solo frena
     label: 'Arena',
-    choices: { boardSize: 35, tickMs: 175, food: 3, bombs: 2, pillars: false, softWalls: 0.02, startLength: 3, wallHit: 'die', bodyHit: 'block' },
+    choices: { boardSize: 35, tickMs: 175, food: 3, bombs: 2, pillars: false, softWalls: 0.02, startLength: 3, wallHit: 'die', bodyHit: 'block', botMistakes: 40 },
   },
   {
     // Intermedio con pilares: los muros frenan, así que se gana con bombas
     label: 'Maze',
-    choices: { boardSize: 35, tickMs: 125, food: 5, bombs: 4, pillars: true, softWalls: 0, startLength: 3, wallHit: 'block', bodyHit: 'block' },
+    choices: { boardSize: 35, tickMs: 125, food: 5, bombs: 4, pillars: true, softWalls: 0, startLength: 3, wallHit: 'block', bodyHit: 'block', botMistakes: 30 },
   },
   {
     // Todo al máximo: rápido, lleno de bombas, comida y paredes, y todo mata
     label: 'Hardcore',
-    choices: { boardSize: 35, tickMs: 125, food: 15, bombs: 10, pillars: false, softWalls: 0.05, startLength: 6, wallHit: 'die', bodyHit: 'die' },
+    choices: { boardSize: 35, tickMs: 125, food: 15, bombs: 10, pillars: false, softWalls: 0.05, startLength: 6, wallHit: 'die', bodyHit: 'die', botMistakes: 20 },
   },
 ]
 

@@ -24,6 +24,7 @@ class BotTest extends TestCase
         'bodyHit' => 'die',
         'controls' => 'turn',
         'camera' => 'board',
+        'botMistakes' => 50,
     ];
 
     private const RIGHT = ['x' => 1, 'y' => 0];
@@ -94,10 +95,23 @@ class BotTest extends TestCase
         $game['worms'][1]['body'] = [['x' => 10, 'y' => 10], ['x' => 10, 'y' => 11], ['x' => 10, 'y' => 12]];
         $game['worms'][1]['dir'] = $game['worms'][1]['wanted'] = self::UP;
 
+        $game['settings']['botMistakes'] = 0;
         Bot::play($game);
         Game::tick($game);
 
         $this->assertSame(['x' => 3, 'y' => 2], $game['worms'][0]['body'][0]);
         $this->assertSame(['x' => 10, 'y' => 9], $game['worms'][1]['body'][0]);
+    }
+
+    public function test_a_careless_bot_keeps_going_straight(): void
+    {
+        $game = $this->game([['x' => 3, 'y' => 10]]);
+        $game['worms'][0]['bot'] = true;
+
+        $game['settings']['botMistakes'] = 100;
+        Bot::play($game);
+        Game::tick($game);
+
+        $this->assertSame(['x' => 4, 'y' => 1], $game['worms'][0]['body'][0]);
     }
 }
