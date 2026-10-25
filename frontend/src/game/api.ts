@@ -10,7 +10,7 @@ export type Match = { game: Game; seat: number | null; roomCode: string | null }
 // The other seats go to bots, so the match starts right away.
 export async function startQuickMatch(settings: Settings): Promise<number | null> {
   const name = `Quick match ${Math.random().toString(36).slice(2, 6).toUpperCase()}`
-  const room = await apiPost<Room>('/api/rooms', { name, settings })
+  const room = await apiPost<Room>('/api/rooms', { name, settings, quick: true })
   if (!room.ok) return null
 
   for (let seat = 1; seat < settings.players; seat++) {

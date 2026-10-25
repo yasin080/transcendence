@@ -19,6 +19,7 @@ class RoomController extends Controller
     public function index(): JsonResponse
     {
         $rooms = Room::whereIn('status', ['open', 'playing'])
+            ->where('quick', false)
             ->with('host:id,name')
             ->with('latestGame')
             ->withCount('players')
@@ -48,6 +49,7 @@ class RoomController extends Controller
                 'code' => $this->newCode(),
                 'name' => $request->validated('name'),
                 'host_id' => $request->user()->id,
+                'quick' => $request->boolean('quick'),
                 'settings' => $request->validated('settings'),
             ]);
             $room->players()->create(['user_id' => $request->user()->id, 'seat' => 0]);

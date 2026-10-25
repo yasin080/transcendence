@@ -19,6 +19,12 @@ class LobbyRoomUpdated implements ShouldBroadcastNow
         return [new PrivateChannel('lobby')];
     }
 
+    // Quick matches never show in the lobby, so there is nothing to announce
+    public function broadcastWhen(): bool
+    {
+        return ! $this->room->quick;
+    }
+
     public function broadcastAs(): string
     {
         return 'room.updated';

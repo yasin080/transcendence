@@ -211,6 +211,17 @@ class RoomTest extends TestCase
         $this->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', null);
     }
 
+    public function test_quick_matches_are_not_listed_in_the_lobby(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Quick match AB12', 'settings' => self::SNAKE, 'quick' => true])
+            ->assertCreated()
+            ->assertJsonPath('quick', true);
+
+        $this->getJson('/api/rooms')->assertOk()->assertJsonCount(0);
+    }
+
     public function test_the_room_list_links_the_latest_match(): void
     {
         $room = $this->createRoom(User::factory()->create());

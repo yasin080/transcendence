@@ -19,6 +19,7 @@ class StoreRoomRequest extends FormRequest
                 'max:40',
                 Rule::unique('rooms', 'name')->whereIn('status', ['open', 'playing']),
             ],
+            'quick' => ['sometimes', 'boolean'],
             'settings' => ['required', 'array:width,height,pillars,softWalls,wrap,tickMs,players,startLength,food,bombs,wallHit,bodyHit,controls,camera'],
             'settings.width' => ['required', 'integer', 'between:10,75'],
             'settings.height' => ['required', 'integer', 'between:10,75'],
