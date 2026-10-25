@@ -72,6 +72,7 @@ class GameController extends Controller
 
     public function ping(Request $request, Game $game): Response
     {
+        abort_if($game->ended_at !== null, 409, 'This match has already ended.');
         LiveGames::seen($game->id, $this->seatOf($request, $game), now()->getTimestampMs());
 
         return response()->noContent();
@@ -79,6 +80,7 @@ class GameController extends Controller
 
     public function leave(Request $request, Game $game): Response
     {
+        abort_if($game->ended_at !== null, 409, 'This match has already ended.');
         LiveGames::seen($game->id, $this->seatOf($request, $game), now()->getTimestampMs() - Presence::AWAY_MS);
 
         return response()->noContent();
