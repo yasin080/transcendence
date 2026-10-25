@@ -24,25 +24,30 @@ export default function StackStatus() {
   useEffect(() => {
     let cancelled = false
 
-    fetch('/api/health')
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json() as Promise<Health>
-      })
-      .then((health) => {
-        if (!cancelled) setApi({ state: 'ok', health })
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) {
-          setApi({
-            state: 'error',
-            message: error instanceof Error ? error.message : 'unknown error',
-          })
-        }
-      })
+    const check = () =>
+      fetch('/api/health')
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          return res.json() as Promise<Health>
+        })
+        .then((health) => {
+          if (!cancelled) setApi({ state: 'ok', health })
+        })
+        .catch((error: unknown) => {
+          if (!cancelled) {
+            setApi({
+              state: 'error',
+              message: error instanceof Error ? error.message : 'unknown error',
+            })
+          }
+        })
+
+    check()
+    const timer = setInterval(check, 5000)
 
     return () => {
       cancelled = true
+      clearInterval(timer)
     }
   }, [])
 
