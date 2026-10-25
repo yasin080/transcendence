@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router'
 import type { ReactNode } from 'react'
 
-import { LobbyIcon, TrophyIcon, UserIcon } from '../ui/Icons'
+import { LobbyIcon, UserIcon } from '../ui/Icons'
 
 type NavItem = {
   to: string
@@ -13,7 +13,6 @@ type NavItem = {
 // Para añadir una sección: una línea aquí y su ruta en main.tsx
 const items: NavItem[] = [
   { to: '/lobby', label: 'Lobby', icon: <LobbyIcon /> },
-  { to: '/leaderboard', label: 'Leaderboard', icon: <TrophyIcon /> },
   { to: '/profile', label: 'Profile', end:true, icon: <UserIcon /> },
 ]
 
