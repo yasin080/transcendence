@@ -26,7 +26,7 @@ esac
 
 echo "[entrypoint] serving in ${MODE} mode"
 mkdir -p /etc/nginx/conf.d
-cp "/etc/nginx/available/${MODE}.conf" /etc/nginx/conf.d/default.conf
+sed "s/HTTPS_PORT/${HTTPS_PORT:-443}/" "/etc/nginx/available/${MODE}.conf" > /etc/nginx/conf.d/default.conf
 
 nginx -t
 

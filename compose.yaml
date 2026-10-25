@@ -32,6 +32,7 @@ services:
       - "${HTTPS_PORT:-1443}:443"
     environment:
       NGINX_MODE: ${NGINX_MODE:-dev}
+      HTTPS_PORT: ${HTTPS_PORT:-1443}
     volumes:
       - ./frontend/dist:/var/www/frontend:ro
       - certs:/etc/nginx/certs

@@ -4,16 +4,26 @@ COMPOSE := docker compose
 HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2),1443)
 
 .DEFAULT_GOAL := all
-.PHONY: up down build rebuild re logs ps prod shell-php shell-front shell-db \
+.PHONY: up dev urls down build rebuild re logs ps shell-php shell-front shell-db \
         migrate fresh test clean fclean
 
 # --- Lifecycle --------------------------------------------------------------
 
 all: up
 
-## Start the whole stack (the "one command" the subject asks for)
+## Start the whole stack in production mode (the "one command" the subject asks for):
+## nginx serves the static build of the frontend
 up: .env
-	$(COMPOSE) up -d
+	$(COMPOSE) run --rm frontend npm run build
+	NGINX_MODE=prod $(COMPOSE) up -d --build
+	@$(MAKE) --no-print-directory urls
+
+## Development mode: nginx proxies to the Vite dev server (hot reload)
+dev: .env
+	NGINX_MODE=dev $(COMPOSE) up -d --build
+	@$(MAKE) --no-print-directory urls
+
+urls:
 	@echo ""
 	@echo "  https://localhost:$(HTTPS_PORT)              → app"
 	@echo "  https://localhost:$(HTTPS_PORT)/api/health   → backend health"
@@ -25,11 +35,6 @@ down:
 
 re: down
 	@$(MAKE) up
-
-## Production mode: nginx serves the static build instead of the Vite dev server
-prod: .env
-	$(COMPOSE) run --rm frontend npm run build
-	NGINX_MODE=prod $(COMPOSE) up -d --build
 
 # --- Images -------------------------------------------------------------
 
@@ -63,7 +68,7 @@ migrate:
 
 ## Drop everything and re-run migrations and seeders
 fresh:
-	$(COMPOSE) exec php php artisan migrate:fresh --seed
+	$(COMPOSE) exec php php artisan migrate:fresh --seed --force
 
 test:
 	$(COMPOSE) exec php php artisan test
