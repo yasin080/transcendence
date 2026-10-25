@@ -68,7 +68,7 @@ migrate:
 
 ## Drop everything and re-run migrations and seeders
 fresh:
-	$(COMPOSE) exec php php artisan migrate:fresh --seed
+	$(COMPOSE) exec php php artisan migrate:fresh --seed --force
 
 test:
 	$(COMPOSE) exec php php artisan test
