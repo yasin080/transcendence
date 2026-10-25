@@ -31,3 +31,7 @@ yarn-error.log*
 .idea/
 .vscode/
 *.swp
+
+# Database dumps made by the backup service
+/backups/*
+!/backups/.gitkeep

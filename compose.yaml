@@ -115,6 +115,24 @@ services:
       retries: 10
       start_period: 30s
 
+  # Dumps the database every 6 hours into ./backups (newest 28 kept, one week).
+  # It starts after php, so the first dump already has the migrated schema.
+  backup:
+    image: mariadb:11.4
+    user: "${UID:-1000}:${GID:-1000}"
+    env_file: .env
+    environment:
+      BACKUP_KEEP: 28
+    command: sh -c 'while true; do backup.sh; sleep 21600; done'
+    volumes:
+      - ./docker/backup/backup.sh:/usr/local/bin/backup.sh:ro
+      - ./backups:/backups
+    networks: [transcendence]
+    restart: unless-stopped
+    depends_on:
+      php:
+        condition: service_healthy
+
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes
