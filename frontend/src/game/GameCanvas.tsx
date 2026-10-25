@@ -23,6 +23,11 @@ export default function GameCanvas({ game, gameId, you, onGameOver, onEliminated
     if (!canvas) return
 
     const scene = createGameScene(canvas, game, you)
+    // Back to a match that already ended: no more ticks will come, so show the result now
+    if (isOver(game)) {
+      onGameOver()
+      return () => scene.dispose()
+    }
     const onTick = () => {
       scene.onTick()
       onUpdate()

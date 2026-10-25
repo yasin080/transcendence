@@ -426,6 +426,18 @@ class RoomTest extends TestCase
         $this->postJson("/api/games/{$gameId}/ping")->assertFails(403);
     }
 
+    public function test_presence_is_ignored_once_the_match_is_over(): void
+    {
+        $room = $this->createRoom(User::factory()->create());
+        $game = $room->games()->findOrFail($this->postJson("/api/rooms/{$room->code}/games")->json('id'));
+        LiveGames::finish($game->id);
+        $game->update(['ended_at' => now()]);
+
+        $this->postJson("/api/games/{$game->id}/ping")->assertFails(409);
+        $this->postJson("/api/games/{$game->id}/leave")->assertFails(409);
+        $this->assertSame([], LiveGames::lastSeen($game->id));
+    }
+
     public function test_show_returns_the_players_and_games(): void
     {
         $host = User::factory()->create(['name' => 'Host']);
