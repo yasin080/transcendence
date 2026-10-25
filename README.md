@@ -340,8 +340,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Touch controls | On-screen controls for mobile devices. | ivromer |
 | Scoreboard | In-game scoreboard and end-of-match screen. | ybahri |
 | Spectator mode | Watch a match in progress. | ybahri |
-| **[RETOMAR]** | | |
-| Tournaments | [RETOMAR] | [RETOMAR] |
+
 
 ## Modules
 
@@ -484,37 +483,60 @@ components.]
 
 ## Game Rules
 
-<!-- [RETOMAR] Pending: the final scope of the game is not closed yet. Review every rule
-against the code before the evaluation. -->
+### Goal
+Be the last worm standing. Eat to grow, use bombs to cut down your rivals and avoid
+crashing.
 
-### The board
-- Square board made of cells. Depending on the settings it can have an outer wall or
-  wrap-around edges, a grid of pillars and breakable walls.
-- Food and bombs appear on random free cells. When one is taken, a new one appears.
+### Setting up a match
+The host picks a **preset** or tunes every setting by hand:
 
-### Moving
-- The game advances in ticks; each tick, every worm moves one cell forward.
-- Players turn their worm left or right (or choose an absolute direction, depending on the
-  controls). A worm cannot turn back on itself.
-- Eating food makes the worm one cell longer.
+| Preset | Board | Food | Bombs | Obstacles | Hitting a wall / a body |
+|---|---|---|---|---|---|
+| **Classic** | Medium | 1 | — | — | Kills / Kills |
+| **Arena** | Medium | 3 | 2 | Breakable walls | Kills / Blocks |
+| **Maze** | Medium | 5 | 4 | Pillars | Blocks / Blocks |
+| **Hardcore** | Medium | 15 | 10 | Breakable walls | Kills / Kills |
+
+Custom settings: number of players (1–4), board size (small, medium, large), speed,
+food, bombs, starting length, pillars, breakable walls, what happens when hitting a wall
+or a body, how often bots make mistakes, and the camera (whole board or following your
+worm). Empty seats can be filled with bots.
+
+### Controls
+- **Keyboard:** `←` / `→` or `A` / `D` turn the worm left or right.
+- **Touch:** tap the left or right half of the screen.
+
+A worm can never turn back on itself.
+
+### Playing
+- The match starts after a 3-second countdown, with each worm in a corner of the board.
+- The game advances in ticks: every tick, all worms move one cell forward at the same time.
+A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the match.
+- **Food:** eating it makes the worm one cell longer. A new piece appears somewhere else.
 
 ### Collisions
-- **Walls and bodies:** depending on the settings, hitting a wall or a body either kills
-  the worm or just blocks it. A worm that stays blocked for too long dies.
-- **Head-on:** if two worms move into the same cell, or swap cells, both die.
+- **Walls and bodies:** depending on the settings, hitting a wall or a worm's body
+  (including your own) either **kills** the worm or **blocks** it in place. A worm
+  that stays blocked for 15 ticks in a row (1.5–4.5 s) dies.
+- **Pillars** always block, never kill.
+- **Head-on:** if two worms move into the same cell, or into each other's cell, both die.
 
 ### Bombs
-- A worm that eats a bomb drops it at once where its tail was.
-- The bomb explodes after a short fuse, hitting the 3×3 square around it.
-- A blast that hits a worm's head kills it; a blast that hits its body cuts the worm at
-  that point.
+- Bombs lie on the board like food. A worm that swallows one **drops it at once from
+  its tail**.
+- After 8 ticks (0.8–2.4 s) the bomb explodes, hitting the 3×3 square around it. Walls
+  and pillars are not affected.
+- A blast on a worm's **head kills it**. A blast on its **body** cuts the worm at that
+  point: everything from the hit segment to the tail disappears, and the worm keeps
+  playing, shorter.
 
 ### End of the match
-- **Multiplayer:** the match ends when one worm or none is left alive. The last worm
-  standing wins.
-- **Single player:** the match ends when the worm dies.
-- Each player finishes with a placing (1st to 4th). [RETOMAR: placings are not stored yet.]
+- **Two or more worms:** the match ends when one worm or none is left alive. The last
+  one alive wins; if the last worms die at the same time, it is a draw.
+- **Single player:** the match ends when your worm dies.
+- The scoreboard ranks worms by survival first, then by how much they have grown.
 
 ### Disconnections
-- A player whose page stops responding for 2.5 s is shown as away and their worm stops.
-- If they come back within 10 s, they continue where they left off;
+- If a player's page stops responding for 2.5 s, their worm stops and turns grey.
+- If they come back within 10 s, they continue where they left off; otherwise the worm
+  is eliminated.
