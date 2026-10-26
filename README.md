@@ -495,7 +495,12 @@ their data again on reconnect. The connection is closed and reopened
 when the page goes into or comes back from the browser's back/forward cache.
 
 ### 9. Health check and status page — Minor
-**Why:** [RETOMAR]. **How:** [RETOMAR]
+**Why:** to see at a glance that the whole stack is alive, and to be able to rebuild
+the database after a disaster. **How:** `GET /api/health` checks the database, Redis,
+the game loop, the queue and the last backup, and answers 503 if any fails; the
+`/health` status page shows it every 5 seconds, plus the WebSocket connection. The
+`backup` service dumps the database every 6 hours into `./backups` (outside Docker),
+and `make restore FILE=…` loads a dump into a fresh stack.
 
 ### 10. Complete web-based game — Major
 **Why:** the core of the project. **How:** see [Description](#description) and
