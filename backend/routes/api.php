@@ -9,9 +9,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AvatarController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 
-Route::get('/health', HealthController::class);
+Route::get('/health', HealthController::class)
+    ->withoutMiddleware(EnsureFrontendRequestsAreStateful::class);
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -43,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/friends/{user}', [FriendController::class, 'destroy']);
 
     // Users
-    Route::get('/users/search', [FriendController::class, 'search']);    
+    Route::get('/users/search', [FriendController::class, 'search']);
     Route::get('/users/{user}', [UserController::class, 'show'])->whereNumber('user');
     Route::patch('/user', [UserController::class, 'update']);
     Route::post('/user/avatar', [AvatarController::class, 'store']);

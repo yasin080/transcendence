@@ -155,6 +155,7 @@ security warning: click *Advanced → Proceed to localhost*. This happens only o
 | `make test` | Run the backend test suite. |
 | `make fresh` | Reset the database: drop all tables, migrate and seed again. |
 | `make fclean` | Remove containers, volumes and images. **Wipes the database and the certificate.** |
+| `make restore FILE=backups/<date>.sql.gz ` | Load the backup dump |
 
 ## Resources
 
@@ -407,77 +408,92 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 
 <!-- [RETOMAR]  -->
 
-| Module | Type | Points | Member(s) |
-|---|---|---|---|
-| Frontend framework (React) | Minor | 1 | All |
-| Backend framework (Laravel) | Minor | 1 | All |
-| ORM (Eloquent) | Minor | 1 | All |
-| Real-time features with WebSockets | Major | 2 | ivromer, beiglesi, aolabarr |
-| Standard user management | Major | 2 | aolabarr |
-| Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
-| Complete web-based game | Major | 2 | ivromer |
-| Remote players | Major | 2 | ivromer |
-| Multiplayer game (more than two players) | Major | 2 | ivromer |
-| AI opponent | Major | 2 | ivromer |
-| Game customization options | Minor | 1 | ivromer |
-| Tournament system | Minor | 1 | [RETOMAR] |
-| Spectator mode | Minor | 1 | ybahri |
-| Custom design system | Minor | 1 | ybahri |
-| **Total** | | **[RETOMAR]** | |
+| # | Module | Type | Points | Member(s) |
+|---|---|---|---|---|
+| 1 | Backend framework (Laravel) | Minor | 1 | All |
+| 2 | ORM (Eloquent) | Minor | 1 | All |
+| 3 | Frontend framework (React) | Minor | 1 | All |
+| 4 | Custom design system | Minor | 1 | ybahri |
+| 5 | Support for additional browsers | Minor | 1 | [RETOMAR] |
+| 6 | Standard user management | Major | 2 | aolabarr |
+| 7 | Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
+| 8 | Real-time features with WebSockets | Major | 2 | ivromer, beiglesi, aolabarr |
+| 9 | Health check and status page | Minor | 1 | [RETOMAR] |
+| 10 | Complete web-based game | Major | 2 | ivromer |
+| 11 | Advanced 3D graphics | Major | 2 | [RETOMAR] |
+| 12 | Game customization options | Minor | 1 | ivromer |
+| 13 | AI opponent | Major | 2 | ivromer |
+| 14 | Remote players | Major | 2 | ivromer |
+| 15 | Multiplayer game (more than two players) | Major | 2 | ivromer |
+| 16 | Spectator mode | Minor | 1 | ybahri |
+| | **Total** | | **23** | |
 
-### Frontend and backend frameworks — Minor + Minor
-**Why:** previous experience of the team with both. **How:** React with TypeScript and
-Vite on the frontend; Laravel on the backend, exposing a JSON API under `/api`.
+### 1. Backend framework — Minor
+**Why:** the team already knew it, and it brings what the project needs out of the box:
+session auth (Sanctum), OAuth (Socialite), WebSockets (Reverb), queues and an ORM
+(Eloquent). **How:** Laravel 13 on PHP 8.3, serving a JSON API under `/api`. Routes are
+grouped behind `auth:sanctum`, input is validated with Form Requests, login and
+register are rate limited, state changes are broadcast as events, and the game loop
+runs as an Artisan command (`game:tick`).
 
-### ORM — Minor
+### 2. ORM — Minor
 **Why:** comes with Laravel and keeps database access declarative and safe. **How:**
 every table has an Eloquent model with its relationships; the schema is versioned with
 migrations.
 
-### Real-time features — Major
-**Why:** lobby, waiting room, friends and matches must update live for every player.
-**How:** Laravel Reverb as WebSocket server and Laravel Echo on the client, with private
-channels authorized by Laravel; matches broadcast their state on every tick.
+### 3. Frontend framework — Minor
+**Why:** previous experience of the team. **How:** React with TypeScript and Vite.
 
-### Standard user management — Major
+### 4. Custom design system — Minor
+**Why:** [RETOMAR]. **How:** [RETOMAR: palette, typography, icons, list of the 10+
+components.]
+
+### 5. Support for additional browsers — Minor
+**Why:** [RETOMAR]. **How:** [RETOMAR]
+
+### 6. Standard user management — Major
 **Why:** players need an identity, a profile and friends. **How:** editable profile,
 avatar from a gallery or uploaded (default avatar otherwise), profile page, friends
 with live online status.
 
-### Remote authentication — Minor
+### 7. Remote authentication — Minor
 **Why:** faster sign-up for players. **How:** Google OAuth 2.0 with Laravel Socialite;
 only the provider's user id is stored.
 
-### Complete web-based game — Major
+### 8. Real-time features — Major
+**Why:** lobby, waiting room, friends and matches must update live for every player.
+**How:** Laravel Reverb as WebSocket server and Laravel Echo on the client, with private
+channels authorized by Laravel; matches broadcast their state on every tick.
+
+### 9. Health check and status page — Minor
+**Why:** [RETOMAR]. **How:** [RETOMAR]
+
+### 10. Complete web-based game — Major
 **Why:** the core of the project. **How:** see [Description](#description) and
 [Game Rules](#game-rules).
 
-### Remote players — Major
+### 11. Advanced 3D graphics — Major
+**Why:** [RETOMAR]. **How:** [RETOMAR: Babylon.js scene, camera, lights, models.]
+
+### 12. Game customization — Minor
+**Why:** one game that becomes many. **How:** board size, speed, food, starting
+length, pillars, breakable walls, bombs and collision rules; Snake-like defaults.
+
+### 13. AI opponent — Major
+**Why:** lets a player fill a room or play without other humans. **How:** [RETOMAR:
+how the bot decides its moves, difficulty levels, how it avoids perfect play.]
+
+### 14. Remote players — Major
 **Why:** players must be able to play from different computers. **How:** the server runs
 the match and broadcasts each tick; clients only send their moves. Players who lose
 connection are marked as away. [RETOMAR: reconnection.]
 
-### Multiplayer (3+ players) — Major
+### 15. Multiplayer (3+ players) — Major
 **Why:** the game is designed for up to four players. **How:** up to four seats per
 room, all synchronized from the same server state.
 
-### AI opponent — Major
-**Why:** lets a player fill a room or play without other humans. **How:** [RETOMAR:
-how the bot decides its moves, difficulty levels, how it avoids perfect play.]
-
-### Game customization — Minor
-**Why:** one game that becomes many. **How:** board size, speed, food, starting
-length, pillars, breakable walls, bombs and collision rules; Snake-like defaults.
-
-### Tournament system — Minor
-[RETOMAR]
-
-### Spectator mode — Minor
+### 16. Spectator mode — Minor
 **Why:** [RETOMAR]. **How:** [RETOMAR]
-
-### Custom design system — Minor
-**Why:** [RETOMAR]. **How:** [RETOMAR: palette, typography, icons, list of the 10+
-components.]
 
 
 ## Individual Contributions
