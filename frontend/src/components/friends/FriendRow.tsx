@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import Avatar from '../ui/Avatar.tsx'
 import Button from '../ui/Button.tsx'
-import { CheckIcon, PlusIcon, XIcon } from './icons.tsx'
+import { CheckIcon, PlusIcon, XIcon } from '../ui/icons.tsx'
 import type { FriendState, FriendSummary } from './types.ts'
 
 export type FriendRowVariant = 'friend' | 'received' | 'sent' | 'search'

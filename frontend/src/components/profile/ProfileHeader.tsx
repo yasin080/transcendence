@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import Avatar from '../ui/Avatar.tsx'
-import { CalendarIcon, UsersIcon } from './icons.tsx'
+import { CalendarIcon, UsersIcon } from '../ui/icons.tsx'
 import type { OnlineStatus } from '../friends/types.ts'
 import type { ProfileUser } from './types.ts'
 
@@ -58,7 +58,7 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
           </span>
           <span aria-hidden="true" className="size-0.75 rounded-full bg-current" />
           <span className="flex items-center gap-1.5 whitespace-nowrap">
-            <UsersIcon />
+            <UsersIcon className="size-3.5" />
             <span className="text-white">{user.friendCount}</span> {friendLabel}
           </span>
         </div>

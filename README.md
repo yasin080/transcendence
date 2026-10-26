@@ -446,11 +446,24 @@ constraints; seeders create test accounts. Joining a room runs in a transaction 
 row locks. The only raw SQL is the health check's `select 1`.
 
 ### 3. Frontend framework — Minor
-**Why:** previous experience of the team. **How:** React with TypeScript and Vite.
+**Why:** the team already knew it, and its component model fits a UI that updates with
+live data (lobby, friends, matches). **How:** React 19 with TypeScript in strict mode,
+built with Vite and styled with Tailwind CSS. React Router splits the app into three
+layouts (public pages, the app with sidebar, the full-screen game), guards private
+routes with `RequireAuth` and lazy-loads the game page. The session lives in an
+`AuthProvider` context, and a small typed API client handles Sanctum's CSRF cookie.
 
 ### 4. Custom design system — Minor
-**Why:** [RETOMAR]. **How:** [RETOMAR: palette, typography, icons, list of the 10+
-components.]
+**Why:** a single visual identity across landing, lobby, profile and game, without
+repeating styles in every screen. **How:** design tokens in `frontend/src/theme.css`
+(Tailwind `@theme`): a dark palette (`void`, `surface`), an action color (`fuse`),
+warm accents (`ember`, `gold`) and colors with a fixed meaning (`online`, `mint` for
+bots); text, border and fill greys; typography with Bungee for display and Space
+Grotesk for body, plus an extra small size and caps tracking; custom animations.
+Hand-drawn SVG icons, all in `frontend/src/components/ui/icons.tsx`. Ten reusable
+components in `frontend/src/components/ui`:
+`Button`, `Avatar`, `Modal`, `MessageModal`, `FormField`, `SearchInput`, `ToggleChip`,
+`SectionHeader`, `EmptyState` and `Sidebar`, each used in two or more places.
 
 ### 5. Support for additional browsers — Minor
 **Why:** [RETOMAR]. **How:** [RETOMAR]

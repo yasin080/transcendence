@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router'
 import type { ReactNode } from 'react'
 
-import { LobbyIcon, UserIcon } from '../ui/Icons'
+import { LobbyIcon, UserIcon } from '../../ui/icons'
 
 type NavItem = {
   to: string

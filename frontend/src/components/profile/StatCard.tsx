@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { BombIcon, GamepadIcon, TrophyIcon } from './icons.tsx'
+import { BombIcon, GamepadIcon, TrophyIcon } from '../ui/icons.tsx'
 
 export type StatKind = 'played' | 'won' | 'bombs'
 

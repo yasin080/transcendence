@@ -177,7 +177,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           <button
             type="submit"
             disabled={busy}
-            className="px-7.5 py-3.5 rounded-xl bg-white font-display text-[15px] uppercase text-[#12102b] cursor-pointer enabled:hover:bg-fuse-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="px-7.5 py-3.5 rounded-xl bg-white font-display text-[15px] uppercase text-surface cursor-pointer enabled:hover:bg-fuse-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? 'Creating…' : 'Create room'}
           </button>

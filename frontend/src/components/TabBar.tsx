@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router'
 
-import { LobbyIcon, UserIcon, UsersIcon } from './left-sidebar/ui/Icons'
+import { LobbyIcon, UserIcon, UsersIcon } from './ui/icons'
 
 type TabBarProps = {
   friendsOpen: boolean
