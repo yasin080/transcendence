@@ -475,13 +475,24 @@ page. Friends: search users, send, accept, decline and remove requests, with liv
 online status through a Reverb presence channel.
 
 ### 7. Remote authentication — Minor
-**Why:** faster sign-up for players. **How:** Google OAuth 2.0 with Laravel Socialite;
-only the provider's user id is stored.
+**Why:** faster sign-up for players, with no new password to remember. **How:** Google
+OAuth 2.0 (authorization code flow) with Laravel Socialite, which checks the `state`
+parameter against the session. Only a verified Google email is accepted: it signs into
+the account with that email, or creates one with an auto-generated username. Only the
+provider's user id is stored, no tokens. Errors send the user back to the landing with
+a message.
 
 ### 8. Real-time features — Major
 **Why:** lobby, waiting room, friends and matches must update live for every player.
-**How:** Laravel Reverb as WebSocket server and Laravel Echo on the client, with private
-channels authorized by Laravel; matches broadcast their state on every tick.
+**How:** Laravel Reverb as WebSocket server, behind the same nginx as the app, and
+Laravel Echo on the client. Private channels are authorized by Laravel with the session
+cookie: `lobby`, `room.{code}`, `game.{id}` and one per user for friend requests; a
+presence channel `online` shows who is connected. Events are broadcast immediately
+(`ShouldBroadcastNow`), with no queue in between. The server runs each match
+(`game:tick`) and broadcasts its state on every tick; a client that drops and
+reconnects is back in sync with the next tick, and the lobby and waiting room fetch
+their data again on reconnect. The connection is closed and reopened
+when the page goes into or comes back from the browser's back/forward cache.
 
 ### 9. Health check and status page — Minor
 **Why:** [RETOMAR]. **How:** [RETOMAR]
