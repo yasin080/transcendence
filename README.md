@@ -289,7 +289,7 @@ when it ended) is stored in MariaDB.
 HTTP or WebSocket, goes through it over HTTPS, as the subject requires, while traffic
 between containers stays on Docker's internal network.
 
-## Database Schema [RETOMAR]
+## Database Schema
 
 The database is MariaDB, managed through Laravel migrations and the Eloquent ORM.
 The state of live matches is not stored here: it lives in Redis while the match is
@@ -333,7 +333,8 @@ erDiagram
         varchar code UK "6 chars"
         varchar name
         bigint host_id FK
-        varchar status "open | playing"
+        varchar status "open | playing | closed"
+        boolean quick "created by quick match"
         json settings
     }
     room_players {
@@ -359,7 +360,7 @@ erDiagram
 | `users` | Accounts and profiles. `password` is null for accounts created with Google; `avatar` stores either the path of a gallery avatar or the uploaded image. | `username` and `email` unique. |
 | `oauth_accounts` | Links a user to an external provider (Google). Only the provider's user id is stored, no tokens. | One account per provider and user; one user per provider id. |
 | `friendships` | Friend requests and accepted friendships between two users. | One row per pair (requester, addressee). |
-| `rooms` | Match rooms: name, invitation code, host and the match settings (board, speed, bombs…) as JSON. | `code` unique. |
+| `rooms` | Match rooms: name, invitation code, host, status and the match settings (board, speed, bombs…) as JSON. `quick` marks rooms created by quick match, which are hidden from the lobby list. | `code` unique. |
 | `room_players` | Seats in a room. A seat holds either a human (`user_id`) or a bot (`bot_difficulty`). | One user per room; one player per seat. |
 | `games` | Each match played in a room, with its start and end time. | — |
 
@@ -437,9 +438,12 @@ register are rate limited, state changes are broadcast as events, and the game l
 runs as an Artisan command (`game:tick`).
 
 ### 2. ORM — Minor
-**Why:** comes with Laravel and keeps database access declarative and safe. **How:**
-every table has an Eloquent model with its relationships; the schema is versioned with
-migrations.
+**Why:** it comes with Laravel and keeps database access declarative and safe from SQL
+injection. **How:** Eloquent models for users, OAuth accounts, rooms, room players,
+games and friendships, with their relationships and casts (room settings are stored as
+JSON). The schema is versioned with migrations, with foreign keys and unique
+constraints; seeders create test accounts. Joining a room runs in a transaction with
+row locks. The only raw SQL is the health check's `select 1`.
 
 ### 3. Frontend framework — Minor
 **Why:** previous experience of the team. **How:** React with TypeScript and Vite.
