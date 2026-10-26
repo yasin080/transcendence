@@ -53,13 +53,6 @@ export default function PlayerCard({ player, onKick }: PlayerCardProps) {
           </div>
         </div>
       </div>
-
-      {!player.isBot && (
-        <div className="hidden gap-2 sm:grid sm:grid-cols-[repeat(auto-fit,minmax(68px,1fr))]">
-          <Stat value={player.winPct} label="Win rate" />
-          <Stat value={player.avgScore} label="Avg score" />
-        </div>
-      )}
     </div>
   )
 }
@@ -68,15 +61,6 @@ function BotAvatar() {
   return (
     <div className="grid size-13 flex-none place-items-center rounded-2xl border border-mint/35 bg-linear-150 from-mint/22 to-mint/10">
       <BotIcon className="size-6.75 text-mint" />
-    </div>
-  )
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="rounded-xl bg-fill-strong px-2.75 py-2.25">
-      <div className="display-stat-sm">{value}</div>
-      <div className="mt-1 text-micro-label text-fg-muted">{label}</div>
     </div>
   )
 }

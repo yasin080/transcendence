@@ -130,9 +130,6 @@ export default function WaitingRoom() {
         name: p.user?.username ?? 'Player',
         isOwner: p.user_id === room.host_id,
         isBot: false,
-        // [RETOMAR] Aún no hay estadísticas ni colores en el backend
-        winPct: '—',
-        avgScore: '—',
         avatar: p.user?.avatar ?? null,
       },
 )

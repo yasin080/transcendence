@@ -10,7 +10,6 @@ import FriendTile from '../components/profile/FriendTile'
 import { PencilIcon } from '../components/ui/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import QuickMatchBanner from '../components/profile/QuickMatchBanner'
-import StatCard from '../components/profile/StatCard'
 import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import SectionHeader from '../components/ui/SectionHeader'
@@ -94,17 +93,6 @@ export default function Profile() {
           )
         }
       />
-
-      {/* Estadísticas: título de sección + tarjetas */}
-      <div className="flex flex-col gap-3">
-        <SectionHeader title="Stats" />
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-3.5">
-          <StatCard kind="played" value={profile.stats.played} />
-          <StatCard kind="won" value={profile.stats.won} />
-          <StatCard kind="bombs" value={profile.stats.bombs} />
-        </div>
-      </div>
 
       {/* Solo en el perfil propio: invitación a jugar */}
       {/* Provisional: lleva al Lobby hasta que exista la partida rápida */}
