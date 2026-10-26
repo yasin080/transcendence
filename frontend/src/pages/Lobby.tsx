@@ -99,21 +99,8 @@ export default function Lobby() {
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 md:px-7">
 
-      <div className="flex flex-wrap items-center gap-4 mb-[22px]">
+      <div className="mb-[22px]">
         <h1 className="font-display text-[26px] tracking-[0.01em]">Lobby</h1>
-
-        <div className="flex w-full items-center gap-2.5 sm:ml-auto sm:w-auto">
-          <SearchInput
-            name="room-search"
-            maxLength={40}
-            placeholder="Search room name"
-            value={query}
-            onChange={(value) => {
-              setQuery(value)
-            }}
-            className="min-w-0 flex-1 sm:w-61 sm:flex-none"
-          />
-        </div>
       </div>
 
       <QuickMatchHero
@@ -143,7 +130,17 @@ export default function Lobby() {
         </div>
       </section>
 
-      <SectionHeader size="lg" title="Open rooms" className="mt-6 mb-3" />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center mt-6 mb-3">
+        <SectionHeader size="lg" title="Open rooms" className="sm:flex-1" />
+        <SearchInput
+          name="room-search"
+          maxLength={40}
+          placeholder="Search room name"
+          value={query}
+          onChange={setQuery}
+          className="sm:w-61"
+        />
+      </div>
 
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 
