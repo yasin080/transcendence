@@ -304,7 +304,6 @@ erDiagram
     rooms ||--o{ room_players : has
     users |o--o{ room_players : "takes a seat"
     rooms ||--o{ games : plays
-    users |o--o{ games : wins
 
     users {
         bigint id PK
@@ -347,7 +346,6 @@ erDiagram
     games {
         bigint id PK
         bigint room_id FK
-        bigint winner_user_id FK "nullable"
         timestamp started_at
         timestamp ended_at "nullable"
     }
@@ -364,8 +362,7 @@ erDiagram
 | `room_players` | Seats in a room. A seat holds either a human (`user_id`) or a bot (`bot_difficulty`). | One user per room; one player per seat. |
 | `games` | Each match played in a room, with its start and end time. | — |
 
-All foreign keys cascade on delete, except `games.winner_user_id`, which is set to null
-if the user is deleted.
+All foreign keys cascade on delete.
 
 Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 `personal_access_tokens`, `migrations`…), not shown above.
@@ -469,9 +466,13 @@ components in `frontend/src/components/ui`:
 **Why:** [RETOMAR]. **How:** [RETOMAR]
 
 ### 6. Standard user management — Major
-**Why:** players need an identity, a profile and friends. **How:** editable profile,
-avatar from a gallery or uploaded (default avatar otherwise), profile page, friends
-with live online status.
+**Why:** players need an identity, a profile and friends. **How:** sign up and log in
+with email and password (Sanctum session cookie, rate limited, validated on both
+sides). Editable profile: username, name, email, bio and password; changing email or
+password asks for the current one. Avatar from a gallery or uploaded (cropped and
+resized to 256×256 on the server), with a default avatar otherwise. Public profile
+page. Friends: search users, send, accept, decline and remove requests, with live
+online status through a Reverb presence channel.
 
 ### 7. Remote authentication — Minor
 **Why:** faster sign-up for players. **How:** Google OAuth 2.0 with Laravel Socialite;
