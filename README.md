@@ -28,8 +28,8 @@ The host picks a **preset** or tunes every setting by hand:
 
 Custom settings: number of players (1–4), board size (small, medium, large), speed,
 food, bombs, starting length, pillars, random walls, what happens when hitting a wall
-or a body, how often bots make mistakes, and the camera (whole board or following your
-worm). Empty seats can be filled with bots.
+or a body, how often bots make mistakes, and the camera (whole board, following your
+worm or behind its head). Empty seats can be filled with bots.
 
 ### Controls
 - **Keyboard:** `←` / `→` or `A` / `D` turn the worm left or right.
@@ -82,7 +82,8 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 - **Real-time lobby**: rooms, waiting room and match updates pushed over WebSockets.
 - **Server-authoritative gameplay**: the backend runs the game loop; clients only send
   their moves.
-- **3D board** rendered with Babylon.js, with a fixed or a follow camera.
+- **3D board** rendered with Babylon.js, with three cameras: whole board, follow and
+  behind the head.
 - **Accounts**: email/password or Google sign-in, profiles, avatars and friends with
   online status.
 
@@ -121,42 +122,40 @@ Edit `.env` and set at least:
 
 ### 2. Start the project
 
-> **[RETOMAR]** una vez definido make definitivo.
-
 ```bash
 make
 ```
 
-This single command builds the images and starts the whole stack. On first start the
-backend installs its dependencies, generates the application key, runs the migrations
-and seeds the database, so the first launch takes a few minutes.
+This single command builds the frontend, builds the images and starts the whole stack
+in production mode. On first start the backend installs its dependencies, generates the
+application key, runs the migrations and seeds the database, so the first launch takes
+a few minutes.
 
 ### 3. Open the app
 
-Go to **https://localhost:[RETOMAR]**.
+Go to **https://localhost:1443** (or the `HTTPS_PORT` you set in `.env`; `make` prints
+the final URL).
 
-> **[RETOMAR]** The HTTPS port is not settled yet: `HTTPS_PORT` in `.env.example` is
-> `1443`, but the `Makefile` prints `https://localhost` and `APP_URL` has no port.
-> Once decided, update this URL, `APP_URL`, `GOOGLE_REDIRECT_URI` and the message
-> printed by `make up` so they all match.
 The certificate is self-signed and generated on first start, so Chrome will show a
 security warning: click *Advanced → Proceed to localhost*. This happens only once.
 
 ### Useful commands
 
-> **[RETOMAR]** y revisar los phony
-
 | Command | Description |
 |---|---|
-| `make` / `make up` | Start the stack (development mode, with hot reload). |
-| `make prod` | Build the frontend and serve it as static files through nginx. |
+| `make` / `make up` | Start the stack in production mode: the frontend is built and served as static files through nginx. |
+| `make dev` | Start the stack in development mode: nginx proxies to the Vite dev server, with hot reload. |
 | `make down` | Stop the containers, keeping the data. |
 | `make re` | Restart the stack. |
 | `make logs` | Follow the logs of every service. |
-| `make test` | Run the backend test suite. |
+| `make ps` | List the running services. |
+| `make shell-php` / `make shell-front` / `make shell-db` | Open a shell in the Laravel, frontend or database container. |
+| `make migrate` | Run the pending database migrations. |
 | `make fresh` | Reset the database: drop all tables, migrate and seed again. |
-| `make fclean` | Remove containers, volumes and images. **Wipes the database and the certificate.** |
-| `make restore FILE=backups/<date>.sql.gz ` | Load the backup dump |
+| `make test` | Run the backend test suite. |
+| `make backup` | Dump the database now, on top of the automatic dump every 6 hours. |
+| `make restore FILE=backups/<date>.sql.gz` | Load a dump into the database. |
+| `make fclean` | Remove containers, volumes and images. **Wipes the database and the certificate.** The dumps in `./backups` survive. |
 
 ## Resources
 
@@ -391,13 +390,13 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Lobby | List of open rooms, updated in real time, with search by name or code. | beiglesi, ybahri |
 | Waiting room | Players and bots in the room, updated in real time; the host starts the match. | beiglesi, aolabarr |
 | **Game** | | |
-| 3D game | Board rendered with Babylon.js, with a fixed or a follow camera. | ivromero |
+| 3D game | Board rendered with Babylon.js, with three cameras: whole board, follow and behind the head. | ivromero |
 | Server game loop | The server runs every match and broadcasts each tick. | ivromero |
 | Multiplayer | Up to 4 players on different computers. | ivromero |
-| Bots | AI players with different difficulty levels. | ivromero |
+| Bots | AI players that skip looking ahead on a share of ticks chosen by the host (20–80 %), so they can be beaten. | ivromero |
 | Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. | ivromero |
 | Disconnections | Players who leave or lose connection are shown as away. | ivromero |
-| Touch controls | On-screen controls for mobile devices. | ivromero |
+| Touch controls | On mobile, tap the left or right half of the screen to turn, or swipe to head that way. | ivromero |
 | Scoreboard | In-game scoreboard and end-of-match screen. | ybahri |
 | Spectator mode | Watch a match in progress. | ybahri |
 

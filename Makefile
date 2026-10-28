@@ -4,7 +4,7 @@ COMPOSE := docker compose
 HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2),1443)
 
 .DEFAULT_GOAL := all
-.PHONY: up dev urls down build rebuild re logs ps shell-php shell-front shell-db \
+.PHONY: all up dev urls down build rebuild re logs ps shell-php shell-front shell-db \
         migrate fresh test backup restore clean fclean
 
 # --- Lifecycle --------------------------------------------------------------
