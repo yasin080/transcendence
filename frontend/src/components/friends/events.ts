@@ -1,22 +1,22 @@
 import { echo } from '../../lib/echo'
 
-// Aviso global "las amistades han cambiado". Lo lanzan las acciones de amistad
-// y lo escuchan el panel y el perfil para recargarse.
+// Global advice: friendship changed, sent by friendship acts.
+// FriendPanel and Profile listeninf to update.
 const FRIENDS_CHANGED = 'friends:changed'
 
 export function notifyFriendsChanged() {
   window.dispatchEvent(new Event(FRIENDS_CHANGED))
 }
 
-// Devuelve la función que deja de escuchar (para la limpieza de useEffect)
+// Return the fuction that leave to listen (to clean of useEffect)
 export function onFriendsChanged(listener: () => void): () => void {
   window.addEventListener(FRIENDS_CHANGED, listener)
   return () => window.removeEventListener(FRIENDS_CHANGED, listener)
 }
 
-// Escucha los avisos del back en el canal privado del usuario:
-// si otro usuario cambia una amistad, se lanza el mismo aviso local.
-// Devuelve la función que deja de escuchar (para la limpieza de useEffect)
+// Listen the back advices in the private channel of the user:
+// if other user change a friendship, it is send the same local advice.
+// Return the fuction that leave to listen (to clean of useEffect)
 export function listenFriendsChanged(userId: number): () => void {
   const channel = `App.Models.User.${userId}`
   echo.private(channel).listen('.friends.changed', notifyFriendsChanged)

@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     else if (status === 'guest') leavePresence()
   }, [status])
 
-  // Avisos de amistad en tiempo real mientras haya sesión iniciada
+  // Real-time friendship notices while logged in
   const userId = user?.id
   useEffect(() => {
     if (userId === undefined) return
