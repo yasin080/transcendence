@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['room_id', 'user_id', 'seat', 'bot_difficulty'])]
+#[Fillable(['room_id', 'user_id', 'seat'])]
 class RoomPlayer extends Model
 {
     public function room(): BelongsTo

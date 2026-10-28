@@ -47,8 +47,8 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 - **Walls and bodies:** depending on the settings, hitting a wall or a worm's body
   (including your own) either **kills** the worm or **blocks** it in place. A worm
   that stays blocked for 15 ticks in a row (1.5–4.5 s) dies.
-- **Pillars and random walls** count as walls and follow the same setting. Turning
-  pillars on switches walls to block.
+- **Pillars and random walls** count as walls and follow the same setting. With
+  pillars on, every wall blocks: pillars never kill.
 - **Head-on:** if two worms move into the same cell, or into each other's cell, both die.
 
 ### Bombs
@@ -342,7 +342,6 @@ erDiagram
         bigint room_id FK
         bigint user_id FK "null for bots"
         tinyint seat "0 to 3"
-        varchar bot_difficulty "null for humans"
     }
     games {
         bigint id PK
@@ -360,7 +359,7 @@ erDiagram
 | `oauth_accounts` | Links a user to an external provider (Google). Only the provider's user id is stored, no tokens. | One account per provider and user; one user per provider id. |
 | `friendships` | Friend requests and accepted friendships between two users. | One row per pair (requester, addressee). |
 | `rooms` | Match rooms: name, invitation code, host, status and the match settings (board, speed, bombs…) as JSON. `quick` marks rooms created by quick match, which are hidden from the lobby list. | `code` unique. |
-| `room_players` | Seats in a room. A seat holds either a human (`user_id`) or a bot (`bot_difficulty`). | One user per room; one player per seat. |
+| `room_players` | Seats in a room. A seat holds either a human (`user_id`) or a bot (`user_id` null). | One user per room; one player per seat. |
 | `games` | Each match played in a room, with its start and end time. | — |
 
 All foreign keys cascade on delete.
@@ -419,7 +418,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | 8 | Real-time features with WebSockets | Major | 2 | ivromer, beiglesi, aolabarr |
 | 9 | Health check and status page | Minor | 1 | [RETOMAR] |
 | 10 | Complete web-based game | Major | 2 | ivromer |
-| 11 | Advanced 3D graphics | Major | 2 | [RETOMAR] |
+| 11 | Advanced 3D graphics | Major | 2 | ivromer |
 | 12 | Game customization options | Minor | 1 | ivromer |
 | 13 | AI opponent | Major | 2 | ivromer |
 | 14 | Remote players | Major | 2 | ivromer |
@@ -510,20 +509,35 @@ only draws it and sends moves. Goal, collisions, bombs and win, loss and draw
 conditions are in [Game Rules](#game-rules).
 
 ### 11. Advanced 3D graphics — Major
-**Why:** [RETOMAR]. **How:** [RETOMAR: Babylon.js scene, camera, lights, models.]
+**Why:** a 3D board makes the arena readable and alive, and lets the camera follow
+your worm. **How:** Babylon.js, loaded only on the game page. glTF models for worms,
+food, bombs, walls and explosions, with instancing for repeated meshes; sky and sun
+lights, emissive materials and a post-processing pipeline (bloom, FXAA). Worms glide
+smoothly between ticks by interpolating their positions every frame. Three cameras:
+whole board, follow and behind the head.
 
 ### 12. Game customization — Minor
-**Why:** one game that becomes many. **How:** board size, speed, food, starting
-length, pillars, random walls, bombs and collision rules; Snake-like defaults.
+**Why:** one game that becomes many. **How:** the host starts from a preset (Classic,
+Arena, Maze or Hardcore; Classic by default) and can tune players, board size, speed,
+food, starting length, pillars, random walls, bombs, what a wall or body hit does, bot
+mistakes and the camera. Bombs act as a power-up and an attack. The form only offers
+valid values, and the backend checks them again (`StoreRoomRequest`).
 
 ### 13. AI opponent — Major
-**Why:** lets a player fill a room or play without other humans. **How:** [RETOMAR:
-how the bot decides its moves, difficulty levels, how it avoids perfect play.]
+**Why:** lets a player fill a room or play without other humans. **How:** a bot is
+just another source of moves, run by the server on every tick (`backend/app/Game/Bot.php`).
+It looks one cell ahead, drops the moves that hit a wall, a worm or a bomb about to go
+off, and heads for the nearest food or bomb, so it plays with the same settings as
+everyone. It does not plan further, so it can trap itself like a person, and on a share
+of ticks set by the host (bot mistakes, 20–80 %) it does not look at all.
 
 ### 14. Remote players — Major
-**Why:** players must be able to play from different computers. **How:** the server runs
-the match and broadcasts each tick; clients only send their moves. Players who lose
-connection are marked as away. [RETOMAR: reconnection.]
+**Why:** players must be able to play from different computers. **How:** the server
+runs the match and broadcasts each tick; clients only send their moves and draw the
+worms gliding between ticks, so latency doesn't make them jump. The countdown is synced
+to the server clock. A page that stops pinging leaves its worm still and grey after
+2.5 s; reloading the page or pressing "Enter" on the room in the lobby brings the player
+back within 10 s, otherwise the worm is out.
 
 ### 15. Multiplayer (3+ players) — Major
 **Why:** the game is designed for up to four players. **How:** up to four seats per

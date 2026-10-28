@@ -25,6 +25,5 @@ export interface RoomPlayer {
   room_id: number
   user_id: number | null
   seat: number
-  bot_difficulty: 'easy' | 'medium' | 'hard' | null
   user?: { id: number; username: string; avatar: string | null } | null
 }
