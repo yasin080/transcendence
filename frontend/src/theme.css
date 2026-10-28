@@ -37,9 +37,7 @@
   --color-fill: rgb(255 255 255 / 3.5%);
   --color-fill-strong: rgb(255 255 255 / 5%);
 
-  /* Paleta ampliada de main (lobby, login). Pendiente de podar o
-     mapear a los tokens de arriba cuando se unifique el sistema de diseño. */
-  --color-surface-2: var(--color-surface); /* alias: nombre antiguo de surface */
+  /* Paleta ampliada: tonos extra de las familias de arriba */
   --color-surface-1: rgba(10, 9, 30, 0.72);   /* Rails laterales / paneles */
   --color-surface-input: rgba(8, 7, 24, 0.6); /* Inputs de texto */
   --color-fuse-100: #ffd7e0;  /* Tinte muy suave para fondos o tags */
@@ -48,9 +46,7 @@
   --color-fuse-500: #ff4a6f;  /* Hover del botón principal */
   --color-fuse-700: #e01446;  /* Click / estado activo / contraste oscuro */
   --color-fuse-900: #9c0a2e;  /* Fondos oscuros o bordes con contraste */
-  --color-ember-400: #ffc06a; /* Alertas leves, acentos cálidos claros */
   --color-ember-600: #ff9b2f; /* Naranja energético / avisos importantes */
-  --color-signal-400: var(--color-mint);   /* Estado activo / online claro */
   --color-signal-500: var(--color-online); /* Éxito / conectado / confirmación */
 
   /* Radios (escala de Tailwind, sin tokens propios):
@@ -144,13 +140,6 @@ no pide reducir movimiento. */
 @utility display-hero {
   font-family: var(--font-display);
   line-height: 0.86;
-  letter-spacing: var(--tracking-tight);
-}
-
-@utility display-stat-lg {
-  font-family: var(--font-display);
-  font-size: var(--text-4xl);
-  line-height: var(--leading-none);
   letter-spacing: var(--tracking-tight);
 }
 

@@ -12,7 +12,7 @@ import { BOARD_OPTIONS, CAMERA_OPTIONS, FOOD_OPTIONS, SOFT_WALL_OPTIONS, SPEED_O
 import type { Settings } from '../game/logic/settings.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
-import { echo } from '../lib/echo'
+import { echo, onReconnect } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
 
 
@@ -23,7 +23,7 @@ function settingChips(s: Settings): MatchSetting[] {
     { label: 'Food', value: labelFor(FOOD_OPTIONS, s.food) },
     { label: 'Start length', value: String(s.startLength) },
     { label: 'Pillars', value: s.pillars ? 'On' : 'Off' },
-    { label: 'Soft walls', value: labelFor(SOFT_WALL_OPTIONS, s.softWalls) },
+    { label: 'Random walls', value: labelFor(SOFT_WALL_OPTIONS, s.softWalls) },
     { label: 'Wall hit', value: s.wallHit === 'die' ? 'Deadly' : 'Blocks' },
     { label: 'Body hit', value: s.bodyHit === 'die' ? 'Deadly' : 'Blocks' },
     { label: 'Bombs', value: s.bombs > 0 ? String(s.bombs) : 'Off' },
@@ -57,21 +57,34 @@ export default function WaitingRoom() {
   const joined = room !== null
   useEffect(() => {
     if (!roomId || !joined) return
-    const channel = echo.private(`room.${roomId}`)
-    channel.listen('.players.updated', () => {
-      void apiGet<Room>(`/api/rooms/${roomId}`).then((result) => {
-        if (!result.ok) return
+    const refresh = () =>
+      apiGet<Room>(`/api/rooms/${roomId}`).then((result) => {
+        if (!result.ok) return null
         setRoom(result.data)
         const stillIn = result.data.players.some((p) => p.user_id === user?.id)
-        if (stillIn) return
+        if (stillIn) return result.data
         echo.leave(`room.${roomId}`)
         setPhase('kicked')
+        return null
       })
-    })
+    const channel = echo.private(`room.${roomId}`)
+    channel.listen('.players.updated', () => void refresh())
     channel.listen('.match.started', (e: { gameId: number }) => {
       navigate(`/game/${e.gameId}`)
     })
-    return () => echo.leave(`room.${roomId}`)
+    // match.started may have been lost while the socket was down
+    const stopReconnect = onReconnect(() =>
+      void refresh().then((fresh) => {
+        const games = fresh?.games ?? []
+        if (fresh?.status === 'playing' && games.length > 0) {
+          navigate(`/game/${Math.max(...games.map((g) => g.id))}`)
+        }
+      }),
+    )
+    return () => {
+      stopReconnect()
+      echo.leave(`room.${roomId}`)
+    }
   }, [roomId, joined, user?.id, navigate])
 
 
@@ -130,9 +143,6 @@ export default function WaitingRoom() {
         name: p.user?.username ?? 'Player',
         isOwner: p.user_id === room.host_id,
         isBot: false,
-        // [RETOMAR] Aún no hay estadísticas ni colores en el backend
-        winPct: '—',
-        avgScore: '—',
         avatar: p.user?.avatar ?? null,
       },
 )

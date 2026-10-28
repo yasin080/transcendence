@@ -77,7 +77,7 @@ test:
 
 ## Dump the database now, on top of the automatic dump every 6 hours
 backup:
-	$(COMPOSE) exec backup backup.sh
+	$(COMPOSE) exec backup /scripts/backup.sh
 
 ## Load a dump into the database: make restore FILE=backups/<date>.sql.gz
 restore:

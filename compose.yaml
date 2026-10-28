@@ -129,9 +129,11 @@ services:
     env_file: .env
     environment:
       BACKUP_KEEP: 28
-    command: sh -c 'while true; do backup.sh; sleep 21600; done'
+    command: sh -c 'while true; do /scripts/backup.sh; sleep 21600; done'
     volumes:
-      - ./docker/backup/backup.sh:/usr/local/bin/backup.sh:ro
+      # The folder, not the file: git replaces the file on checkout and a
+      # single-file mount would keep pointing at the deleted one.
+      - ./docker/backup:/scripts:ro
       - ./backups:/backups
     networks: [transcendence]
     restart: unless-stopped

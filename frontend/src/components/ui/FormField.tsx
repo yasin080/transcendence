@@ -1,6 +1,7 @@
-import { useId, type ChangeEvent } from 'react'
+import { useId, type ChangeEvent, type Ref } from 'react'
 
 interface FormFieldProps {
+  ref?: Ref<HTMLInputElement>
   label: string
   name: string
   value: string
@@ -18,6 +19,7 @@ interface FormFieldProps {
 }
 
 export default function FormField({
+  ref,
   label,
   name,
   value,
@@ -65,7 +67,7 @@ export default function FormField({
       {multiline ? (
         <textarea {...control} rows={rows} />
       ) : (
-        <input {...control} type={type} autoComplete={autoComplete} />
+        <input {...control} ref={ref} type={type} autoComplete={autoComplete} />
       )}
 
       {message && (
