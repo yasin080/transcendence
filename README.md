@@ -209,7 +209,7 @@ the team member could understand it, explain it and take responsibility for it.
 |---|---|---|
 | **aolabarr** | Project Manager, Developer | Organizes team meetings and planning, tracks progress and deadlines, keeps communication flowing and removes blockers. |
 | **beiglesi** | Product Owner, Developer | Defines the product vision and the game rules, maintains and prioritizes the backlog, decides which features and modules are built, and validates finished work. |
-| **ivromer** | Technical Lead, Developer | Defines the architecture and the technical stack, sets code quality standards and reviews critical changes. |
+| **ivromero** | Technical Lead, Developer | Defines the architecture and the technical stack, sets code quality standards and reviews critical changes. |
 | **ybahri** | Developer | Leads the visual and creative side of the project: the look and feel of the website, its layout and the visual identity of the game. |
 
 All members are developers: each one implements features, takes part in code reviews,
@@ -374,7 +374,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Feature | Description | Member(s) |
 |---|---|---|
 | **Infrastructure** | | |
-| Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. | ivromer |
+| Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. | ivromero |
 | **Accounts and authentication** | | |
 | Sign up and log in | Email and password authentication with hashed passwords and email verification. |  beiglesi |
 | Google sign-in | Log in or create an account with Google (OAuth 2.0). | beiglesi |
@@ -391,13 +391,13 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Lobby | List of open rooms, updated in real time, with search by name or code. | beiglesi, ybahri |
 | Waiting room | Players and bots in the room, updated in real time; the host starts the match. | beiglesi, aolabarr |
 | **Game** | | |
-| 3D game | Board rendered with Babylon.js, with a fixed or a follow camera. | ivromer |
-| Server game loop | The server runs every match and broadcasts each tick. | ivromer |
-| Multiplayer | Up to 4 players on different computers. | ivromer |
-| Bots | AI players with different difficulty levels. | ivromer |
-| Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. | ivromer |
-| Disconnections | Players who leave or lose connection are shown as away. | ivromer |
-| Touch controls | On-screen controls for mobile devices. | ivromer |
+| 3D game | Board rendered with Babylon.js, with a fixed or a follow camera. | ivromero |
+| Server game loop | The server runs every match and broadcasts each tick. | ivromero |
+| Multiplayer | Up to 4 players on different computers. | ivromero |
+| Bots | AI players with different difficulty levels. | ivromero |
+| Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. | ivromero |
+| Disconnections | Players who leave or lose connection are shown as away. | ivromero |
+| Touch controls | On-screen controls for mobile devices. | ivromero |
 | Scoreboard | In-game scoreboard and end-of-match screen. | ybahri |
 | Spectator mode | Watch a match in progress. | ybahri |
 
@@ -415,14 +415,14 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | 5 | Support for additional browsers | Minor | 1 | [RETOMAR] |
 | 6 | Standard user management | Major | 2 | aolabarr |
 | 7 | Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
-| 8 | Real-time features with WebSockets | Major | 2 | ivromer, beiglesi, aolabarr |
-| 9 | Health check and status page | Minor | 1 | [RETOMAR] |
-| 10 | Complete web-based game | Major | 2 | ivromer |
-| 11 | Advanced 3D graphics | Major | 2 | ivromer |
-| 12 | Game customization options | Minor | 1 | ivromer |
-| 13 | AI opponent | Major | 2 | ivromer |
-| 14 | Remote players | Major | 2 | ivromer |
-| 15 | Multiplayer game (more than two players) | Major | 2 | ivromer |
+| 8 | Real-time features with WebSockets | Major | 2 | ivromero, beiglesi, aolabarr |
+| 9 | Health check and status page | Minor | 1 | ivromero |
+| 10 | Complete web-based game | Major | 2 | ivromero |
+| 11 | Advanced 3D graphics | Major | 2 | ivromero |
+| 12 | Game customization options | Minor | 1 | ivromero |
+| 13 | AI opponent | Major | 2 | ivromero |
+| 14 | Remote players | Major | 2 | ivromero |
+| 15 | Multiplayer game (more than two players) | Major | 2 | ivromero |
 | 16 | Spectator mode | Minor | 1 | ybahri |
 | | **Total** | | **23** | |
 
@@ -541,17 +541,26 @@ back within 10 s, otherwise the worm is out.
 
 ### 15. Multiplayer (3+ players) — Major
 **Why:** the game is designed for up to four players. **How:** up to four seats per
-room, all synchronized from the same server state.
+room, humans and bots mixed. Every worm starts in its own corner, at the same distance
+from the walls, and all of them move at the same time on each tick: head-on crashes
+are worked out first, and every collision is checked against the board as it was
+before anyone moved, so the seat order never matters. All clients draw the same
+server state.
 
 ### 16. Spectator mode — Minor
-**Why:** [RETOMAR]. **How:** [RETOMAR]
+**Why:** friends can watch a match in progress without taking a seat. **How:** the
+lobby lists rooms that are playing with a "Spectate" button. A spectator opens the same
+game page with no seat: the server sends the same ticks over the game channel, the
+camera shows the whole board, there are no controls or pings, and the server refuses
+moves from anyone without a seat. At the end it shows who won and goes back to the
+lobby.
 
 
 ## Individual Contributions
 
 <!-- [RETOMAR] Challenges de cada uno. -->
 
-### ivromer — Technical Lead, Developer
+### ivromero — Technical Lead, Developer
 
 - **Architecture and infrastructure:** Docker stack, nginx with HTTPS, base structure of
   the backend and the frontend.
