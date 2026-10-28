@@ -48,7 +48,7 @@ export const BOMBS_ON = 3
 // Porcentaje de ticks en que un bot no mira por dónde va: más alto, más fácil de ganar
 export const BOT_MISTAKE_OPTIONS = range(20, 80, 5, (n) => `${n}%`)
 
-// Proporción de muros rompibles: de 0 a 0.05
+// Proporción de muros aleatorios: de 0 a 0.05
 export const SOFT_WALL_OPTIONS = range(0, 5, 1, (n) => `${n}%`).map(({ label, value }) => ({ label, value: value / 100 }))
 
 // El largo inicial crece con el tablero: el 30 % del lado (20 → 6, 35 → 10, 50 → 15)

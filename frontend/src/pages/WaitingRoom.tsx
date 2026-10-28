@@ -23,7 +23,7 @@ function settingChips(s: Settings): MatchSetting[] {
     { label: 'Food', value: labelFor(FOOD_OPTIONS, s.food) },
     { label: 'Start length', value: String(s.startLength) },
     { label: 'Pillars', value: s.pillars ? 'On' : 'Off' },
-    { label: 'Soft walls', value: labelFor(SOFT_WALL_OPTIONS, s.softWalls) },
+    { label: 'Random walls', value: labelFor(SOFT_WALL_OPTIONS, s.softWalls) },
     { label: 'Wall hit', value: s.wallHit === 'die' ? 'Deadly' : 'Blocks' },
     { label: 'Body hit', value: s.bodyHit === 'die' ? 'Deadly' : 'Blocks' },
     { label: 'Bombs', value: s.bombs > 0 ? String(s.bombs) : 'Off' },

@@ -45,7 +45,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
   const toggleWallHit = () =>
     setChoices(choices.wallHit === 'die' ? { ...choices, wallHit: 'block' } : { ...choices, wallHit: 'die', pillars: false })
 
-  // Con pilares no hay muros rompibles ni muros que maten
+  // Con pilares no hay muros aleatorios ni muros que maten
   const togglePillars = () =>
     setChoices(choices.pillars ? { ...choices, pillars: false } : { ...choices, pillars: true, wallHit: 'block', softWalls: 0 })
 
@@ -123,7 +123,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           <Slider label="Food" options={FOOD_OPTIONS} value={choices.food} onChange={(v) => choose('food', v)} />
           <Slider label="Bot mistakes" options={BOT_MISTAKE_OPTIONS} value={choices.botMistakes} onChange={(v) => choose('botMistakes', v)} />
           {!choices.pillars && (
-            <Slider label="Soft walls" options={SOFT_WALL_OPTIONS} value={choices.softWalls} onChange={(v) => choose('softWalls', v)} />
+            <Slider label="Random walls" options={SOFT_WALL_OPTIONS} value={choices.softWalls} onChange={(v) => choose('softWalls', v)} />
           )}
         </div>
 

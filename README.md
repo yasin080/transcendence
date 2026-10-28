@@ -5,7 +5,7 @@
 ## Description
 
 **Worms** is an online multiplayer worm game for up to four players, rendered in 3D in
-the browser. There is only one game, but every match is defined by a set of rules, and those rules change its nature completely: an open board with food and deadly walls plays like a classic **Snake**; add pillars, breakable walls and bombs and it turns into a
+the browser. There is only one game, but every match is defined by a set of rules, and those rules change its nature completely: an open board with food and deadly walls plays like a classic **Snake**; add pillars, random walls and bombs and it turns into a
 **Bomberman**-style arena where worms swallow bombs and drop them from their tail to
 blow up walls and trap their rivals.
 
@@ -22,18 +22,18 @@ The host picks a **preset** or tunes every setting by hand:
 | Preset | Board | Food | Bombs | Obstacles | Hitting a wall / a body |
 |---|---|---|---|---|---|
 | **Classic** | Medium | 1 | — | — | Kills / Kills |
-| **Arena** | Medium | 3 | 2 | Breakable walls | Kills / Blocks |
+| **Arena** | Medium | 3 | 2 | Random walls | Kills / Blocks |
 | **Maze** | Medium | 5 | 4 | Pillars | Blocks / Blocks |
-| **Hardcore** | Medium | 15 | 10 | Breakable walls | Kills / Kills |
+| **Hardcore** | Medium | 15 | 10 | Random walls | Kills / Kills |
 
 Custom settings: number of players (1–4), board size (small, medium, large), speed,
-food, bombs, starting length, pillars, breakable walls, what happens when hitting a wall
+food, bombs, starting length, pillars, random walls, what happens when hitting a wall
 or a body, how often bots make mistakes, and the camera (whole board or following your
 worm). Empty seats can be filled with bots.
 
 ### Controls
 - **Keyboard:** `←` / `→` or `A` / `D` turn the worm left or right.
-- **Touch:** tap the left or right half of the screen.
+- **Touch:** tap the left or right half of the screen to turn, or swipe to head that way.
 
 A worm can never turn back on itself.
 
@@ -47,7 +47,8 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 - **Walls and bodies:** depending on the settings, hitting a wall or a worm's body
   (including your own) either **kills** the worm or **blocks** it in place. A worm
   that stays blocked for 15 ticks in a row (1.5–4.5 s) dies.
-- **Pillars** always block, never kill.
+- **Pillars and random walls** count as walls and follow the same setting. Turning
+  pillars on switches walls to block.
 - **Head-on:** if two worms move into the same cell, or into each other's cell, both die.
 
 ### Bombs
@@ -74,9 +75,9 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 ### Key features
 
 - **One game, many modes**: board size, speed, food, starting length, pillars,
-  breakable walls, bombs, and whether hitting a wall or a body kills or just blocks.
+  random walls, bombs, and whether hitting a wall or a body kills or just blocks.
 - **Bombs**: eat one and it drops from your tail; when the fuse runs out it blasts a
-  3×3 area, breaking walls and killing any worm head it catches.
+  3×3 area, killing any worm head it catches and cutting any body it hits.
 - **Up to 4 players** per match, mixing humans on different computers and AI bots.
 - **Real-time lobby**: rooms, waiting room and match updates pushed over WebSockets.
 - **Server-authoritative gameplay**: the backend runs the game loop; clients only send
@@ -503,15 +504,17 @@ the game loop, the queue and the last backup, and answers 503 if any fails; the
 and `make restore FILE=…` loads a dump into a fresh stack.
 
 ### 10. Complete web-based game — Major
-**Why:** the core of the project. **How:** see [Description](#description) and
-[Game Rules](#game-rules).
+**Why:** the core of the project. **How:** a worm game for 1 to 4 players, played
+live. The server runs every match tick by tick (`backend/app/Game`) and the browser
+only draws it and sends moves. Goal, collisions, bombs and win, loss and draw
+conditions are in [Game Rules](#game-rules).
 
 ### 11. Advanced 3D graphics — Major
 **Why:** [RETOMAR]. **How:** [RETOMAR: Babylon.js scene, camera, lights, models.]
 
 ### 12. Game customization — Minor
 **Why:** one game that becomes many. **How:** board size, speed, food, starting
-length, pillars, breakable walls, bombs and collision rules; Snake-like defaults.
+length, pillars, random walls, bombs and collision rules; Snake-like defaults.
 
 ### 13. AI opponent — Major
 **Why:** lets a player fill a room or play without other humans. **How:** [RETOMAR:
