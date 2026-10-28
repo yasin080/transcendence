@@ -2,7 +2,7 @@ import { apiDelete, apiGet, apiPost } from '../../lib/api'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
 import { notifyFriendsChanged } from './events.ts'
 
-// Cómo envía Laravel a un usuario: id numérico y snake_case
+// How send Laravel the user: id number, snake_case
 export interface ApiUser {
   id: number
   username: string
@@ -23,8 +23,7 @@ interface ApiStateResponse {
   friend_state: FriendState
 }
 
-// Traduce un usuario del backend al tipo del frontend.
-// [RETOMAR] status llegará por el canal de presencia de Reverb; de momento, todos offline.
+// Traduce the user from backend user to frontend type
 export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),
@@ -52,8 +51,7 @@ export async function searchPlayers(query: string): Promise<SearchResult[]> {
   return result.data.map((user) => ({ ...toSummary(user), friendState: user.friend_state }))
 }
 
-// Acciones: devuelven el nuevo estado de la relación, o null si fallan
-
+// Actions: return the new relationship state, or null on failure
 export async function sendRequest(userId: string): Promise<FriendState | null> {
   const result = await apiPost<ApiStateResponse>(`/api/friends/${userId}`)
   if (!result.ok) return null

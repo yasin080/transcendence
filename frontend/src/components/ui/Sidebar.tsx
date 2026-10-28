@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react'
 
 type SidebarProps = {
-  /** Zona superior fija */
-  header?: ReactNode
-  /** Zona inferior fija */
-  footer?: ReactNode
-  /** Contenido central; hace scroll si no cabe */
-  children?: ReactNode
+  
+  header?: ReactNode    // Fixed upper zone
+  footer?: ReactNode    // Fixed lower zone
+  children?: ReactNode  // Central zone; scroll
 }
 
 /**

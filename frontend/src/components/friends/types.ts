@@ -1,26 +1,26 @@
-// Tipos de amistad, compartidos por el perfil y el panel de amigos
+// Friendship types, shared by the profile and the friends panel
 
 export type OnlineStatus = 'online' | 'offline'
 
-// Relación entre quien mira y otro jugador (botón de amistad)
+// Relationship between the viewer and another player (friend button)
 export type FriendState = 'none' | 'sent' | 'received' | 'friends'
 
-// Lo mínimo para pintar a un amigo en una lista o cuadrícula
+// The minimum needed to show a friend in a list or grid
 export interface FriendSummary {
   id: string
   username: string
-  avatarUrl: string | null // null = avatar por defecto
+  avatarUrl: string | null // null = default avatar
   status: OnlineStatus
 }
 
-// Las tres listas del panel
+// The panel's three lists
 export interface FriendsPanelData {
   friends: FriendSummary[]
   received: FriendSummary[]
   sent: FriendSummary[]
 }
 
-// Un resultado del buscador: el jugador y mi relación con él
+// A search result: the player and my relationship with them
 export interface SearchResult extends FriendSummary {
   friendState: FriendState
 }

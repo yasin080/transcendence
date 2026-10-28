@@ -13,12 +13,12 @@ const MIN_QUERY = 2
 const MAX_QUERY = 20
 const SEARCH_DELAY_MS = 300
 
-// Orden alfabético sin distinguir mayúsculas
+// Case-insensitive alphabetical order
 function byName(a: FriendSummary, b: FriendSummary) {
   return a.username.localeCompare(b.username, undefined, { sensitivity: 'base' })
 }
 
-// Sidebar derecho global: buscador, amigos y solicitudes del usuario autenticado
+// Global right sidebar: search, friends and requests of the logged-in user
 export default function FriendsPanel() {
   const [data, setData] = useState<FriendsPanelData | null>(null)
   const [failed, setFailed] = useState(false)
@@ -47,7 +47,7 @@ export default function FriendsPanel() {
     void load()
   }, [load])
 
-  // Busca 300 ms después de la última tecla
+  // Search 300 ms after the last keystroke
   useEffect(() => {
     if (!searching) {
       setResults(null)
@@ -57,7 +57,7 @@ export default function FriendsPanel() {
     return () => clearTimeout(timer)
   }, [trimmed, searching, runSearch])
 
-  // Recarga cuando cambia cualquier amistad, aquí o en un perfil
+  // Reload when any friendship changes, here or on a profile
   useEffect(
     () =>
       onFriendsChanged(() => {
@@ -67,7 +67,7 @@ export default function FriendsPanel() {
     [load, runSearch, searching, trimmed],
   )
 
-  // Lanza la acción; el aviso de amistades recarga panel y búsqueda
+  // Run the action; the friendship notice reloads the panel and the search
   async function act(action: (userId: string) => Promise<FriendState | null>, userId: string) {
     await action(userId)
   }
