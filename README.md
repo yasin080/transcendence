@@ -376,7 +376,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | **Infrastructure** | | |
 | Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. | ivromero |
 | **Accounts and authentication** | | |
-| Sign up and log in | Email and password authentication with hashed passwords and email verification. |  beiglesi |
+| Sign up and log in | Email and password authentication with hashed passwords, rate limited. | ivromero, beiglesi |
 | Google sign-in | Log in or create an account with Google (OAuth 2.0). | beiglesi |
 | **Profiles and social** | | |
 | User profile | Username, bio and avatar, chosen from a gallery or uploaded; default avatar if none is set. | aolabarr |
@@ -429,7 +429,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 ### 1. Backend framework — Minor
 **Why:** the team already knew it, and it brings what the project needs out of the box:
 session auth (Sanctum), OAuth (Socialite), WebSockets (Reverb), queues and an ORM
-(Eloquent). **How:** Laravel 13 on PHP 8.3, serving a JSON API under `/api`. Routes are
+(Eloquent). **How:** Laravel 13 on PHP 8.4, serving a JSON API under `/api`. Routes are
 grouped behind `auth:sanctum`, input is validated with Form Requests, login and
 register are rate limited, state changes are broadcast as events, and the game loop
 runs as an Artisan command (`game:tick`).
@@ -564,7 +564,7 @@ lobby.
 
 - **Architecture and infrastructure:** Docker stack, nginx with HTTPS, base structure of
   the backend and the frontend.
-- **Authentication:** login and email verification.
+- **Authentication:** sign-up and login API with Sanctum sessions and rate limiting.
 - **Game engine:** game models, the server game loop (`game:tick`), multiplayer
   synchronization and the bomb mechanics.
 - **3D game:** rendering of the board with Babylon.js.
