@@ -105,8 +105,12 @@ class GameTest extends TestCase
     {
         $game = Game::create(['wallHit' => 'block'] + self::SNAKE);
         $game['food'] = [['x' => 20, 'y' => 20]];
+        while ($game['worms'][0]['body'][0]['x'] < 28) {
+            Game::tick($game);
+        }
 
-        for ($i = 0; $i < 40; $i++) {
+        // Pushing against the wall, but for less than STUCK ticks
+        for ($i = 0; $i < 5; $i++) {
             Game::tick($game);
         }
 

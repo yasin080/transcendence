@@ -24,7 +24,7 @@ class StoreRoomRequest extends FormRequest
             'settings.width' => ['required', 'integer', 'between:10,75'],
             'settings.height' => ['required', 'integer', 'between:10,75'],
             'settings.pillars' => ['required', 'boolean'],
-            // Con pilares no hay muros rompibles
+            // Con pilares no hay muros aleatorios
             'settings.softWalls' => ['required', 'numeric', 'between:0,'.($this->boolean('settings.pillars') ? 0 : 0.5)],
             'settings.wrap' => ['required', 'boolean'],
             'settings.tickMs' => ['required', 'integer', 'between:50,1000'],

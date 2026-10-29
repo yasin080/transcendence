@@ -23,6 +23,8 @@ interface ApiStateResponse {
   friend_state: FriendState
 }
 
+// Traduce un usuario del backend al tipo del frontend.
+// El estado real (online/offline) lo pone withPresence() con el canal de presencia.
 export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),

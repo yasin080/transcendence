@@ -6,10 +6,11 @@ export interface Room {
   code: string
   name: string
   host_id: number
-  status: 'open' | 'playing' | 'finished' | 'closed'
+  status: 'open' | 'playing' | 'closed'
   quick: boolean
   settings: Settings
   players: RoomPlayer[]
+  games?: { id: number }[] // solo en GET /api/rooms/{code}
 }
 
 // Sala tal como la devuelve GET /api/rooms
@@ -24,6 +25,5 @@ export interface RoomPlayer {
   room_id: number
   user_id: number | null
   seat: number
-  bot_difficulty: 'easy' | 'medium' | 'hard' | null
   user?: { id: number; username: string; avatar: string | null } | null
 }

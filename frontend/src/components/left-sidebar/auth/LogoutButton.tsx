@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router'
 
 import { useAuth } from '../../../auth/useAuth'
 import Button from '../../ui/Button'
-import { LogoutIcon } from '../ui/Icons'
+import { LogoutIcon } from '../../ui/icons'
 
 type LogoutButtonProps = {
   compact?: boolean

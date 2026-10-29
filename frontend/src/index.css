@@ -2,7 +2,7 @@
 @import './theme.css';
 
 body {
-	background: #07061a;
+	background: var(--color-void);
 }
 
 /* scroll oscuro*/
