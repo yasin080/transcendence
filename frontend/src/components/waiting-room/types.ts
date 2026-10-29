@@ -6,8 +6,6 @@ interface PlayerBase {
 
 export interface HumanPlayer extends PlayerBase {
   isBot: false
-  winPct: string
-  avgScore: string
   avatar: string | null
 }
 

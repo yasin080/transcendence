@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -81,7 +80,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime', #RETOMAR, 
+            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -89,7 +88,7 @@ class User extends Authenticatable
     /**
      * Get the room the user is currently in.
      */
-      public function currentRoom(): ?Room
+    public function currentRoom(): ?Room
     {
         return Room::whereIn('status', ['open', 'playing'])
             ->whereHas('players', fn ($q) => $q->where('user_id', $this->id))

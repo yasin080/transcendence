@@ -1,7 +1,7 @@
 import { apiGet, apiPatch, apiPost, type ApiResult } from '../../lib/api'
 import { toSummary, type ApiUser } from '../friends/api.ts'
 import type { FriendState, FriendSummary } from '../friends/types.ts'
-import type { ProfileStats, ProfileUser } from './types.ts'
+import type { ProfileUser } from './types.ts'
 
 // Cómo envía Laravel un perfil
 interface ApiProfile extends ApiUser {
@@ -22,9 +22,6 @@ export interface ProfileData {
   friends: FriendSummary[]
 }
 
-// [RETOMAR] Stats falsas hasta que el juego guarde resultados
-const PLACEHOLDER_STATS: ProfileStats = { played: 148, won: 63, bombs: 1240 }
-
 export async function fetchProfile(userId: string): Promise<ProfileData | null> {
   const result = await apiGet<ApiProfile>(`/api/users/${userId}`)
   if (!result.ok) return null
@@ -39,7 +36,6 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
       bio: data.bio ?? '',
       memberSince: data.created_at,
       friendCount: data.friend_count,
-      stats: PLACEHOLDER_STATS,
     },
     isOwn: data.is_own,
     friendState: data.friend_state,

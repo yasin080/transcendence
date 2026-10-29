@@ -66,7 +66,7 @@ export async function acceptRequest(userId: string): Promise<FriendState | null>
   return result.data.friend_state
 }
 
-// Rechazar, cancelar o eliminar: en el backend son la misma acción
+// Rechazar, cancel or delete: in backend are the same act
 export async function removeFriendship(userId: string): Promise<FriendState | null> {
   const result = await apiDelete<ApiStateResponse>(`/api/friends/${userId}`)
   if (!result.ok) return null

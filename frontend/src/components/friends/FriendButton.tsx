@@ -1,5 +1,5 @@
 import Button from '../ui/Button.tsx'
-import { CheckIcon, ClockIcon, PlusIcon, UserMinusIcon } from './icons.tsx'
+import { CheckIcon, ClockIcon, PlusIcon, UserMinusIcon } from '../ui/icons.tsx'
 import type { FriendState } from './types.ts'
 
 // Botón de amistad. No guarda estado: lo recibe del padre

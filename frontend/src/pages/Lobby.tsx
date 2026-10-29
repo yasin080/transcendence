@@ -9,7 +9,7 @@ import SectionHeader from '../components/ui/SectionHeader.tsx'
 import { startQuickMatch } from '../game/api.ts'
 import { PRESETS, quickMatchSettings } from '../components/lobby/roomOptions.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
-import { echo } from '../lib/echo'
+import { echo, onReconnect } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
 import duel from '../assets/duel.webp'
 import RoomRow from '../components/lobby/RoomRow.tsx'
@@ -47,32 +47,36 @@ export default function Lobby() {
   useEffect(() => {
     let cancelled = false
 
-    void apiGet<RoomSummary[]>('/api/rooms').then((result) => {
-      if (cancelled) return
-      if (result.ok) setRooms(result.data)
-      else setError(result.failure.message)
-    })
+    const loadRooms = () =>
+      void apiGet<RoomSummary[]>('/api/rooms').then((result) => {
+        if (cancelled) return
+        if (result.ok) setRooms(result.data)
+        else setError(result.failure.message)
+      })
+    loadRooms()
+    const stopReconnect = onReconnect(loadRooms)
 
     void leaveCurrentRoom().then((code) => {
       if (!cancelled) setMyRoomCode(code)
     })
 
     echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {
-    if (room.status === 'closed' || room.status === 'finished') {
-      setMyRoomCode((prev) => (prev === room.code ? null : prev))
-    }
-    setRooms((prev) => {
-      const list = prev ?? []
-      if (room.status === 'closed' || room.status === 'finished') {
-        return list.filter((r) => r.id !== room.id)
+      if (room.status === 'closed') {
+        setMyRoomCode((prev) => (prev === room.code ? null : prev))
       }
-      const exists = list.some((r) => r.id === room.id)
-      return exists ? list.map((r) => (r.id === room.id ? room : r)) : [room, ...list]
+      setRooms((prev) => {
+        const list = prev ?? []
+        if (room.status === 'closed') {
+          return list.filter((r) => r.id !== room.id)
+        }
+        const exists = list.some((r) => r.id === room.id)
+        return exists ? list.map((r) => (r.id === room.id ? room : r)) : [room, ...list]
+      })
     })
-  })
 
     return () => {
       cancelled = true
+      stopReconnect()
       echo.leave('lobby')
     }
   }, [])

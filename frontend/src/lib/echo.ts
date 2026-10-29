@@ -35,6 +35,20 @@ export const echo = new Echo({
   },
 })
 
+export function onReconnect(callback: () => void) {
+  const connection = echo.connector.pusher.connection
+  let dropped = false
+  const onChange = ({ previous, current }: { previous: string; current: string }) => {
+    if (previous === 'connected') dropped = true
+    if (current === 'connected' && dropped) {
+      dropped = false
+      callback()
+    }
+  }
+  connection.bind('state_change', onChange)
+  return () => connection.unbind('state_change', onChange)
+}
+
 window.addEventListener('pagehide', (event) => {
   if (event.persisted) echo.connector.pusher.disconnect()
 })
