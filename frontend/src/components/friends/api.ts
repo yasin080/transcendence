@@ -23,8 +23,6 @@ interface ApiStateResponse {
   friend_state: FriendState
 }
 
-// Traduce un usuario del backend al tipo del frontend.
-// [RETOMAR] status llegará por el canal de presencia de Reverb; de momento, todos offline.
 export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),
