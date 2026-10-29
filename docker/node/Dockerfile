@@ -17,7 +17,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /app
 
-RUN mkdir -p /app/node_modules && chown -R node:node /app
+RUN mkdir -p /app/node_modules && chown -R root:root /app
 
 EXPOSE 5173
 
