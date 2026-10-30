@@ -129,6 +129,21 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_a_google_user_without_a_password_cannot_log_in_with_one(): void
+    {
+        User::factory()->create([
+            'email' => 'gusano@example.com',
+            'password' => null,
+        ]);
+
+        $this->postJson('/api/login', [
+            'email' => 'gusano@example.com',
+            'password' => 'secret-worm',
+        ])->assertFails(422)->assertJsonValidationErrors('email');
+
+        $this->assertGuest();
+    }
+
     public function test_a_caller_without_frontend_headers_gets_a_clean_error(): void
     {
         User::factory()->create([
