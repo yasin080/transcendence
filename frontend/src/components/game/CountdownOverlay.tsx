@@ -28,7 +28,7 @@ export default function CountdownOverlay({ endsAt, controls, onDone }: Countdown
     <div className="fixed inset-0 z-40 grid place-items-center bg-void/84 backdrop-blur-md">
       <div
         aria-hidden="true"
-        className="absolute size-130 rounded-full bg-radial from-[#ff9b2f]/30 via-fuse-600/12 via-45% to-void/0 to-70%"
+        className="absolute size-130 rounded-full bg-radial from-ember-600/30 via-fuse-600/12 via-45% to-void/0 to-70%"
       />
       <div className="relative flex flex-col items-center gap-1.5 text-center text-white">
         <div className="text-eyebrow">Match starts in</div>

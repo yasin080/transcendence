@@ -6,7 +6,7 @@ import Sidebar from '../ui/Sidebar'
 import LegalLinks from '../LegalLinks'
 import { useAuth } from '../../auth/useAuth'
 import Avatar from '../ui/Avatar'
-import { UsersIcon } from './ui/Icons'
+import { UsersIcon } from '../ui/icons'
 
 type MainLayoutSidebarProps = {
   onOpenFriends: () => void

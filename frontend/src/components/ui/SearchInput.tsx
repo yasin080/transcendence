@@ -1,4 +1,4 @@
-import { SearchIcon, XIcon } from '../friends/icons.tsx'
+import { SearchIcon, XIcon } from './icons.tsx'
 
 interface SearchInputProps {
   name: string

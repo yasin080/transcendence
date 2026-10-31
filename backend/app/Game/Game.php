@@ -51,13 +51,14 @@ class Game
         unset($worm);
 
         $next = array_map(fn ($worm) => Worms::nextCell($worm, $game['board']), $game['worms']);
+        $before = $game['worms'];
         $crashed = array_map(fn ($i) => self::moves($game['worms'][$i]) && self::headOn($game, $next, $i), array_keys($game['worms']));
 
         foreach (array_keys($game['worms']) as $i) {
             if ($crashed[$i]) {
                 $game['worms'][$i]['alive'] = false;
             } elseif (self::moves($game['worms'][$i])) {
-                self::moveWorm($game, $i, $next[$i]);
+                self::moveWorm($game, $i, $next[$i], $before);
             }
         }
 
@@ -105,12 +106,12 @@ class Game
         return false;
     }
 
-    private static function moveWorm(array &$game, int $i, array $next): void
+    private static function moveWorm(array &$game, int $i, array $next, array $before): void
     {
         $worm = &$game['worms'][$i];
 
         $wall = Board::cellAt($game['board'], $next['x'], $next['y']) !== Board::EMPTY;
-        if ($wall || Worms::isOnWorm($game['worms'], $next)) {
+        if ($wall || Worms::isOnWorm($before, $next)) {
             $hit = $wall ? $game['settings']['wallHit'] : $game['settings']['bodyHit'];
             $worm['stuck']++;
             if ($hit === 'die' || $worm['stuck'] >= self::STUCK) {

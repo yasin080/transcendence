@@ -9,7 +9,7 @@ import SectionHeader from '../components/ui/SectionHeader.tsx'
 import { startQuickMatch } from '../game/api.ts'
 import { PRESETS, quickMatchSettings } from '../components/lobby/roomOptions.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
-import { echo } from '../lib/echo'
+import { echo, onReconnect } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
 import duel from '../assets/duel.webp'
 import RoomRow from '../components/lobby/RoomRow.tsx'
@@ -47,32 +47,36 @@ export default function Lobby() {
   useEffect(() => {
     let cancelled = false
 
-    void apiGet<RoomSummary[]>('/api/rooms').then((result) => {
-      if (cancelled) return
-      if (result.ok) setRooms(result.data)
-      else setError(result.failure.message)
-    })
+    const loadRooms = () =>
+      void apiGet<RoomSummary[]>('/api/rooms').then((result) => {
+        if (cancelled) return
+        if (result.ok) setRooms(result.data)
+        else setError(result.failure.message)
+      })
+    loadRooms()
+    const stopReconnect = onReconnect(loadRooms)
 
     void leaveCurrentRoom().then((code) => {
       if (!cancelled) setMyRoomCode(code)
     })
 
     echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {
-    if (room.status === 'closed' || room.status === 'finished') {
-      setMyRoomCode((prev) => (prev === room.code ? null : prev))
-    }
-    setRooms((prev) => {
-      const list = prev ?? []
-      if (room.status === 'closed' || room.status === 'finished') {
-        return list.filter((r) => r.id !== room.id)
+      if (room.status === 'closed') {
+        setMyRoomCode((prev) => (prev === room.code ? null : prev))
       }
-      const exists = list.some((r) => r.id === room.id)
-      return exists ? list.map((r) => (r.id === room.id ? room : r)) : [room, ...list]
+      setRooms((prev) => {
+        const list = prev ?? []
+        if (room.status === 'closed') {
+          return list.filter((r) => r.id !== room.id)
+        }
+        const exists = list.some((r) => r.id === room.id)
+        return exists ? list.map((r) => (r.id === room.id ? room : r)) : [room, ...list]
+      })
     })
-  })
 
     return () => {
       cancelled = true
+      stopReconnect()
       echo.leave('lobby')
     }
   }, [])
@@ -99,21 +103,8 @@ export default function Lobby() {
   return (
     <section className="flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 md:px-7">
 
-      <div className="flex flex-wrap items-center gap-4 mb-[22px]">
+      <div className="mb-[22px]">
         <h1 className="font-display text-[26px] tracking-[0.01em]">Lobby</h1>
-
-        <div className="flex w-full items-center gap-2.5 sm:ml-auto sm:w-auto">
-          <SearchInput
-            name="room-search"
-            maxLength={40}
-            placeholder="Search room name"
-            value={query}
-            onChange={(value) => {
-              setQuery(value)
-            }}
-            className="min-w-0 flex-1 sm:w-61 sm:flex-none"
-          />
-        </div>
       </div>
 
       <QuickMatchHero
@@ -143,7 +134,17 @@ export default function Lobby() {
         </div>
       </section>
 
-      <SectionHeader size="lg" title="Open rooms" className="mt-6 mb-3" />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center mt-6 mb-3">
+        <SectionHeader size="lg" title="Open rooms" className="sm:flex-1" />
+        <SearchInput
+          name="room-search"
+          maxLength={40}
+          placeholder="Search room name"
+          value={query}
+          onChange={setQuery}
+          className="sm:w-61"
+        />
+      </div>
 
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
 

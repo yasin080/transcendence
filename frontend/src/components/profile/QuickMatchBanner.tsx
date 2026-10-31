@@ -4,7 +4,7 @@ interface QuickMatchBannerProps {
   onPlay: () => void
 }
 
-// Banner del perfil propio: invita a jugar para subir las estadísticas.
+// Banner del perfil propio: invita a jugar.
 // Mismo aspecto que el hero del Lobby (candidato a compartir en una revisión).
 export default function QuickMatchBanner({ onPlay }: QuickMatchBannerProps) {
   return (
@@ -17,8 +17,8 @@ export default function QuickMatchBanner({ onPlay }: QuickMatchBannerProps) {
       <div className="relative flex flex-wrap items-center gap-x-7 gap-y-5 px-5 py-6.5 sm:px-7">
         <div className="w-full min-w-0 text-center sm:w-auto sm:flex-1 sm:text-left">
           <p className="text-eyebrow">Quick match</p>
-          <h2 className="mt-2 display-heading">Push those numbers up</h2>
-          <p className="mt-2 text-body-muted">Every finished match counts towards your stats.</p>
+          <h2 className="mt-2 display-heading">Ready for another round?</h2>
+          <p className="mt-2 text-body-muted">Jump into a live arena with other players.</p>
         </div>
 
         <Button variant="arcade" size="xl" pulse className="w-full flex-none sm:w-auto" onClick={onPlay}>

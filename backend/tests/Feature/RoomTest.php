@@ -446,7 +446,7 @@ class RoomTest extends TestCase
 
         $this->getJson("/api/rooms/{$room->code}")
             ->assertOk()
-            ->assertJsonPath('players.0.user.name', 'Host')
+            ->assertJsonPath('players.0.user.username', $host->username)
             ->assertJsonPath('games.0.id', $gameId);
     }
 

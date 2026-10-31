@@ -1,5 +1,5 @@
 import PlayerCard from './PlayerCard.tsx'
-import { BotIcon } from '../left-sidebar/ui/Icons.tsx'
+import { BotIcon } from '../ui/icons.tsx'
 import type { Player } from './types.ts'
 
 interface PlayerGridProps {

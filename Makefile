@@ -4,8 +4,8 @@ COMPOSE := docker compose
 HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2),1443)
 
 .DEFAULT_GOAL := all
-.PHONY: up dev urls down build rebuild re logs ps shell-php shell-front shell-db \
-        migrate fresh test clean fclean
+.PHONY: all up dev urls down build rebuild re logs ps shell-php shell-front shell-db \
+        migrate fresh test backup restore clean fclean
 
 # --- Lifecycle --------------------------------------------------------------
 
@@ -73,12 +73,25 @@ fresh:
 test:
 	$(COMPOSE) exec php php artisan test
 
+# --- Backups --------------------------------------------------------------
+
+## Dump the database now, on top of the automatic dump every 6 hours
+backup:
+	$(COMPOSE) exec backup /scripts/backup.sh
+
+## Load a dump into the database: make restore FILE=backups/<date>.sql.gz
+restore:
+	@test -f "$(FILE)" || { echo "Usage: make restore FILE=backups/<date>.sql.gz"; exit 1; }
+	gunzip -c "$(FILE)" | $(COMPOSE) exec -T mariadb sh -c 'mariadb -u"$$MARIADB_USER" -p"$$MARIADB_PASSWORD" "$$MARIADB_DATABASE"'
+	@echo "Restored $(FILE)"
+
 # --- Cleanup ----------------------------------------------------------------
 
 ## Remove containers, keep the database
 clean: down
 
 ## Remove containers, volumes and images — wipes the database and the certs
+## (the dumps in ./backups survive)
 fclean:
 	$(COMPOSE) down -v --remove-orphans --rmi local
 

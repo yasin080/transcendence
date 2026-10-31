@@ -1,8 +1,5 @@
 name: transcendence
 
-# Only nginx publishes ports. Everything else lives on the internal network,
-# which is what lets us guarantee that every external connection is HTTPS.
-
 x-php-build: &php-build
   context: .
   dockerfile: docker/php/Dockerfile
@@ -14,6 +11,7 @@ x-php-common: &php-common
   env_file: .env
   volumes:
     - ./backend:/var/www/html
+    - ./backups:/var/www/backups:ro
   networks: [transcendence]
   restart: unless-stopped
   depends_on:
@@ -51,7 +49,7 @@ services:
         GID: ${GID:-1000}
     # Run as the (host-aligned) node user so nothing Vite writes into the
     # bind mount or the node_modules volume ends up owned by root.
-    user: node
+    user: root
     env_file: .env
     volumes:
       - ./frontend:/app
@@ -77,6 +75,11 @@ services:
     build: *php-build
     <<: *php-common
     command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8080 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     depends_on:
       php:
         condition: service_healthy
@@ -114,6 +117,26 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+
+  # Dumps the database every 6 hours into ./backups (newest 28 kept, one week).
+  # It starts after php, so the first dump already has the migrated schema.
+  backup:
+    image: mariadb:11.4
+    user: root
+    env_file: .env
+    environment:
+      BACKUP_KEEP: 28
+    command: sh -c 'while true; do /scripts/backup.sh; sleep 21600; done'
+    volumes:
+      # The folder, not the file: git replaces the file on checkout and a
+      # single-file mount would keep pointing at the deleted one.
+      - ./docker/backup:/scripts:ro
+      - ./backups:/backups
+    networks: [transcendence]
+    restart: unless-stopped
+    depends_on:
+      php:
+        condition: service_healthy
 
   redis:
     image: redis:7-alpine

@@ -5,7 +5,7 @@
 ## Description
 
 **Worms** is an online multiplayer worm game for up to four players, rendered in 3D in
-the browser. There is only one game, but every match is defined by a set of rules, and those rules change its nature completely: an open board with food and deadly walls plays like a classic **Snake**; add pillars, breakable walls and bombs and it turns into a
+the browser. There is only one game, but every match is defined by a set of rules, and those rules change its nature completely: an open board with food and deadly walls plays like a classic **Snake**; add pillars, random walls and bombs and it turns into a
 **Bomberman**-style arena where worms swallow bombs and drop them from their tail to
 blow up walls and trap their rivals.
 
@@ -22,18 +22,18 @@ The host picks a **preset** or tunes every setting by hand:
 | Preset | Board | Food | Bombs | Obstacles | Hitting a wall / a body |
 |---|---|---|---|---|---|
 | **Classic** | Medium | 1 | — | — | Kills / Kills |
-| **Arena** | Medium | 3 | 2 | Breakable walls | Kills / Blocks |
+| **Arena** | Medium | 3 | 2 | Random walls | Kills / Blocks |
 | **Maze** | Medium | 5 | 4 | Pillars | Blocks / Blocks |
-| **Hardcore** | Medium | 15 | 10 | Breakable walls | Kills / Kills |
+| **Hardcore** | Medium | 15 | 10 | Random walls | Kills / Kills |
 
 Custom settings: number of players (1–4), board size (small, medium, large), speed,
-food, bombs, starting length, pillars, breakable walls, what happens when hitting a wall
-or a body, how often bots make mistakes, and the camera (whole board or following your
-worm). Empty seats can be filled with bots.
+food, bombs, starting length, pillars, random walls, what happens when hitting a wall
+or a body, how often bots make mistakes, and the camera (whole board, following your
+worm or behind its head). Empty seats can be filled with bots.
 
 ### Controls
 - **Keyboard:** `←` / `→` or `A` / `D` turn the worm left or right.
-- **Touch:** tap the left or right half of the screen.
+- **Touch:** tap the left or right half of the screen to turn, or swipe to head that way.
 
 A worm can never turn back on itself.
 
@@ -47,7 +47,8 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 - **Walls and bodies:** depending on the settings, hitting a wall or a worm's body
   (including your own) either **kills** the worm or **blocks** it in place. A worm
   that stays blocked for 15 ticks in a row (1.5–4.5 s) dies.
-- **Pillars** always block, never kill.
+- **Pillars and random walls** count as walls and follow the same setting. With
+  pillars on, every wall blocks: pillars never kill.
 - **Head-on:** if two worms move into the same cell, or into each other's cell, both die.
 
 ### Bombs
@@ -74,14 +75,15 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 ### Key features
 
 - **One game, many modes**: board size, speed, food, starting length, pillars,
-  breakable walls, bombs, and whether hitting a wall or a body kills or just blocks.
+  random walls, bombs, and whether hitting a wall or a body kills or just blocks.
 - **Bombs**: eat one and it drops from your tail; when the fuse runs out it blasts a
-  3×3 area, breaking walls and killing any worm head it catches.
+  3×3 area, killing any worm head it catches and cutting any body it hits.
 - **Up to 4 players** per match, mixing humans on different computers and AI bots.
 - **Real-time lobby**: rooms, waiting room and match updates pushed over WebSockets.
 - **Server-authoritative gameplay**: the backend runs the game loop; clients only send
   their moves.
-- **3D board** rendered with Babylon.js, with a fixed or a follow camera.
+- **3D board** rendered with Babylon.js, with three cameras: whole board, follow and
+  behind the head.
 - **Accounts**: email/password or Google sign-in, profiles, avatars and friends with
   online status.
 
@@ -120,41 +122,40 @@ Edit `.env` and set at least:
 
 ### 2. Start the project
 
-> **[RETOMAR]** una vez definido make definitivo.
-
 ```bash
 make
 ```
 
-This single command builds the images and starts the whole stack. On first start the
-backend installs its dependencies, generates the application key, runs the migrations
-and seeds the database, so the first launch takes a few minutes.
+This single command builds the frontend, builds the images and starts the whole stack
+in production mode. On first start the backend installs its dependencies, generates the
+application key, runs the migrations and seeds the database, so the first launch takes
+a few minutes.
 
 ### 3. Open the app
 
-Go to **https://localhost:[RETOMAR]**.
+Go to **https://localhost:1443** (or the `HTTPS_PORT` you set in `.env`; `make` prints
+the final URL).
 
-> **[RETOMAR]** The HTTPS port is not settled yet: `HTTPS_PORT` in `.env.example` is
-> `1443`, but the `Makefile` prints `https://localhost` and `APP_URL` has no port.
-> Once decided, update this URL, `APP_URL`, `GOOGLE_REDIRECT_URI` and the message
-> printed by `make up` so they all match.
 The certificate is self-signed and generated on first start, so Chrome will show a
 security warning: click *Advanced → Proceed to localhost*. This happens only once.
 
 ### Useful commands
 
-> **[RETOMAR]** y revisar los phony
-
 | Command | Description |
 |---|---|
-| `make` / `make up` | Start the stack (development mode, with hot reload). |
-| `make prod` | Build the frontend and serve it as static files through nginx. |
+| `make` / `make up` | Start the stack in production mode: the frontend is built and served as static files through nginx. |
+| `make dev` | Start the stack in development mode: nginx proxies to the Vite dev server, with hot reload. |
 | `make down` | Stop the containers, keeping the data. |
 | `make re` | Restart the stack. |
 | `make logs` | Follow the logs of every service. |
-| `make test` | Run the backend test suite. |
+| `make ps` | List the running services. |
+| `make shell-php` / `make shell-front` / `make shell-db` | Open a shell in the Laravel, frontend or database container. |
+| `make migrate` | Run the pending database migrations. |
 | `make fresh` | Reset the database: drop all tables, migrate and seed again. |
-| `make fclean` | Remove containers, volumes and images. **Wipes the database and the certificate.** |
+| `make test` | Run the backend test suite. |
+| `make backup` | Dump the database now, on top of the automatic dump every 6 hours. |
+| `make restore FILE=backups/<date>.sql.gz` | Load a dump into the database. |
+| `make fclean` | Remove containers, volumes and images. **Wipes the database and the certificate.** The dumps in `./backups` survive. |
 
 ## Resources
 
@@ -207,7 +208,7 @@ the team member could understand it, explain it and take responsibility for it.
 |---|---|---|
 | **aolabarr** | Project Manager, Developer | Organizes team meetings and planning, tracks progress and deadlines, keeps communication flowing and removes blockers. |
 | **beiglesi** | Product Owner, Developer | Defines the product vision and the game rules, maintains and prioritizes the backlog, decides which features and modules are built, and validates finished work. |
-| **ivromer** | Technical Lead, Developer | Defines the architecture and the technical stack, sets code quality standards and reviews critical changes. |
+| **ivromero** | Technical Lead, Developer | Defines the architecture and the technical stack, sets code quality standards and reviews critical changes. |
 | **ybahri** | Developer | Leads the visual and creative side of the project: the look and feel of the website, its layout and the visual identity of the game. |
 
 All members are developers: each one implements features, takes part in code reviews,
@@ -288,7 +289,7 @@ when it ended) is stored in MariaDB.
 HTTP or WebSocket, goes through it over HTTPS, as the subject requires, while traffic
 between containers stays on Docker's internal network.
 
-## Database Schema [RETOMAR]
+## Database Schema
 
 The database is MariaDB, managed through Laravel migrations and the Eloquent ORM.
 The state of live matches is not stored here: it lives in Redis while the match is
@@ -303,7 +304,6 @@ erDiagram
     rooms ||--o{ room_players : has
     users |o--o{ room_players : "takes a seat"
     rooms ||--o{ games : plays
-    users |o--o{ games : wins
 
     users {
         bigint id PK
@@ -332,7 +332,8 @@ erDiagram
         varchar code UK "6 chars"
         varchar name
         bigint host_id FK
-        varchar status "open | playing"
+        varchar status "open | playing | closed"
+        boolean quick "created by quick match"
         json settings
     }
     room_players {
@@ -340,12 +341,10 @@ erDiagram
         bigint room_id FK
         bigint user_id FK "null for bots"
         tinyint seat "0 to 3"
-        varchar bot_difficulty "null for humans"
     }
     games {
         bigint id PK
         bigint room_id FK
-        bigint winner_user_id FK "nullable"
         timestamp started_at
         timestamp ended_at "nullable"
     }
@@ -358,12 +357,11 @@ erDiagram
 | `users` | Accounts and profiles. `password` is null for accounts created with Google; `avatar` stores either the path of a gallery avatar or the uploaded image. | `username` and `email` unique. |
 | `oauth_accounts` | Links a user to an external provider (Google). Only the provider's user id is stored, no tokens. | One account per provider and user; one user per provider id. |
 | `friendships` | Friend requests and accepted friendships between two users. | One row per pair (requester, addressee). |
-| `rooms` | Match rooms: name, invitation code, host and the match settings (board, speed, bombs…) as JSON. | `code` unique. |
-| `room_players` | Seats in a room. A seat holds either a human (`user_id`) or a bot (`bot_difficulty`). | One user per room; one player per seat. |
+| `rooms` | Match rooms: name, invitation code, host, status and the match settings (board, speed, bombs…) as JSON. `quick` marks rooms created by quick match, which are hidden from the lobby list. | `code` unique. |
+| `room_players` | Seats in a room. A seat holds either a human (`user_id`) or a bot (`user_id` null). | One user per room; one player per seat. |
 | `games` | Each match played in a room, with its start and end time. | — |
 
-All foreign keys cascade on delete, except `games.winner_user_id`, which is set to null
-if the user is deleted.
+All foreign keys cascade on delete.
 
 Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 `personal_access_tokens`, `migrations`…), not shown above.
@@ -375,9 +373,9 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Feature | Description | Member(s) |
 |---|---|---|
 | **Infrastructure** | | |
-| Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. | ivromer |
+| Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. | ivromero |
 | **Accounts and authentication** | | |
-| Sign up and log in | Email and password authentication with hashed passwords and email verification. |  beiglesi |
+| Sign up and log in | Email and password authentication with hashed passwords, rate limited. | ivromero, beiglesi |
 | Google sign-in | Log in or create an account with Google (OAuth 2.0). | beiglesi |
 | **Profiles and social** | | |
 | User profile | Username, bio and avatar, chosen from a gallery or uploaded; default avatar if none is set. | aolabarr |
@@ -392,13 +390,13 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Lobby | List of open rooms, updated in real time, with search by name or code. | beiglesi, ybahri |
 | Waiting room | Players and bots in the room, updated in real time; the host starts the match. | beiglesi, aolabarr |
 | **Game** | | |
-| 3D game | Board rendered with Babylon.js, with a fixed or a follow camera. | ivromer |
-| Server game loop | The server runs every match and broadcasts each tick. | ivromer |
-| Multiplayer | Up to 4 players on different computers. | ivromer |
-| Bots | AI players with different difficulty levels. | ivromer |
-| Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. | ivromer |
-| Disconnections | Players who leave or lose connection are shown as away. | ivromer |
-| Touch controls | On-screen controls for mobile devices. | ivromer |
+| 3D game | Board rendered with Babylon.js, with three cameras: whole board, follow and behind the head. | ivromero |
+| Server game loop | The server runs every match and broadcasts each tick. | ivromero |
+| Multiplayer | Up to 4 players on different computers. | ivromero |
+| Bots | AI players that skip looking ahead on a share of ticks chosen by the host (20–80 %), so they can be beaten. | ivromero |
+| Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. | ivromero |
+| Disconnections | Players who leave or lose connection are shown as away. | ivromero |
+| Touch controls | On mobile, tap the left or right half of the screen to turn, or swipe to head that way. | ivromero |
 | Scoreboard | In-game scoreboard and end-of-match screen. | ybahri |
 | Spectator mode | Watch a match in progress. | ybahri |
 
@@ -407,88 +405,165 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 
 <!-- [RETOMAR]  -->
 
-| Module | Type | Points | Member(s) |
-|---|---|---|---|
-| Frontend framework (React) | Minor | 1 | All |
-| Backend framework (Laravel) | Minor | 1 | All |
-| ORM (Eloquent) | Minor | 1 | All |
-| Real-time features with WebSockets | Major | 2 | ivromer, beiglesi, aolabarr |
-| Standard user management | Major | 2 | aolabarr |
-| Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
-| Complete web-based game | Major | 2 | ivromer |
-| Remote players | Major | 2 | ivromer |
-| Multiplayer game (more than two players) | Major | 2 | ivromer |
-| AI opponent | Major | 2 | ivromer |
-| Game customization options | Minor | 1 | ivromer |
-| Tournament system | Minor | 1 | [RETOMAR] |
-| Spectator mode | Minor | 1 | ybahri |
-| Custom design system | Minor | 1 | ybahri |
-| **Total** | | **[RETOMAR]** | |
+| # | Module | Type | Points | Member(s) |
+|---|---|---|---|---|
+| 1 | Backend framework (Laravel) | Minor | 1 | All |
+| 2 | ORM (Eloquent) | Minor | 1 | All |
+| 3 | Frontend framework (React) | Minor | 1 | All |
+| 4 | Custom design system | Minor | 1 | ybahri |
+| 5 | Support for additional browsers | Minor | 1 | [RETOMAR] |
+| 6 | Standard user management | Major | 2 | aolabarr |
+| 7 | Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
+| 8 | Real-time features with WebSockets | Major | 2 | ivromero, beiglesi, aolabarr |
+| 9 | Health check and status page | Minor | 1 | ivromero |
+| 10 | Complete web-based game | Major | 2 | ivromero |
+| 11 | Advanced 3D graphics | Major | 2 | ivromero |
+| 12 | Game customization options | Minor | 1 | ivromero |
+| 13 | AI opponent | Major | 2 | ivromero |
+| 14 | Remote players | Major | 2 | ivromero |
+| 15 | Multiplayer game (more than two players) | Major | 2 | ivromero |
+| 16 | Spectator mode | Minor | 1 | ybahri |
+| | **Total** | | **23** | |
 
-### Frontend and backend frameworks — Minor + Minor
-**Why:** previous experience of the team with both. **How:** React with TypeScript and
-Vite on the frontend; Laravel on the backend, exposing a JSON API under `/api`.
+### 1. Backend framework — Minor
+**Why:** the team already knew it, and it brings what the project needs out of the box:
+session auth (Sanctum), OAuth (Socialite), WebSockets (Reverb), queues and an ORM
+(Eloquent). **How:** Laravel 13 on PHP 8.4, serving a JSON API under `/api`. Routes are
+grouped behind `auth:sanctum`, input is validated with Form Requests, login and
+register are rate limited, state changes are broadcast as events, and the game loop
+runs as an Artisan command (`game:tick`).
 
-### ORM — Minor
-**Why:** comes with Laravel and keeps database access declarative and safe. **How:**
-every table has an Eloquent model with its relationships; the schema is versioned with
-migrations.
+### 2. ORM — Minor
+**Why:** it comes with Laravel and keeps database access declarative and safe from SQL
+injection. **How:** Eloquent models for users, OAuth accounts, rooms, room players,
+games and friendships, with their relationships and casts (room settings are stored as
+JSON). The schema is versioned with migrations, with foreign keys and unique
+constraints; seeders create test accounts. Joining a room runs in a transaction with
+row locks. The only raw SQL is the health check's `select 1`.
 
-### Real-time features — Major
-**Why:** lobby, waiting room, friends and matches must update live for every player.
-**How:** Laravel Reverb as WebSocket server and Laravel Echo on the client, with private
-channels authorized by Laravel; matches broadcast their state on every tick.
+### 3. Frontend framework — Minor
+**Why:** the team already knew it, and its component model fits a UI that updates with
+live data (lobby, friends, matches). **How:** React 19 with TypeScript in strict mode,
+built with Vite and styled with Tailwind CSS. React Router splits the app into three
+layouts (public pages, the app with sidebar, the full-screen game), guards private
+routes with `RequireAuth` and lazy-loads the game page. The session lives in an
+`AuthProvider` context, and a small typed API client handles Sanctum's CSRF cookie.
 
-### Standard user management — Major
-**Why:** players need an identity, a profile and friends. **How:** editable profile,
-avatar from a gallery or uploaded (default avatar otherwise), profile page, friends
-with live online status.
+### 4. Custom design system — Minor
+**Why:** a single visual identity across landing, lobby, profile and game, without
+repeating styles in every screen. **How:** design tokens in `frontend/src/theme.css`
+(Tailwind `@theme`): a dark palette (`void`, `surface`), an action color (`fuse`),
+warm accents (`ember`, `gold`) and colors with a fixed meaning (`online`, `mint` for
+bots); text, border and fill greys; typography with Bungee for display and Space
+Grotesk for body, plus an extra small size and caps tracking; custom animations.
+Hand-drawn SVG icons, all in `frontend/src/components/ui/icons.tsx`. Ten reusable
+components in `frontend/src/components/ui`:
+`Button`, `Avatar`, `Modal`, `MessageModal`, `FormField`, `SearchInput`, `ToggleChip`,
+`SectionHeader`, `EmptyState` and `Sidebar`, each used in two or more places.
 
-### Remote authentication — Minor
-**Why:** faster sign-up for players. **How:** Google OAuth 2.0 with Laravel Socialite;
-only the provider's user id is stored.
-
-### Complete web-based game — Major
-**Why:** the core of the project. **How:** see [Description](#description) and
-[Game Rules](#game-rules).
-
-### Remote players — Major
-**Why:** players must be able to play from different computers. **How:** the server runs
-the match and broadcasts each tick; clients only send their moves. Players who lose
-connection are marked as away. [RETOMAR: reconnection.]
-
-### Multiplayer (3+ players) — Major
-**Why:** the game is designed for up to four players. **How:** up to four seats per
-room, all synchronized from the same server state.
-
-### AI opponent — Major
-**Why:** lets a player fill a room or play without other humans. **How:** [RETOMAR:
-how the bot decides its moves, difficulty levels, how it avoids perfect play.]
-
-### Game customization — Minor
-**Why:** one game that becomes many. **How:** board size, speed, food, starting
-length, pillars, breakable walls, bombs and collision rules; Snake-like defaults.
-
-### Tournament system — Minor
-[RETOMAR]
-
-### Spectator mode — Minor
+### 5. Support for additional browsers — Minor
 **Why:** [RETOMAR]. **How:** [RETOMAR]
 
-### Custom design system — Minor
-**Why:** [RETOMAR]. **How:** [RETOMAR: palette, typography, icons, list of the 10+
-components.]
+### 6. Standard user management — Major
+**Why:** players need an identity, a profile and friends. **How:** sign up and log in
+with email and password (Sanctum session cookie, rate limited, validated on both
+sides). Editable profile: username, name, email, bio and password; changing email or
+password asks for the current one. Avatar from a gallery or uploaded (cropped and
+resized to 256×256 on the server), with a default avatar otherwise. Public profile
+page. Friends: search users, send, accept, decline and remove requests, with live
+online status through a Reverb presence channel.
+
+### 7. Remote authentication — Minor
+**Why:** faster sign-up for players, with no new password to remember. **How:** Google
+OAuth 2.0 (authorization code flow) with Laravel Socialite, which checks the `state`
+parameter against the session. Only a verified Google email is accepted: it signs into
+the account with that email, or creates one with an auto-generated username. Only the
+provider's user id is stored, no tokens. Errors send the user back to the landing with
+a message.
+
+### 8. Real-time features — Major
+**Why:** lobby, waiting room, friends and matches must update live for every player.
+**How:** Laravel Reverb as WebSocket server, behind the same nginx as the app, and
+Laravel Echo on the client. Private channels are authorized by Laravel with the session
+cookie: `lobby`, `room.{code}`, `game.{id}` and one per user for friend requests; a
+presence channel `online` shows who is connected. Events are broadcast immediately
+(`ShouldBroadcastNow`), with no queue in between. The server runs each match
+(`game:tick`) and broadcasts its state on every tick; a client that drops and
+reconnects is back in sync with the next tick, and the lobby and waiting room fetch
+their data again on reconnect. The connection is closed and reopened
+when the page goes into or comes back from the browser's back/forward cache.
+
+### 9. Health check and status page — Minor
+**Why:** to see at a glance that the whole stack is alive, and to be able to rebuild
+the database after a disaster. **How:** `GET /api/health` checks the database, Redis,
+the game loop, the queue and the last backup, and answers 503 if any fails; the
+`/health` status page shows it every 5 seconds, plus the WebSocket connection. The
+`backup` service dumps the database every 6 hours into `./backups` (outside Docker),
+and `make restore FILE=…` loads a dump into a fresh stack.
+
+### 10. Complete web-based game — Major
+**Why:** the core of the project. **How:** a worm game for 1 to 4 players, played
+live. The server runs every match tick by tick (`backend/app/Game`) and the browser
+only draws it and sends moves. Goal, collisions, bombs and win, loss and draw
+conditions are in [Game Rules](#game-rules).
+
+### 11. Advanced 3D graphics — Major
+**Why:** a 3D board makes the arena readable and alive, and lets the camera follow
+your worm. **How:** Babylon.js, loaded only on the game page. glTF models for worms,
+food, bombs, walls and explosions, with instancing for repeated meshes; sky and sun
+lights, emissive materials and a post-processing pipeline (bloom, FXAA). Worms glide
+smoothly between ticks by interpolating their positions every frame. Three cameras:
+whole board, follow and behind the head.
+
+### 12. Game customization — Minor
+**Why:** one game that becomes many. **How:** the host starts from a preset (Classic,
+Arena, Maze or Hardcore; Classic by default) and can tune players, board size, speed,
+food, starting length, pillars, random walls, bombs, what a wall or body hit does, bot
+mistakes and the camera. Bombs act as a power-up and an attack. The form only offers
+valid values, and the backend checks them again (`StoreRoomRequest`).
+
+### 13. AI opponent — Major
+**Why:** lets a player fill a room or play without other humans. **How:** a bot is
+just another source of moves, run by the server on every tick (`backend/app/Game/Bot.php`).
+It looks one cell ahead, drops the moves that hit a wall, a worm or a bomb about to go
+off, and heads for the nearest food or bomb, so it plays with the same settings as
+everyone. It does not plan further, so it can trap itself like a person, and on a share
+of ticks set by the host (bot mistakes, 20–80 %) it does not look at all.
+
+### 14. Remote players — Major
+**Why:** players must be able to play from different computers. **How:** the server
+runs the match and broadcasts each tick; clients only send their moves and draw the
+worms gliding between ticks, so latency doesn't make them jump. The countdown is synced
+to the server clock. A page that stops pinging leaves its worm still and grey after
+2.5 s; reloading the page or pressing "Enter" on the room in the lobby brings the player
+back within 10 s, otherwise the worm is out.
+
+### 15. Multiplayer (3+ players) — Major
+**Why:** the game is designed for up to four players. **How:** up to four seats per
+room, humans and bots mixed. Every worm starts in its own corner, at the same distance
+from the walls, and all of them move at the same time on each tick: head-on crashes
+are worked out first, and every collision is checked against the board as it was
+before anyone moved, so the seat order never matters. All clients draw the same
+server state.
+
+### 16. Spectator mode — Minor
+**Why:** friends can watch a match in progress without taking a seat. **How:** the
+lobby lists rooms that are playing with a "Spectate" button. A spectator opens the same
+game page with no seat: the server sends the same ticks over the game channel, the
+camera shows the whole board, there are no controls or pings, and the server refuses
+moves from anyone without a seat. At the end it shows who won and goes back to the
+lobby.
 
 
 ## Individual Contributions
 
 <!-- [RETOMAR] Challenges de cada uno. -->
 
-### ivromer — Technical Lead, Developer
+### ivromero — Technical Lead, Developer
 
 - **Architecture and infrastructure:** Docker stack, nginx with HTTPS, base structure of
   the backend and the frontend.
-- **Authentication:** login and email verification.
+- **Authentication:** sign-up and login API with Sanctum sessions and rate limiting.
 - **Game engine:** game models, the server game loop (`game:tick`), multiplayer
   synchronization and the bomb mechanics.
 - **3D game:** rendering of the board with Babylon.js.
