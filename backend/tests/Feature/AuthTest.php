@@ -295,22 +295,21 @@ class AuthTest extends TestCase
 
     public function test_registration_is_rate_limited(): void
     {
-        // /register shares the `login` limiter (throttle:login in
-        // routes/api.php), which keys on email+IP — a fresh email per attempt
-        // still shares the IP, but the limiter is keyed by email too, so use
-        // the same email to hit the same bucket deterministically.
-        for ($i = 0; $i < 6; $i++) {
+        // /register uses its own `register` limiter (throttle:register in
+        // routes/api.php), keyed on IP only — a fresh email per attempt still
+        // lands in the same bucket, so 10 sign-ups exhaust the per-minute budget.
+        for ($i = 0; $i < 10; $i++) {
             $this->postJson('/api/register', [
-                'name' => 'Gusano',
-                'email' => 'gusano@example.com',
+                'username' => "gusano{$i}",
+                'email' => "gusano{$i}@example.com",
                 'password' => 'secret-worm',
                 'password_confirmation' => 'secret-worm',
-            ]);
+            ])->assertCreated();
         }
 
         $this->postJson('/api/register', [
-            'name' => 'Gusano',
-            'email' => 'gusano@example.com',
+            'username' => 'gusano10',
+            'email' => 'gusano10@example.com',
             'password' => 'secret-worm',
             'password_confirmation' => 'secret-worm',
         ])->assertFails(429);
