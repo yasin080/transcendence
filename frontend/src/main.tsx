@@ -15,6 +15,7 @@ import Privacy from './pages/Privacy.tsx'
 import Profile from './pages/Profile.tsx'
 import Terms from './pages/Terms.tsx'
 import NotFound from './pages/NotFound.tsx'
+import ErrorBoundary from './components/ErrorBoundary.tsx'
 
 const Game = lazy(() => import('./pages/Game.tsx'))
 
@@ -23,6 +24,7 @@ if (!root) throw new Error('Root element not found')
 
 createRoot(root).render(
   <StrictMode>
+    <ErrorBoundary>
     <BrowserRouter>
       <AuthProvider>
         <Routes>
@@ -57,5 +59,6 @@ createRoot(root).render(
         </Routes>
       </AuthProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>
 )
