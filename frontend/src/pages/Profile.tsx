@@ -27,6 +27,7 @@ export default function Profile() {
   const [data, setData] = useState<ProfileData | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
   const onlineIds = useOnlineIds()
 
   // Sin id en la URL → mi perfil
@@ -48,10 +49,16 @@ export default function Profile() {
   // Recarga cuando cambia cualquier amistad (por ejemplo, desde el panel)
   useEffect(() => onFriendsChanged(() => void load()), [load])
 
-  // Lanza la acción; el aviso de amistades recarga el perfil
+  // Runs a friend action; busy blocks repeated clicks while the request is in flight
   async function act(action: (userId: string) => Promise<FriendState | null>) {
-    if (!data) return
-    await action(data.profile.id)
+    if (!data || busy) return
+    setBusy(true)
+    try {
+      const state = await action(data.profile.id)
+      if (state) setData((prev) => (prev ? { ...prev, friendState: state } : prev))
+    } finally {
+      setBusy(false)
+    }
   }
 
   if (!user) return null
@@ -85,6 +92,7 @@ export default function Profile() {
           ) : (
             <FriendButton
               state={friendState}
+              busy={busy}
               onAdd={() => void act(sendRequest)}
               onAccept={() => void act(acceptRequest)}
               onDecline={() => void act(removeFriendship)}
