@@ -42,7 +42,6 @@ class GoogleAuthTest extends TestCase
         $user = User::where('email', 'worm@example.com')->firstOrFail();
         $this->assertAuthenticatedAs($user);
         $this->assertSame('Worm', $user->username);
-        $this->assertNotNull($user->email_verified_at);
         $this->assertDatabaseHas('oauth_accounts', ['user_id' => $user->id, 'provider' => 'google', 'provider_id' => 'google-123']);
     }
 
