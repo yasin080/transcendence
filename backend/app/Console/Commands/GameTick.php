@@ -52,6 +52,9 @@ class GameTick extends Command
         Presence::apply($state, LiveGames::lastSeen($id), (int) $now);
         Bot::play($state);
         foreach (LiveGames::takeInputs($id) as $seat => $input) {
+            if (! isset($state['players'][$seat])) {
+                continue;
+            }
             isset($input['side'])
                 ? GameLogic::steer($state, $seat, $input['side'])
                 : GameLogic::turn($state, $seat, $input['dir']);
