@@ -43,7 +43,6 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
         {action && <div className="flex-none">{action}</div>}
       </div>
 
-      {/* Bio y metadatos */}
       <div className="flex flex-col gap-3.5 px-5 pt-4 pb-6 sm:px-7">
         {bio ? (
           <p className="max-w-prose text-body-muted">{bio}</p>

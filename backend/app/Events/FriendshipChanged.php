@@ -7,8 +7,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 
-// Avisa a un usuario de que una amistad suya ha cambiado
-// (solicitud recibida, aceptada, rechazada o eliminada).
+// Tells a user that one of their friendships has changed
 class FriendshipChanged implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets;
@@ -25,7 +24,7 @@ class FriendshipChanged implements ShouldBroadcastNow
         return 'friends.changed';
     }
 
-    // Solo avisa: el front recarga el panel por HTTP
+    // Signal only: the frontend reloads the panel over HTTP
     public function broadcastWith(): array
     {
         return [];

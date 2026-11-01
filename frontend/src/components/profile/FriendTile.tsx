@@ -6,7 +6,7 @@ interface FriendTileProps {
   friend: FriendSummary
 }
 
-// Celda de la cuadrícula "Friends of": avatar + nombre, enlaza a su perfil
+// Cell of the "Friends of" grid: avatar + name, links to their profile
 export default function FriendTile({ friend }: FriendTileProps) {
   return (
     <Link

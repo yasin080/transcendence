@@ -3,7 +3,7 @@ import { toSummary, type ApiUser } from '../friends/api.ts'
 import type { FriendState, FriendSummary } from '../friends/types.ts'
 import type { ProfileUser } from './types.ts'
 
-// Cómo envía Laravel un perfil
+// A profile as Laravel sends it
 interface ApiProfile extends ApiUser {
   name: string | null
   bio: string | null
@@ -14,7 +14,7 @@ interface ApiProfile extends ApiUser {
   friends: ApiUser[]
 }
 
-// Lo que necesita la página de perfil
+// What the profile page needs
 export interface ProfileData {
   profile: ProfileUser
   isOwn: boolean
@@ -43,13 +43,13 @@ export async function fetchProfile(userId: string): Promise<ProfileData | null> 
   }
 }
 
-// Lo que acepta PATCH /api/user
+// What PATCH /api/user accepts
 export interface ProfileUpdate {
   username: string
   name: string
   email: string
   bio: string
-  avatar?: string | null // solo al elegir de la galería o volver al de por defecto
+  avatar?: string | null
   password?: string
   password_confirmation?: string
   current_password?: string

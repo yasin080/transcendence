@@ -3,7 +3,7 @@ export type User = {
   username: string
   name: string | null
   email: string
-  avatar: string | null // ruta de la galería o data URL en base64; null = por defecto
+  avatar: string | null // gallery path or base64 data URL; null = default
   bio: string | null
   created_at: string
 }

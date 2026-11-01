@@ -2,14 +2,14 @@ import { useSyncExternalStore } from 'react'
 import { echo } from '../../lib/echo'
 import type { FriendSummary } from './types.ts'
 
-// Each member's data: what channels.php returns
+// Each member's info, as returned by channels.php
 type Member = { id: number }
 
 let onlineIds = new Set<string>()
 const listeners = new Set<() => void>()
 let joined = false
 
-// Replace the set and notify subscribed components
+// Replace the set (a new reference, so React sees the change) and notify subscribers
 function publish(next: Set<string>) {
   onlineIds = next
   listeners.forEach((listener) => listener())
@@ -45,12 +45,13 @@ function subscribe(listener: () => void) {
   }
 }
 
-// Ids of online users; the component re-renders when they change
+// Ids of connected users; the component re-renders when they change
 export function useOnlineIds() {
   return useSyncExternalStore(subscribe, () => onlineIds)
 }
 
-// Replace the API status with the presence one, keeping extra fields (e.g. friendState)
+// Set each user's online/offline status.
+// Generic so each list keeps its extra fields (e.g. friendState).
 export function withPresence<T extends FriendSummary>(list: T[], onlineIds: Set<string>): T[] {
   return list.map((user) => ({
     ...user,

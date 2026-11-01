@@ -2,8 +2,8 @@ const defaultAvatar = '/avatar/blue-worm.png'
 
 export type AvatarStatus = 'online' | 'offline' | 'none'
 
-// Token del fondo sobre el que va el avatar: el anillo y el borde
-// del punto se pintan de ese color para "recortar" contra él.
+// Token of the background behind the avatar: the ring and the dot's border
+// are painted in that colour so they look "cut out" against it.
 export type AvatarRing = 'void' | 'surface'
 
 interface AvatarProps {
@@ -23,7 +23,7 @@ export default function Avatar({
 }: AvatarProps) {
   const ringColor = `var(--color-${ring})`
 
-  // Literales: geometría proporcional a size (valores del handoff).
+  // Literals: geometry proportional to size (values from the design handoff).
   const radius = Math.round(size * 0.3)
   const dot = Math.min(22, Math.max(8, Math.round(size * 0.24)))
   const dotOffset = -dot * 0.18

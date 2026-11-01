@@ -1,5 +1,6 @@
-// Avatares predefinidos (ficheros en public/avatar/).
-// url null = avatar por defecto (blue-worm), igual que ProfileUser.avatarUrl.
+// Preset avatars (files in public/avatar/).
+// url null = default avatar (blue-worm).
+
 export interface GalleryAvatar {
   label: string
   url: string | null

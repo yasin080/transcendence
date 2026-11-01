@@ -2,7 +2,7 @@ import { apiDelete, apiGet, apiPost } from '../../lib/api'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
 import { notifyFriendsChanged } from './events.ts'
 
-// How send Laravel the user: id number, snake_case
+// A user as Laravel sends it: numeric id and snake_case
 export interface ApiUser {
   id: number
   username: string
@@ -23,7 +23,8 @@ interface ApiStateResponse {
   friend_state: FriendState
 }
 
-// Traduce the user from backend user to frontend type
+// Maps a backend user to the frontend type.
+// The real online/offline status is set by withPresence() from the presence channel.
 export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),
@@ -66,7 +67,7 @@ export async function acceptRequest(userId: string): Promise<FriendState | null>
   return result.data.friend_state
 }
 
-// Rechazar, cancel or delete: in backend are the same act
+// Decline, cancel or remove: the same action in the backend
 export async function removeFriendship(userId: string): Promise<FriendState | null> {
   const result = await apiDelete<ApiStateResponse>(`/api/friends/${userId}`)
   if (!result.ok) return null

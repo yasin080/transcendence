@@ -112,7 +112,7 @@ class ProfileTest extends TestCase
         $this->assertStringStartsWith('data:image/png;base64,', $avatar);
         $this->assertSame($avatar, $user->fresh()->avatar);
 
-        // Recortada al cuadrado central y reducida a 256×256
+        // Cropped to the centre square and scaled to 256×256
         $bytes = base64_decode(substr($avatar, strlen('data:image/png;base64,')));
         [$width, $height] = getimagesizefromstring($bytes);
         $this->assertSame([256, 256], [$width, $height]);

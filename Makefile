@@ -1,6 +1,6 @@
 COMPOSE := docker compose
 
-# Port HTTPS published (from .env; 1443 si no está)
+# Port HTTPS published (from .env; 1443 if not set)
 HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2),1443)
 
 .DEFAULT_GOAL := all

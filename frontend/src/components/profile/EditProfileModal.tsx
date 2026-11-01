@@ -7,7 +7,7 @@ import FormField from '../ui/FormField.tsx'
 import { updateProfile, uploadAvatar, type ProfileUpdate } from './api.ts'
 import type { ProfileUser } from './types.ts'
 
-// Mismos tipos que acepta el backend (POST /api/user/avatar)
+// Same types the backend accepts (POST /api/user/avatar)
 const AVATAR_TYPES = ['image/png', 'image/jpeg']
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024 // 2 MB
 const AVATAR_ERROR = 'That file is not a valid image. Use PNG or JPG up to 2 MB.'
@@ -26,7 +26,7 @@ interface FormValues {
   current_password: string
 }
 
-// Mismo formato que Laravel: por campo, una lista de mensajes
+// Same shape as Laravel: a list of messages per field
 type FormErrors = Partial<Record<keyof FormValues, string[]>>
 
 function validate(values: FormValues): FormErrors {
@@ -74,14 +74,14 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
     current_password: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
-  // Avatar elegido de la galería (null = por defecto)
+  // Avatar picked from the gallery (null = default)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatarUrl)
-  // Fichero subido por el usuario y su URL temporal para previsualizarlo
+  // File chosen by the user and its temporary URL for the preview
   const [upload, setUpload] = useState<{ file: File; preview: string } | null>(null)
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const [saving, setSaving] = useState(false)
-  // Error sin campo concreto (p. ej. no se pudo conectar al servidor)
+  // Error not tied to a field (e.g. the server could not be reached)
   const [formError, setFormError] = useState<string | null>(null)
 
   function set(field: keyof FormValues, value: string) {
@@ -89,7 +89,7 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
-  // Libera la URL temporal cuando cambia el fichero o se cierra el modal
+  // Release the temporary URL when the file changes or the modal closes
   useEffect(() => {
     if (!upload) return
     return () => URL.revokeObjectURL(upload.preview)
@@ -103,7 +103,7 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
 
   function onFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
-    event.target.value = '' // permite volver a elegir el mismo fichero
+    event.target.value = '' // lets the user pick the same file again
     if (!file) return
 
     if (!AVATAR_TYPES.includes(file.type) || file.size > AVATAR_MAX_BYTES) {
@@ -115,7 +115,6 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
     setUpload({ file, preview: URL.createObjectURL(file) })
   }
 
-  // Lo que se ve en la previsualización: el fichero subido manda sobre la galería
   const preview = upload?.preview ?? avatarUrl
 
   async function onSubmit(event: SubmitEvent) {
@@ -128,7 +127,7 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
 
     setSaving(true)
 
-    // 1. La foto subida va por su propio endpoint, que ya la guarda
+    // 1. The uploaded photo goes through its own endpoint, which saves it
     if (upload) {
       const result = await uploadAvatar(upload.file)
       if (!result.ok) {
@@ -136,19 +135,19 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
         setSaving(false)
         return
       }
-      // Ya está en el servidor: si el PATCH falla, al reintentar no se vuelve a subir
+      // Already on the server: if the PATCH fails, a retry won't upload it again
       setUpload(null)
       setAvatarUrl(result.data.avatar)
     }
 
-    // 2. El resto de datos
+    // 2. The rest of the data
     const update: ProfileUpdate = {
       username: values.username.trim(),
       name: values.name.trim(),
       email: values.email.trim(),
       bio: values.bio.trim(),
     }
-    // El avatar solo viaja si se ha elegido otro de la galería (o el de por defecto)
+    // Only send the avatar if another gallery one (or the default) was picked
     if (!upload && avatarUrl !== profile.avatarUrl) update.avatar = avatarUrl
     if (values.password !== '') {
       update.password = values.password

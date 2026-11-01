@@ -9,15 +9,12 @@ use App\Models\User;
 
 class UpdateProfileRequest extends FormRequest
 {
-    /**
-     * @return array<string, array<int, mixed>>
-     */
     public function rules(): array
     {
         $user = $this->user();
 
-        // Cambiar email o contraseña exige la contraseña actual,
-        // salvo a quien entró con Google y nunca tuvo contraseña
+        // Changing email or password requires the current password,
+        // except for Google users who never had one
         $changesCredentials = $this->filled('password') || $this->input('email') !== $user->email;
 
         return [
@@ -25,8 +22,8 @@ class UpdateProfileRequest extends FormRequest
             'name' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'bio' => ['nullable', 'string', 'max:160'],
-            // Solo galería o por defecto (null); la imagen subida va por POST /api/user/avatar.
-            // Si no viene, el avatar no se toca.
+            // Gallery or default (null) only; uploads go through POST /api/user/avatar.
+            // If missing, the avatar is left unchanged.
             'avatar' => ['sometimes', 'nullable', Rule::in(User::AVATAR_PRESETS)],
             'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
             'current_password' => [Rule::requiredIf($changesCredentials && $user->password !== null), 'nullable', 'current_password'],
