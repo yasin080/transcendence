@@ -33,6 +33,32 @@ class GoogleAuthTest extends TestCase
         $this->assertDatabaseHas('oauth_accounts', ['user_id' => $user->id, 'provider_id' => 'google-123']);
     }
 
+    public function test_a_new_google_user_gets_an_account_with_a_generated_username(): void
+    {
+        $this->googleReturns('worm@example.com', verified: true);
+
+        $this->get('/auth/google/callback')->assertRedirect('/lobby');
+
+        $user = User::where('email', 'worm@example.com')->firstOrFail();
+        $this->assertAuthenticatedAs($user);
+        $this->assertSame('Worm', $user->username);
+        $this->assertDatabaseHas('oauth_accounts', ['user_id' => $user->id, 'provider' => 'google', 'provider_id' => 'google-123']);
+    }
+
+    public function test_a_returning_google_user_logs_into_the_linked_account(): void
+    {
+        // Email distinto en Google: se le encuentra por el vínculo, no por email
+        $user = User::factory()->create(['email' => 'old@example.com']);
+        $user->oauthAccounts()->create(['provider' => 'google', 'provider_id' => 'google-123']);
+        $this->googleReturns('new@example.com', verified: true);
+
+        $this->get('/auth/google/callback')->assertRedirect('/lobby');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('oauth_accounts', 1);
+    }
+
     public function test_an_unverified_google_email_is_rejected(): void
     {
         $user = User::factory()->create(['email' => 'worm@example.com']);
