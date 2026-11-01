@@ -7,7 +7,6 @@ import type { ProfileUser } from './types.ts'
 const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' })
 const DEFAULT_BIO = 'No bio yet. This worm is too busy dodging bombs.'
 
-
 interface ProfileHeaderProps {
   user: ProfileUser
   isOwn: boolean
@@ -31,7 +30,7 @@ export default function ProfileHeader({ user, isOwn, status, action }: ProfileHe
       </div>
 
       <div className="relative -mt-15.5 flex flex-col items-start gap-4 px-5 sm:flex-row sm:items-end sm:gap-5.5 sm:px-7">
-        <Avatar size={124} src={user.avatarUrl} status={status ?? 'none'} ring="surface" ringWidth={5} />
+        <Avatar size={124} src={user.avatarUrl} status={status} ring="surface" ringWidth={5} />
 
         <div className="w-full min-w-0 sm:w-auto sm:flex-1">
           <div className="flex min-w-0 flex-wrap items-center gap-3">

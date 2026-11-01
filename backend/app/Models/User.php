@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,17 +45,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(OauthAccount::class);
     }
-
-    public function sentFriendships(): HasMany
-    {
-        return $this->hasMany(Friendship::class, 'requester_id');
-    }
-
-    public function receivedFriendships(): HasMany
-    {
-        return $this->hasMany(Friendship::class, 'addressee_id');
-    }
-
 
     public function summary(): array
     {
