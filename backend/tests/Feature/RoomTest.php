@@ -340,6 +340,10 @@ class RoomTest extends TestCase
 
         $this->assertSame([0 => ['side' => 'right']], LiveGames::takeInputs($gameId));
         $this->assertSame([], LiveGames::takeInputs($gameId));
+
+        // Una dirección llega como enteros aunque el cliente mande cadenas: el bucle compara con ===
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => '0', 'y' => '-1']])->assertNoContent();
+        $this->assertSame([0 => ['dir' => ['x' => 0, 'y' => -1]]], LiveGames::takeInputs($gameId));
     }
 
     public function test_a_turn_is_validated_and_needs_a_player(): void
@@ -349,6 +353,11 @@ class RoomTest extends TestCase
 
         $this->postJson("/api/games/{$gameId}/turn", ['side' => 'up'])->assertFails(422);
         $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 5, 'y' => 0]])->assertFails(422);
+        // Solo las cuatro direcciones: ni diagonal ni quieto
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 1, 'y' => 1]])->assertFails(422);
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 0, 'y' => 0]])->assertFails(422);
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 'up', 'y' => 0]])->assertFails(422);
+        $this->postJson("/api/games/{$gameId}/turn", ['dir' => 'up'])->assertFails(422);
 
         $this->actingAs(User::factory()->create());
         $this->postJson("/api/games/{$gameId}/turn", ['side' => 'left'])->assertFails(403);
