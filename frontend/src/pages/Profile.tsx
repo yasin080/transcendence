@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import { acceptRequest, removeFriendship, sendRequest } from '../components/friends/api'
 import FriendButton from '../components/friends/FriendButton'
@@ -9,7 +9,7 @@ import EditProfileModal from '../components/profile/EditProfileModal'
 import FriendTile from '../components/profile/FriendTile'
 import { PencilIcon } from '../components/ui/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
-import QuickMatchBanner from '../components/profile/QuickMatchBanner'
+import ProfileBanner from '../components/profile/ProfileBanner'
 import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import SectionHeader from '../components/ui/SectionHeader'
@@ -22,7 +22,6 @@ import { useOnlineIds, withPresence } from '../components/friends/presence'
 export default function Profile() {
   const { user, refreshUser } = useAuth()
   const { userId } = useParams()
-  const navigate = useNavigate()
 
   const [data, setData] = useState<ProfileData | null>(null)
   const [notFound, setNotFound] = useState(false)
@@ -102,9 +101,7 @@ export default function Profile() {
         }
       />
 
-      {/* Solo en el perfil propio: invitación a jugar */}
-      {/* Provisional: lleva al Lobby hasta que exista la partida rápida */}
-      {isOwn && <QuickMatchBanner onPlay={() => void navigate('/lobby')} />}
+      {isOwn && <ProfileBanner />}
 
       {/* Solo en el perfil ajeno: sus amigos */}
       {!isOwn && (
