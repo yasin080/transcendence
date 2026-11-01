@@ -229,7 +229,7 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             label="Username"
             name="username"
@@ -276,7 +276,7 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
             <span className="text-meta text-fg-muted">Optional · leave blank to keep the current one</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               label="New password"
               name="password"
