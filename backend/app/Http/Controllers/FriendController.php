@@ -70,7 +70,7 @@ class FriendController extends Controller
         foreach ($friendships as $friendship) {
             $iSent = $friendship->requester_id == $me->id;
             $otherId = $iSent ? $friendship->addressee_id : $friendship->requester_id;
-           $stateOf[$otherId] = Friendship::stateFor($friendship, $me);
+            $stateOf[$otherId] = Friendship::stateFor($friendship, $me);
         }
 
         return response()->json($users->map(fn (User $user) => [

@@ -1,4 +1,3 @@
-
 export default function ProfileBanner() {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-line bg-surface">

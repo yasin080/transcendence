@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 
 type SidebarProps = {
-  
   header?: ReactNode    // Fixed upper zone
   footer?: ReactNode    // Fixed lower zone
   children?: ReactNode  // Central zone; scroll
@@ -9,8 +8,8 @@ type SidebarProps = {
 
 /**
 * Generic sidebar shell: structure only, no content of its own.
- * Width, background and border are set by the container
- */
+* Width, background and border are set by the container
+*/
 export default function Sidebar({ header, footer, children }: SidebarProps) {
   return (
     <div className="flex h-full flex-col">
