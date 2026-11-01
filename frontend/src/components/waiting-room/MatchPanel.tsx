@@ -21,7 +21,7 @@ export default function MatchPanel({ isOwner, settings, canStart, onStart, onLea
         />
       </div>
 
-      {/* En xl este envoltorio desaparece (contents) y sus hijos se colocan en la rejilla */}
+      {/* At xl this wrapper disappears (contents) and its children join the parent grid */}
       <div className="relative flex flex-wrap items-end gap-x-8 gap-y-5 px-5 pb-6 sm:px-7 md:absolute md:inset-x-0 md:bottom-0 xl:contents">
         <div className="min-w-0 flex-1 xl:col-start-2 xl:row-start-1 xl:border-l xl:border-line xl:px-4 xl:py-5">
           <div className="text-eyebrow">Match settings</div>

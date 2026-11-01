@@ -1,10 +1,10 @@
 @theme {
 
-  /* Paleta base
-    void    = fondo de la página
-    surface = paneles y modales sobre void
-    fuse    = acción principal y peligro (600 reposo, 650 hover)
-    ember   = acentos cálidos (300 espera; 450 eyebrows, gold) */
+ /* Base palette
+    void    = page background
+    surface = panels and modals on top of void
+    fuse    = main action and danger (600 rest, 650 hover)
+    ember   = warm accents (300 waiting; 450 eyebrows, gold) */
   --color-void: #07061a;
   --color-surface: #120e2c;
   --color-fuse-600: #ff2e5b;
@@ -12,60 +12,60 @@
   --color-ember-300: #ffd76a;
   --color-ember-450: #ffb45e;
 
-  /* Colores con significado propio:
-    gold   = propietario de sala, insignias, recompensas
-    online = indicadores de conexión
-    mint   = todo lo relacionado con bots (bordes: /25 contenedor,
-              /35 interactivo, /65 hover; fondos: /5, /10, /20) */
+  /* Colours with their own meaning:
+    gold   = room owner, badges, rewards
+    online = connection indicators
+    mint   = anything bot-related (borders: /25 container,
+              /35 interactive, /65 hover; fills: /5, /10, /20) */
   --color-gold: var(--color-ember-450);
   --color-online: #45e07a;
   --color-offline: #6c6982;
   --color-mint: #63e58f;
   
-  /* Grises de texto: blanco con transparencia, de más a menos visible */
+  /* Text greys: white with transparency, from most to least visible */
   --color-fg-secondary: rgb(255 255 255 / 60%);
   --color-fg-muted: rgb(255 255 255 / 45%);
   --color-fg-faint: rgb(255 255 255 / 32%);
   
-  /* Bordes: blanco con transparencia */
+  /* Borders: white with transparency */
   --color-line: rgb(255 255 255 / 10%);
   --color-line-strong: rgb(255 255 255 / 15%);
   
-  /* Rellenos: blanco con transparencia, para capas sobre surface/void.
-     Cristal oscuro sobre imágenes o paneles: usar bg-void/50. */
+ /* Fills: white with transparency, for layers on top of surface/void.
+     For dark glass over images or panels, use bg-void/50. */
   --color-fill-subtle: rgb(255 255 255 / 1.2%);
   --color-fill: rgb(255 255 255 / 3.5%);
   --color-fill-strong: rgb(255 255 255 / 5%);
 
-  /* Paleta ampliada: tonos extra de las familias de arriba */
-  --color-surface-1: rgba(10, 9, 30, 0.72);   /* Rails laterales / paneles */
-  --color-surface-input: rgba(8, 7, 24, 0.6); /* Inputs de texto */
-  --color-fuse-100: #ffd7e0;  /* Tinte muy suave para fondos o tags */
-  --color-fuse-300: #ff89a5;  /* Bordes suaves o estados inactivos */
-  --color-fuse-400: #ff5f7a;  /* Acentos claros */
-  --color-fuse-500: #ff4a6f;  /* Hover del botón principal */
-  --color-fuse-700: #e01446;  /* Click / estado activo / contraste oscuro */
-  --color-fuse-900: #9c0a2e;  /* Fondos oscuros o bordes con contraste */
-  --color-ember-600: #ff9b2f; /* Naranja energético / avisos importantes */
-  --color-signal-500: var(--color-online); /* Éxito / conectado / confirmación */
+  /* Extended palette: extra shades of the families above */
+  --color-surface-1: rgba(10, 9, 30, 0.72);   /* Side rails / panels */
+  --color-surface-input: rgba(8, 7, 24, 0.6); /* Text inputs */
+  --color-fuse-100: #ffd7e0;  /* Very soft tint for backgrounds or tags */
+  --color-fuse-300: #ff89a5;  /* Soft borders or inactive states */
+  --color-fuse-400: #ff5f7a;  /* Light accents */
+  --color-fuse-500: #ff4a6f;  /* Main button hover */
+  --color-fuse-700: #e01446;  /* Click / active state / dark contrast */
+  --color-fuse-900: #9c0a2e;  /* Dark backgrounds or high-contrast borders */
+  --color-ember-600: #ff9b2f; /* Energetic orange / important notices */
+  --color-signal-500: var(--color-online); /* Success / connected / confirmation */
 
-  /* Radios (escala de Tailwind, sin tokens propios):
-     lg = controles pequeños · xl = chips y cajas internas
-     2xl = tarjetas, botones grandes, avatares, modales
-     3xl = paneles grandes · full = píldoras y círculos */
+  /* Radius (Tailwind's scale, no custom tokens):
+     lg = small controls · xl = chips and inner boxes
+     2xl = cards, large buttons, avatars, modals
+     3xl = large panels · full = pills and circles */
 
   --font-display: 'Bungee', system-ui, sans-serif;
   --font-body: 'Space Grotesk', system-ui, sans-serif;
-  /* Sobrescribe la fuente base de Tailwind: el preflight aplica --font-sans
-  al <html>, así todo el texto hereda la fuente de cuerpo sin clases. */
+  /* Overrides Tailwind's base font: preflight applies --font-sans
+  to <html>, so all text inherits the body font without classes. */
   --font-sans: var(--font-body);
     
-  /* Escalón extra bajo la escala de Tailwind, para etiquetas en mayúsculas */
+  /* Extra step below Tailwind's scale, for uppercase labels */
   --text-2xs: 0.6875rem; /* 11px */
   --text-2xs--line-height: calc(1 / 0.6875); /* 16px */
 
-  /* Tracking para texto pequeño en mayúsculas (etiquetas, eyebrows).
-  Tailwind no trae nada por encima de widest (0.1em). */
+  /* Tracking for small uppercase text (labels, eyebrows).
+  Tailwind has nothing above widest (0.1em). */
   --tracking-caps: 0.15em;
 
 
@@ -97,8 +97,8 @@
   }
 }
 
-/* Pulso de brillo para botones destacados. Solo si está activo y el usuario
-no pide reducir movimiento. */
+/* Glow pulse for highlighted buttons. Only when active and the user
+has not asked for reduced motion. */
 @utility glow-pulse {
   @media (prefers-reduced-motion: no-preference) {
     &:enabled {
@@ -108,14 +108,14 @@ no pide reducir movimiento. */
 }
 
 /*
- * Roles tipográficos del proyecto.
+ * The project's typography roles.
  *
- * Prefijos: display-* para Bungee, text-* para la fuente de cuerpo.
- * Valores: tamaño, tracking, peso e interlineado salen de tokens (@theme
- *   o los de serie de Tailwind); un literal solo si no hay token y se comenta.
- * Color: un rol lo fija solo si es el mismo en todos sus usos. Si depende
- *   del contexto, lo pone el componente. No sobrescribir el color de un rol
- *   que ya lo trae.
+ * Prefixes: display-* for Bungee, text-* for the body font.
+ * Values: size, tracking, weight and line height come from tokens (@theme
+ *   or Tailwind's defaults); a literal only if there is no token, with a comment.
+ * Colour: a role sets it only if it is the same everywhere it is used. If it
+ *   depends on context, the component sets it. Don't override the colour of a
+ *   role that already has one.
  */
 
 @utility display-heading {
@@ -126,7 +126,7 @@ no pide reducir movimiento. */
   letter-spacing: var(--tracking-normal);
 }
 
-/* Título principal de una página (p. ej. el nombre en la cabecera del perfil) */
+/* Main page title (e.g. the name in the profile header) */
 @utility display-title {
   font-family: var(--font-display);
   text-transform: uppercase;
@@ -135,8 +135,8 @@ no pide reducir movimiento. */
   letter-spacing: var(--tracking-normal);
 }
 
-/* Sin font-size a propósito: el tamaño lo pone cada uso (ej. text-[220px]
-   en la cuenta atrás), porque depende del espacio disponible. */
+/* No font-size on purpose: each use sets its own (e.g. text-[220px]
+   in the countdown), because it depends on the available space. */
 @utility display-hero {
   font-family: var(--font-display);
   line-height: 0.86;
@@ -173,7 +173,7 @@ no pide reducir movimiento. */
   letter-spacing: var(--tracking-caps);
 }
 
-/* Texto pequeño de metadatos: estados, valores de chips. Sin mayúsculas. */
+/* Small metadata text: statuses, chip values. Not uppercase. */
 @utility text-meta {
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);
