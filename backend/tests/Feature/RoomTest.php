@@ -23,8 +23,8 @@ class RoomTest extends TestCase
     }
 
     private const SNAKE = [
-        'width' => 30,
-        'height' => 30,
+        'width' => 31,
+        'height' => 31,
         'pillars' => false,
         'softWalls' => 0,
         'wrap' => false,
@@ -95,13 +95,23 @@ class RoomTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        // 30 de ancho: hasta 9 casillas de largo
+        // 31 de ancho: hasta 9 casillas de largo
         $this->postJson('/api/rooms', ['name' => 'Long', 'settings' => ['startLength' => 10] + self::SNAKE])
             ->assertFails(422)
             ->assertJsonValidationErrors(['settings.startLength']);
 
         $this->postJson('/api/rooms', ['name' => 'Long', 'settings' => ['startLength' => 9] + self::SNAKE])
             ->assertCreated();
+    }
+
+    // Con un lado par el asiento 2 nace con un pilar delante (pilares en x e y pares)
+    public function test_the_board_side_must_be_odd(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Even', 'settings' => ['width' => 30, 'height' => 30] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.width']);
     }
 
     public function test_pillars_and_deadly_walls_do_not_go_together(): void
@@ -307,7 +317,7 @@ class RoomTest extends TestCase
         $this->assertSame([$gameId], LiveGames::active());
         $state = LiveGames::load($gameId);
         $this->assertSame('Gusano', $state['worms'][0]['name']);
-        $this->assertSame(30, $state['board']['width']);
+        $this->assertSame(31, $state['board']['width']);
     }
 
     public function test_a_player_can_send_a_turn(): void

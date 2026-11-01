@@ -21,7 +21,8 @@ class StoreRoomRequest extends FormRequest
             ],
             'quick' => ['sometimes', 'boolean'],
             'settings' => ['required', 'array:width,height,pillars,softWalls,wrap,tickMs,players,startLength,food,bombs,wallHit,bodyHit,controls,camera,botMistakes'],
-            'settings.width' => ['required', 'integer', 'between:10,75'],
+            // Lado impar: con uno par el asiento 2 nace con un pilar delante (pilares en x e y pares)
+            'settings.width' => ['required', 'integer', 'between:11,75', fn ($attribute, $value, $fail) => $value % 2 === 1 || $fail('The board side must be odd.')],
             'settings.height' => ['required', 'integer', 'between:10,75'],
             'settings.pillars' => ['required', 'boolean'],
             // Con pilares no hay muros aleatorios
