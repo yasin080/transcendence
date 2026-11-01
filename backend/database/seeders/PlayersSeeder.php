@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-// Población de jugadores para producción: se puede ejecutar varias veces
+// Player population for production: safe to run several times
 class PlayersSeeder extends Seeder
 {
     // username => bio
@@ -32,7 +32,7 @@ class PlayersSeeder extends Seeder
         'Detonator' => 'Top of the food chain. Allegedly.',
     ];
 
-    // Amistades aceptadas entre ellos (Nebula y Sparky se quedan sin amigos)
+    // Accepted friendships between them (Nebula and Sparky have no friends)
     private const FRIENDSHIPS = [
         ['Boomer_92', 'ex0'], ['Boomer_92', 'Pixel_Rex'], ['Boomer_92', 'ash_fuse'],
         ['Boomer_92', 'Mochi'], ['Boomer_92', 'Detonator'],

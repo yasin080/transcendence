@@ -1,6 +1,6 @@
 <?php
 
-// Cuentas con credenciales conocidas que crea el seeder (valores en .env)
+// Accounts with known credentials created by the seeder (values from .env)
 return [
     'accounts' => [
         [

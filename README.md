@@ -116,7 +116,7 @@ Edit `.env` and set at least:
 | `REVERB_APP_KEY`, `REVERB_APP_SECRET` | Random strings (e.g. `openssl rand -hex 16`). |
 | `VITE_REVERB_APP_KEY` | **The same value** as `REVERB_APP_KEY`. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Your OAuth credentials. Add `GOOGLE_REDIRECT_URI` as an authorized redirect URI in the Google console. |
-| `SEED_USER*` | *Optional.* Demo accounts created on first start; an account with any empty field is skipped. |
+| `SEED_USER*` | Two demo accounts, preset in `.env.example` so the app is usable right away. **Change the passwords in any shared deployment.** Leave any field empty to skip that account. |
 
 `.env` is ignored by Git; never commit it.
 
@@ -138,6 +138,21 @@ the final URL).
 
 The certificate is self-signed and generated on first start, so Chrome will show a
 security warning: click *Advanced → Proceed to localhost*. This happens only once.
+
+### Demo data
+
+On first start the database is seeded with sample data:
+
+- **18 players** with friendships between them, so search, profiles and the friends
+  panel have content. They cannot log in.
+- **Two demo accounts**, with the credentials set in `.env` (`SEED_USER1_*`, `SEED_USER2_*`):
+  - *User 1* starts with friends and pending requests, sent and received.
+  - *User 2* has a couple of friends and no link to User 1. Log in with each account
+    in a different browser (or a private window) to send a request from one, accept it
+    from the other and see both online.
+
+Seeding runs on every start but never overwrites existing data, so changes made in
+the app are kept. `make fresh` resets the database to this initial state.
 
 ### Useful commands
 
@@ -583,7 +598,7 @@ lobby.
   status with Reverb presence channels.
 - **Waiting room:** first version of the waiting room in the frontend.
 - **Game:** player identity in rooms and matches.
-- **Data:** production seeder with players and friendships.
+- **Data:** seeders with sample players, friendships and demo accounts.
 - **Validation and fixes:** form validation in frontend and backend, Makefile fixes.
 - **Project management:** weekly meetings, planning and progress tracking.
 
@@ -600,7 +615,11 @@ lobby.
 - **Product ownership:** game rules, backlog and priorities, validation of finished
   work, and the README.
 
-**Challenges:** [RETOMAR]
+**Challenges:** I had no previous experience in web development, so most of the work
+meant learning while building. The friends system was the most complete example: it
+covered the whole stack, from the migration and model to the API, the React panel and
+real-time updates with Reverb. As Project Manager, I prepared the agenda for each
+meeting so that they stayed focused and useful.
 
 ### ybahri — Developer
 
