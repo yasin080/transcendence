@@ -76,6 +76,8 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
   const [errors, setErrors] = useState<FormErrors>({})
   // Avatar picked from the gallery (null = default)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatarUrl)
+  // Avatar the server has right now (changes after an upload)
+  const [savedAvatar, setSavedAvatar] = useState<string | null>(profile.avatarUrl)
   // File chosen by the user and its temporary URL for the preview
   const [upload, setUpload] = useState<{ file: File; preview: string } | null>(null)
   const [avatarError, setAvatarError] = useState<string | null>(null)
@@ -138,6 +140,8 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
       // Already on the server: if the PATCH fails, a retry won't upload it again
       setUpload(null)
       setAvatarUrl(result.data.avatar)
+      setSavedAvatar(result.data.avatar)
+      onSaved() // show the new photo even if the user cancels
     }
 
     // 2. The rest of the data
@@ -148,7 +152,7 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
       bio: values.bio.trim(),
     }
     // Only send the avatar if another gallery one (or the default) was picked
-    if (!upload && avatarUrl !== profile.avatarUrl) update.avatar = avatarUrl
+    if (!upload && avatarUrl !== savedAvatar) update.avatar = avatarUrl
     if (values.password !== '') {
       update.password = values.password
       update.password_confirmation = values.password_confirmation
@@ -160,6 +164,7 @@ export default function EditProfileModal({ profile, email, onSaved, onClose }: E
 
     if (!result.ok) {
       setErrors(result.failure.errors as FormErrors)
+      setAvatarError(result.failure.errors.avatar?.[0] ?? null)
       if (Object.keys(result.failure.errors).length === 0) setFormError(result.failure.message)
       return
     }

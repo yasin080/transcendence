@@ -68,7 +68,6 @@ export default function FriendsPanel() {
     [load, runSearch, searching, trimmed],
   )
 
-  // Run the action; the friendship notice reloads the panel and the search
   // Runs a friend action; the user's row stays disabled until the panel has reloaded
   async function act(action: (userId: string) => Promise<FriendState | null>, userId: string) {
     if (busyIds.has(userId)) return
