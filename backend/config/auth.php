@@ -91,7 +91,6 @@ return [
     | quickly generating a very large amount of password reset tokens.
     |
     */
-    # RETOMAR recuperación de contraseña por email
     'passwords' => [
         'users' => [
             'provider' => 'users',
@@ -111,7 +110,6 @@ return [
     | confirmation screen. By default, the timeout lasts for three hours.
     |
     */
-    # RETOMAR cambio de datos sensibles, como email o contraseña, se pedirá la contraseña nuevamente
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
 ];

@@ -15,7 +15,7 @@ class RegisterRequest extends FormRequest
         return [
             'username' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]{3,20}$/', 'unique:users,username'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'confirmed', Password::defaults()], #RETOMAR configuración propia del password o default de laravel?
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
         ];
     }
 }

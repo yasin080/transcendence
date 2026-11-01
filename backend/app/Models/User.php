@@ -15,14 +15,10 @@ use Illuminate\Support\Str;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    // Avatares de la galería (frontend/public/avatar/). null = el de por defecto.
-    // Una imagen subida se guarda en la misma columna (AvatarController).
     public const AVATAR_PRESETS = ['/avatar/red-worm.png'];
 
-    // Si al crear un usuario nadie da username, se genera uno a partir de name
     protected static function booted(): void
     {
         static::creating(function (User $user) {
@@ -51,19 +47,17 @@ class User extends Authenticatable
         return $this->hasMany(OauthAccount::class);
     }
 
-    // Solicitudes que este usuario ha enviado
     public function sentFriendships(): HasMany
     {
         return $this->hasMany(Friendship::class, 'requester_id');
     }
 
-    // Solicitudes que este usuario ha recibido
     public function receivedFriendships(): HasMany
     {
         return $this->hasMany(Friendship::class, 'addressee_id');
     }
 
-    // Lo mínimo para pintar a un usuario en una lista
+
     public function summary(): array
     {
         return [
@@ -73,21 +67,13 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the attributes that should be cast.
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
-    /**
-     * Get the room the user is currently in.
-     */
     public function currentRoom(): ?Room
     {
         return Room::whereIn('status', ['open', 'playing'])
