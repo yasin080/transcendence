@@ -297,8 +297,8 @@ Clients only send their moves. This keeps all players in sync, prevents cheating
 the browser and lets bots play exactly like humans.
 
 **Redis for live matches.** A match changes state several times per second. Keeping it
-in Redis avoids writing to the database on every tick; only durable data (who played,
-when it ended) is stored in MariaDB.
+in Redis avoids writing to the database on every tick; only durable data (the room,
+its seats, and when each match started and ended) is stored in MariaDB.
 
 **nginx as single entry point.** Only nginx publishes ports. Every external connection,
 HTTP or WebSocket, goes through it over HTTPS, as the subject requires, while traffic
@@ -454,7 +454,8 @@ injection. **How:** Eloquent models for users, OAuth accounts, rooms, room playe
 games and friendships, with their relationships and casts (room settings are stored as
 JSON). The schema is versioned with migrations, with foreign keys and unique
 constraints; seeders create test accounts. Joining a room runs in a transaction with
-row locks. The only raw SQL is the health check's `select 1`.
+row locks. The only raw SQL is the health check's `select 1` and two `DB::raw`
+column copies inside migrations.
 
 ### 3. Frontend framework — Minor
 **Why:** the team already knew it, and its component model fits a UI that updates with
