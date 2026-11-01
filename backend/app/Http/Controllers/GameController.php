@@ -34,7 +34,7 @@ class GameController extends Controller
     {
         abort_unless($room->host_id === $request->user()->id, 403, 'Only the host can start the match.');
 
-        $game = DB::transaction(function () use ($room) {
+        [$game, $state] = DB::transaction(function () use ($room) {
             $room = Room::lockForUpdate()->find($room->id);
             abort_unless($room->status === 'open', 409, 'This match has already started.');
 
@@ -44,10 +44,10 @@ class GameController extends Controller
 
             $room->update(['status' => 'playing']);
 
-            return $room->games()->create();
+            return [$room->games()->create(), $this->initialState($room)];
         });
 
-        LiveGames::start($game->id, $this->initialState($room));
+        LiveGames::start($game->id, $state);
 
         MatchStarted::dispatch($room, $game->id);
         LobbyRoomUpdated::dispatch($room->refresh());
