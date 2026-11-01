@@ -2,7 +2,7 @@ import { apiDelete, apiGet, apiPost } from '../../lib/api'
 import type { FriendState, FriendsPanelData, FriendSummary, SearchResult } from './types.ts'
 import { notifyFriendsChanged } from './events.ts'
 
-// Cómo envía Laravel a un usuario: id numérico y snake_case
+// A user as Laravel sends it: numeric id and snake_case
 export interface ApiUser {
   id: number
   username: string
@@ -23,8 +23,8 @@ interface ApiStateResponse {
   friend_state: FriendState
 }
 
-// Traduce un usuario del backend al tipo del frontend.
-// El estado real (online/offline) lo pone withPresence() con el canal de presencia.
+// Maps a backend user to the frontend type.
+// The real online/offline status is set by withPresence() from the presence channel.
 export function toSummary(user: ApiUser): FriendSummary {
   return {
     id: String(user.id),
@@ -52,8 +52,7 @@ export async function searchPlayers(query: string): Promise<SearchResult[]> {
   return result.data.map((user) => ({ ...toSummary(user), friendState: user.friend_state }))
 }
 
-// Acciones: devuelven el nuevo estado de la relación, o null si fallan
-
+// Actions: return the new relationship state, or null on failure
 export async function sendRequest(userId: string): Promise<FriendState | null> {
   const result = await apiPost<ApiStateResponse>(`/api/friends/${userId}`)
   if (!result.ok) return null
@@ -68,7 +67,7 @@ export async function acceptRequest(userId: string): Promise<FriendState | null>
   return result.data.friend_state
 }
 
-// Rechazar, cancelar o eliminar: en el backend son la misma acción
+// Decline, cancel or remove: the same action in the backend
 export async function removeFriendship(userId: string): Promise<FriendState | null> {
   const result = await apiDelete<ApiStateResponse>(`/api/friends/${userId}`)
   if (!result.ok) return null

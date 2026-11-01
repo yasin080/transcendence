@@ -8,11 +8,11 @@ interface FormFieldProps {
   onChange: (value: string) => void
   type?: string
   autoComplete?: string
-  // Mismo formato que devuelve Laravel: lista de mensajes; se muestra el primero
+  // Same shape Laravel returns: a list of messages; the first one is shown
   errors?: string[]
-  // Texto de ayuda bajo el campo; se oculta si hay error
+  // Help text under the field; hidden when there is an error
   hint?: string
-  // Si se pasa, limita lo que se puede escribir y muestra el contador "n / max"
+  // If set, limits the input and shows an "n / max" counter
   maxLength?: number
   multiline?: boolean
   rows?: number
@@ -37,7 +37,7 @@ export default function FormField({
   const invalid = Boolean(errors?.length)
   const message = invalid ? errors?.[0] : hint
 
-  // Lo común a <input> y <textarea>
+  // Props shared by <input> and <textarea>
   const control = {
     id,
     name,

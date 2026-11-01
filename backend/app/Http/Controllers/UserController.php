@@ -10,13 +10,13 @@ use App\Http\Requests\UpdateProfileRequest;
 
 class UserController extends Controller
 {
-    // GET /api/users/{user} — perfil de un jugador, visto por el usuario autenticado
+    // GET /api/users/{user} — a player's profile, as seen by the authenticated user
     public function show(Request $request, User $user): JsonResponse
     {
         $me = $request->user();
         $isOwn = $user->id == $me->id;
 
-        // Sus amistades aceptadas, esté en la columna que esté
+        // Their accepted friendships, whichever column they are in
         $friendships = Friendship::with(['requester', 'addressee'])
             ->where('status', 'accepted')
             ->where(fn ($q) => $q->where('requester_id', $user->id)->orWhere('addressee_id', $user->id))
@@ -40,7 +40,7 @@ class UserController extends Controller
         ]);
     }
 
-    // PATCH /api/user — el usuario autenticado actualiza su propio perfil
+    // PATCH /api/user — the authenticated user updates their own profile
     public function update(UpdateProfileRequest $request): JsonResponse
     {
         $user = $request->user();

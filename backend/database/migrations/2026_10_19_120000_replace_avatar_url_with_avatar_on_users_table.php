@@ -5,8 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-// El avatar pasa de ser una URL a guardarse en la BD: ruta de la galería
-// (/avatar/...) o la imagen subida como data URL en base64.
+// The avatar is now stored in the DB: either a gallery path (/avatar/...)
+// or the uploaded image as a base64 data URL.
 return new class extends Migration
 {
     public function up(): void
@@ -15,7 +15,7 @@ return new class extends Migration
             $table->longText('avatar')->nullable()->after('email');
         });
 
-        // Las rutas de la galería se conservan; lo demás vuelve al avatar por defecto
+        // Keep gallery paths; anything else falls back to the default avatar
         DB::table('users')
             ->where('avatar_url', 'like', '/avatar/%')
             ->update(['avatar' => DB::raw('avatar_url')]);

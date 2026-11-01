@@ -18,7 +18,7 @@ import LegalLinks from '../components/ui/LegalLinks'
 import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
 import { useOnlineIds, withPresence } from '../components/friends/presence'
 
-// Vive bajo RequireAuth: aquí siempre hay sesión.
+// Rendered under RequireAuth: there is always a session here.
 export default function Profile() {
   const { user, refreshUser } = useAuth()
   const { userId } = useParams()
@@ -29,7 +29,7 @@ export default function Profile() {
   const [busy, setBusy] = useState(false)
   const onlineIds = useOnlineIds()
 
-  // Sin id en la URL → mi perfil
+  // No id in the URL → my own profile
   const targetId = userId ?? (user ? String(user.id) : null)
 
   const load = useCallback(async () => {
@@ -44,8 +44,8 @@ export default function Profile() {
     setNotFound(false)
     void load()
   }, [load])
-
-  // Recarga cuando cambia cualquier amistad (por ejemplo, desde el panel)
+  
+  // Reload when any friendship changes (e.g. from the friends panel)
   useEffect(() => onFriendsChanged(() => void load()), [load])
 
   // Runs a friend action; busy blocks repeated clicks while the request is in flight
@@ -71,7 +71,7 @@ export default function Profile() {
     )
   }
 
-  if (!data) return null // cargando
+  if (!data) return null // loading
 
   const { isOwn, friendState, profile } = data
   const friends = withPresence(data.friends, onlineIds)
@@ -103,7 +103,7 @@ export default function Profile() {
 
       {isOwn && <ProfileBanner />}
 
-      {/* Solo en el perfil ajeno: sus amigos */}
+      {/* Other players' profiles only: their friends */}
       {!isOwn && (
         <div className="flex flex-col gap-3">
           <SectionHeader title={`Friends of ${profile.username}`} count={friends.length} />

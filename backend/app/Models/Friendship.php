@@ -19,7 +19,7 @@ class Friendship extends Model
         return $this->belongsTo(User::class, 'addressee_id');
     }
 
-    // La amistad entre dos usuarios, sea cual sea la dirección
+    // The friendship between two users, in either direction
     public static function between(User $a, User $b): ?self
     {
         return static::where(fn ($q) => $q->where('requester_id', $a->id)->where('addressee_id', $b->id))
@@ -27,7 +27,7 @@ class Friendship extends Model
             ->first();
     }
 
-    // Estado del botón de amistad visto desde $me
+    // Friend button state, as seen by $me
     public static function stateFor(?self $friendship, User $me): string
     {
         if (! $friendship) {

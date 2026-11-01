@@ -9,14 +9,14 @@ export type FriendRowVariant = 'friend' | 'received' | 'sent' | 'search'
 interface FriendRowProps {
   user: FriendSummary
   variant: FriendRowVariant
-  friendState?: FriendState // solo en 'search'
+  friendState?: FriendState // only 'search'
   onAdd?: () => void
   onAccept?: () => void
-  onRemove?: () => void // rechazar, cancelar o eliminar
+  onRemove?: () => void // decline, cancel or remove
   busy?: boolean
 }
 
-// Fila del panel de amigos: avatar + nombre (enlace a su perfil) + acciones de icono
+// Friends panel row: avatar, name (links to profile) and icon actions
 export default function FriendRow({ user, variant, friendState = 'none', onAdd, onAccept, onRemove, busy = false }: FriendRowProps) {
   const isSearch = variant === 'search'
   const received = variant === 'received' || (isSearch && friendState === 'received')

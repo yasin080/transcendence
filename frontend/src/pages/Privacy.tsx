@@ -62,11 +62,11 @@ export default function Privacy() {
       <section className="space-y-2">
         <h2 className="text-xl font-semibold">Who can see what</h2>
         <p className="text-fg-secondary">
-          Other logged-in players can see your username, avatar, bio, join date, friends list and
-          the names of the rooms you create. Your username is also shown inside the rooms you join.
-          Your display name is shown on your profile. If you sign in with Google, it starts as the
-          name on your Google account, and you can change it from your profile. The players in a
-          match see its result. Your email and password are never shown.
+          Other logged-in players can see your username, avatar, bio, join date, friends list,
+          whether you are online and the names of the rooms you create. Your username is also shown
+          inside the rooms you join. Your display name is only visible to you. If you sign in with
+          Google, it starts as the name on your Google account, and you can change it from your
+          profile. The players in a match see its result. Your email and password are never shown.
         </p>
       </section>
 

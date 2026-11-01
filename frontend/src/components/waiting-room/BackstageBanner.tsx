@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
 
 interface BackstageBannerProps {
-  // La capa de fondo: una imagen ahora, un canvas más adelante.
-  // Debe rellenar todo el marco (size-full).
   children: ReactNode
 }
 

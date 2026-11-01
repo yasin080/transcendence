@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('bio', 160)->nullable()->after('avatar_url');
         });
 
-        // Usuarios que ya existían: les damos un username único
+        // Backfill a unique username for existing users
         DB::table('users')
             ->whereNull('username')
             ->update(['username' => DB::raw("CONCAT('user', id)")]);

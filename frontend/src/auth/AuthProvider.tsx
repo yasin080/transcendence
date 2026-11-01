@@ -33,13 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Online mientras haya sesión iniciada, en cualquier página
+  // Online while logged in, on any page
   useEffect(() => {
     if (status === 'authenticated') joinPresence()
     else if (status === 'guest') leavePresence()
   }, [status])
 
-  // Avisos de amistad en tiempo real mientras haya sesión iniciada
+  // Real-time friendship notifications while logged in
   const userId = user?.id
   useEffect(() => {
     if (userId === undefined) return

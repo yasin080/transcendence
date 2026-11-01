@@ -2,20 +2,20 @@ import { useSyncExternalStore } from 'react'
 import { echo } from '../../lib/echo'
 import type { FriendSummary } from './types.ts'
 
-// Ficha de cada miembro: lo que devuelve channels.php
+// Each member's info, as returned by channels.php
 type Member = { id: number }
 
 let onlineIds = new Set<string>()
 const listeners = new Set<() => void>()
 let joined = false
 
-// Sustituye el conjunto y avisa a los componentes suscritos
+// Replace the set (a new reference, so React sees the change) and notify subscribers
 function publish(next: Set<string>) {
   onlineIds = next
   listeners.forEach((listener) => listener())
 }
 
-// Entra en el canal de presencia (una sola vez por sesión)
+// Join the presence channel (once per session)
 export function joinPresence() {
   if (joined) return
   joined = true
@@ -30,7 +30,7 @@ export function joinPresence() {
     })
 }
 
-// Sale del canal (al hacer logout)
+// Leave the channel (on logout)
 export function leavePresence() {
   if (!joined) return
   echo.leave('online')
@@ -45,12 +45,13 @@ function subscribe(listener: () => void) {
   }
 }
 
-// Ids de usuarios conectados; el componente se repinta al cambiar
+// Ids of connected users; the component re-renders when they change
 export function useOnlineIds() {
   return useSyncExternalStore(subscribe, () => onlineIds)
 }
 
-// Conserva los campos extra de cada lista (p. ej. friendState).
+// Set each user's online/offline status.
+// Generic so each list keeps its extra fields (e.g. friendState).
 export function withPresence<T extends FriendSummary>(list: T[], onlineIds: Set<string>): T[] {
   return list.map((user) => ({
     ...user,

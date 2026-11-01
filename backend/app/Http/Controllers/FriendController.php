@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class FriendController extends Controller
 {
-    // GET /api/friends — authenticated user panel
+    // GET /api/friends — the authenticated user's friends panel
     public function index(Request $request): JsonResponse
     {
         $me = $request->user();
@@ -43,7 +43,7 @@ class FriendController extends Controller
         return response()->json(compact('friends', 'received', 'sent'));
     }
 
-    // GET /api/users/search?q=bo — players by username, relationship with each one
+    // GET /api/users/search?q=bo — players by username, with my relationship to each
     public function search(Request $request): JsonResponse
     {
         $request->validate(['q' => ['nullable', 'string', 'max:20']]);
@@ -60,7 +60,7 @@ class FriendController extends Controller
             ->limit(20)
             ->get();
 
-        // Relationships with this users (one request)
+        // My friendships with these users, in a single query
         $ids = $users->pluck('id');
         $friendships = Friendship::where(fn ($q) => $q->where('requester_id', $me->id)->whereIn('addressee_id', $ids))
             ->orWhere(fn ($q) => $q->where('addressee_id', $me->id)->whereIn('requester_id', $ids))
@@ -70,7 +70,7 @@ class FriendController extends Controller
         foreach ($friendships as $friendship) {
             $iSent = $friendship->requester_id == $me->id;
             $otherId = $iSent ? $friendship->addressee_id : $friendship->requester_id;
-            $stateOf[$otherId] = $friendship->status === 'accepted' ? 'friends' : ($iSent ? 'sent' : 'received');
+            $stateOf[$otherId] = Friendship::stateFor($friendship, $me);
         }
 
         return response()->json($users->map(fn (User $user) => [
@@ -116,7 +116,7 @@ class FriendController extends Controller
         return response()->json(['friend_state' => Friendship::stateFor($friendship, $me)]);
     }
 
-    // POST /api/friends/{user}/accept - accept request
+    // POST /api/friends/{user}/accept — accept their request
     public function accept(Request $request, User $user): JsonResponse
     {
         $friendship = Friendship::where('requester_id', $user->id)

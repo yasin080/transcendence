@@ -8,11 +8,10 @@ use Illuminate\Validation\ValidationException;
 
 class AvatarController extends Controller
 {
-    // Lado del cuadrado al que se reduce cada avatar subido
     private const SIZE = 256;
 
-    // POST /api/user/avatar — sube una imagen como avatar del usuario autenticado.
-    // Se guarda en la BD como data URL (base64), ya recortada y reducida.
+    // POST /api/user/avatar — uploads an image as the authenticated user's avatar.
+    // Stored in the DB as a base64 data URL, already cropped and resized.
     public function store(Request $request): JsonResponse
     {
         $request->validate([
@@ -31,8 +30,8 @@ class AvatarController extends Controller
         return response()->json(['avatar' => $user->avatar]);
     }
 
-    // Recorta al cuadrado central, reduce a SIZE×SIZE y codifica en base64.
-    // PNG conserva la transparencia; JPEG pesa mucho menos para fotos.
+    // Crops to the centre square, scales to SIZE×SIZE and encodes as base64.
+    // PNG keeps transparency; JPEG is much lighter for photos.
     private function toDataUrl(\GdImage $source, bool $png): string
     {
         $side = min(imagesx($source), imagesy($source));

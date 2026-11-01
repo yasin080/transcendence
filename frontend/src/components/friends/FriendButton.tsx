@@ -2,8 +2,8 @@ import Button from '../ui/Button.tsx'
 import { CheckIcon, ClockIcon, PlusIcon, UserMinusIcon } from '../ui/icons.tsx'
 import type { FriendState } from './types.ts'
 
-// Botón de amistad. No guarda estado: lo recibe del padre
-// y le avisa de lo que pulsa el usuario.
+// Friend button. Holds no state: the parent passes it in
+// and is told what the user clicks.
 interface FriendButtonProps {
   state: FriendState
   onAdd: () => void
