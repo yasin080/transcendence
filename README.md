@@ -602,7 +602,11 @@ lobby.
 - **Validation and fixes:** form validation in frontend and backend, Makefile fixes.
 - **Project management:** weekly meetings, planning and progress tracking.
 
-**Challenges:** [RETOMAR]
+**Challenges:** I had no previous experience in web development, so most of the work
+meant learning while building. The friends system was the most complete example: it
+covered the whole stack, from the migration and model to the API, the React panel and
+real-time updates with Reverb. As Project Manager, I prepared the agenda for each
+meeting so that they stayed focused and useful.
 
 ### beiglesi — Product Owner, Developer
 
@@ -615,11 +619,7 @@ lobby.
 - **Product ownership:** game rules, backlog and priorities, validation of finished
   work, and the README.
 
-**Challenges:** I had no previous experience in web development, so most of the work
-meant learning while building. The friends system was the most complete example: it
-covered the whole stack, from the migration and model to the API, the React panel and
-real-time updates with Reverb. As Project Manager, I prepared the agenda for each
-meeting so that they stayed focused and useful.
+**Challenges:** [RETOMAR]
 
 ### ybahri — Developer
 
