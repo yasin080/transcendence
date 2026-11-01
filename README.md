@@ -525,10 +525,12 @@ conditions are in [Game Rules](#game-rules).
 ### 11. Advanced 3D graphics — Major
 **Why:** a 3D board makes the arena readable and alive, and lets the camera follow
 your worm. **How:** Babylon.js, loaded only on the game page. glTF models for worms,
-food, bombs, walls and explosions, with instancing for repeated meshes; sky and sun
-lights, emissive materials and a post-processing pipeline (bloom, FXAA). Worms glide
-smoothly between ticks by interpolating their positions every frame. Three cameras:
-whole board, follow and behind the head.
+food, bombs, walls and explosions; walls, food, bombs and blasts are instances of a
+single mesh each, worm segments are clones. Sky and sun lights, with the sun casting
+real-time shadows (shadow map with PCF filtering); a floor that mirrors the worms in
+real time (MirrorTexture); emissive materials and a post-processing pipeline (bloom,
+FXAA). Worms glide smoothly between ticks by interpolating their positions every frame.
+Three cameras: whole board, follow and behind the head.
 
 ### 12. Game customization — Minor
 **Why:** one game that becomes many. **How:** the host starts from a preset (Classic,
