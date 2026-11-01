@@ -93,6 +93,8 @@ class ProfileTest extends TestCase
             'password' => 'nueva-clave',
             'password_confirmation' => 'nueva-clave',
         ]))->assertOk();
+
+        $this->assertTrue(Hash::check('nueva-clave', $user->fresh()->password));
     }
 
     public function test_a_guest_cannot_update_a_profile(): void

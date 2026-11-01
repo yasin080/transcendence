@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import { acceptRequest, removeFriendship, sendRequest } from '../components/friends/api'
 import FriendButton from '../components/friends/FriendButton'
@@ -9,7 +9,7 @@ import EditProfileModal from '../components/profile/EditProfileModal'
 import FriendTile from '../components/profile/FriendTile'
 import { PencilIcon } from '../components/ui/icons'
 import ProfileHeader from '../components/profile/ProfileHeader'
-import QuickMatchBanner from '../components/profile/QuickMatchBanner'
+import ProfileBanner from '../components/profile/ProfileBanner'
 import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import SectionHeader from '../components/ui/SectionHeader'
@@ -22,11 +22,11 @@ import { useOnlineIds, withPresence } from '../components/friends/presence'
 export default function Profile() {
   const { user, refreshUser } = useAuth()
   const { userId } = useParams()
-  const navigate = useNavigate()
 
   const [data, setData] = useState<ProfileData | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
   const onlineIds = useOnlineIds()
 
   // Sin id en la URL → mi perfil
@@ -48,10 +48,16 @@ export default function Profile() {
   // Recarga cuando cambia cualquier amistad (por ejemplo, desde el panel)
   useEffect(() => onFriendsChanged(() => void load()), [load])
 
-  // Lanza la acción; el aviso de amistades recarga el perfil
+  // Runs a friend action; busy blocks repeated clicks while the request is in flight
   async function act(action: (userId: string) => Promise<FriendState | null>) {
-    if (!data) return
-    await action(data.profile.id)
+    if (!data || busy) return
+    setBusy(true)
+    try {
+      const state = await action(data.profile.id)
+      if (state) setData((prev) => (prev ? { ...prev, friendState: state } : prev))
+    } finally {
+      setBusy(false)
+    }
   }
 
   if (!user) return null
@@ -85,6 +91,7 @@ export default function Profile() {
           ) : (
             <FriendButton
               state={friendState}
+              busy={busy}
               onAdd={() => void act(sendRequest)}
               onAccept={() => void act(acceptRequest)}
               onDecline={() => void act(removeFriendship)}
@@ -94,9 +101,7 @@ export default function Profile() {
         }
       />
 
-      {/* Solo en el perfil propio: invitación a jugar */}
-      {/* Provisional: lleva al Lobby hasta que exista la partida rápida */}
-      {isOwn && <QuickMatchBanner onPlay={() => void navigate('/lobby')} />}
+      {isOwn && <ProfileBanner />}
 
       {/* Solo en el perfil ajeno: sus amigos */}
       {!isOwn && (

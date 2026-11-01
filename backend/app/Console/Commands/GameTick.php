@@ -53,6 +53,9 @@ class GameTick extends Command
         Presence::apply($state, LiveGames::lastSeen($id), (int) $now);
         Bot::play($state);
         foreach (LiveGames::takeInputs($id) as $seat => $input) {
+            if (! isset($state['worms'][$seat])) {
+                continue;
+            }
             isset($input['side'])
                 ? GameLogic::steer($state, $seat, $input['side'])
                 : GameLogic::turn($state, $seat, $input['dir']);
@@ -72,7 +75,7 @@ class GameTick extends Command
         unset($this->nextTick[$id]);
         $game = Game::find($id);
         $game?->update(['ended_at' => now()]);
-        $game?->room->update(['status' => 'open']);
+        $game?->room()->where('status', 'playing')->update(['status' => 'open']);
         if ($game) {
             LobbyRoomUpdated::dispatch($game->room);
         }

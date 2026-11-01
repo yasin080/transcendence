@@ -134,32 +134,37 @@ class RoomController extends Controller
     {
         $userId = $request->user()->id;
 
-        if ($room->status === 'playing') {
-            // El host que se va a mitad de partida pasa el mando al siguiente jugador
-            // y pierde su asiento; puede volver a entrar como jugador cuando acabe.
-            $heir = $room->players()->whereNotNull('user_id')->where('user_id', '!=', $userId)->orderBy('seat')->first();
-            if ($room->host_id !== $userId || ! $heir) {
-                // Mid-match you keep your seat, so you can still go back to the game.
-                return response()->json(null, 204);
+    
+        $room = DB::transaction(function () use ($room, $userId) {
+            $room = Room::whereKey($room->id)->lockForUpdate()->first();
+            
+            if ($room->status === 'playing') {
+                // El host que se va a mitad de partida pasa el mando al siguiente jugador
+                // y pierde su asiento; puede volver a entrar como jugador cuando acabe.
+                $heir = $room->players()->whereNotNull('user_id')->where('user_id', '!=', $userId)->orderBy('seat')->first();
+                if ($room->host_id !== $userId || ! $heir) {
+                    // Mid-match you keep your seat, so you can still go back to the game.
+                    return null;
+                }
+                
+                $room->update(['host_id' => $heir->user_id]);
+                $room->players()->where('user_id', $userId)->delete();
+                return $room;    
             }
-            $room->update(['host_id' => $heir->user_id]);
-            $room->players()->where('user_id', $userId)->delete();
 
+            if ($room->host_id === $userId) {
+                if ($room->status === 'open') {
+                    $room->update(['status' => 'closed']);
+                }
+            } else {
+                $room->players()->where('user_id', $userId)->delete();
+            }
+            return $room;
+        });
+        if ($room) {
             RoomPlayersUpdated::dispatch($room);
             LobbyRoomUpdated::dispatch($room);
-            return response()->json(null, 204);
         }
-
-        if ($room->host_id === $userId) {
-            if ($room->status === 'open') {
-                $room->update(['status' => 'closed']);
-            }
-        } else {
-            $room->players()->where('user_id', $userId)->delete();
-        }
-
-        RoomPlayersUpdated::dispatch($room);
-        LobbyRoomUpdated::dispatch($room);
         return response()->json(null, 204);
     }
 
@@ -177,10 +182,16 @@ class RoomController extends Controller
         abort_unless($room->host_id === $request->user()->id, 403);
         abort_unless($player->room_id === $room->id, 404);
         abort_if($player->user_id === $room->host_id, 422);
-        abort_unless($room->status === 'open', 409, 'This match has already started.');
 
-        $player->delete();
+        $room = DB::transaction(function () use ($room, $player) {
+            $room = Room::lockForUpdate()->find($room->id);
+            abort_unless($room->status === 'open', 409, 'This match has already started.');
 
+            $player->delete();
+
+            return $room;
+        });
+    
         RoomPlayersUpdated::dispatch($room);
         LobbyRoomUpdated::dispatch($room);
         return response()->json(null, 204);

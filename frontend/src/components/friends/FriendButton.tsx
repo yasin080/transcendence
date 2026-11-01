@@ -10,13 +10,14 @@ interface FriendButtonProps {
   onAccept: () => void
   onDecline: () => void
   onRemove: () => void
+  busy?: boolean
 }
 
-export default function FriendButton({ state, onAdd, onAccept, onDecline, onRemove }: FriendButtonProps) {
+export default function FriendButton({ state, onAdd, onAccept, onDecline, onRemove, busy = false }: FriendButtonProps) {
   switch (state) {
     case 'none':
       return (
-        <Button variant="primary" size="md" onClick={onAdd}>
+        <Button variant="primary" size="md" onClick={onAdd} disabled={busy}>
           <PlusIcon />
           Add friend
         </Button>
@@ -33,11 +34,11 @@ export default function FriendButton({ state, onAdd, onAccept, onDecline, onRemo
     case 'received':
       return (
         <div className="flex gap-2">
-          <Button variant="primary" size="md" onClick={onAccept}>
+          <Button variant="primary" size="md" onClick={onAccept} disabled={busy}>
             <CheckIcon />
             Accept
           </Button>
-          <Button variant="secondary" size="md" onClick={onDecline}>
+          <Button variant="secondary" size="md" onClick={onDecline} disabled={busy}>
             Decline
           </Button>
         </div>
@@ -45,7 +46,7 @@ export default function FriendButton({ state, onAdd, onAccept, onDecline, onRemo
 
     case 'friends':
       return (
-        <Button variant="ghost" size="sm" onClick={onRemove}>
+        <Button variant="ghost" size="sm" onClick={onRemove} disabled={busy}>
           <UserMinusIcon />
           Remove friend
         </Button>

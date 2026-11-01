@@ -5,7 +5,7 @@ import MatchPanel from '../components/waiting-room/MatchPanel.tsx'
 import PlayerGrid from '../components/waiting-room/PlayerGrid.tsx'
 import BackstageBanner from '../components/waiting-room/BackstageBanner.tsx'
 import MessageModal from '../components/ui/MessageModal.tsx'
-import backstage from '../assets/salon.jpg'
+import backstage from '../assets/backstage.png'
 import type { MatchSetting, Player } from '../components/waiting-room/types.ts'
 import type { Room } from '../components/lobby/types.ts'
 import { BOARD_OPTIONS, CAMERA_OPTIONS, FOOD_OPTIONS, SOFT_WALL_OPTIONS, SPEED_OPTIONS, labelFor } from '../components/lobby/roomOptions.ts'
@@ -172,7 +172,7 @@ export default function WaitingRoom() {
         onAddBot={addBot}
       />
       <BackstageBanner>
-         <img src={backstage} alt="" className="size-full object-cover" />
+         <img src={backstage} alt="" className="size-full object-cover object-[center_70%]" />
       </BackstageBanner>
 
       {(phase === 'closed' || (room.status === 'closed' && !isOwner)) && (

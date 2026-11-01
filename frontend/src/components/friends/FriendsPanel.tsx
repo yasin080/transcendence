@@ -24,6 +24,7 @@ export default function FriendsPanel() {
   const [failed, setFailed] = useState(false)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[] | null>(null)
+  const [busyIds, setBusyIds] = useState<Set<string>>(new Set())
   const onlineIds = useOnlineIds()
 
   const trimmed = query.trim()
@@ -68,8 +69,21 @@ export default function FriendsPanel() {
   )
 
   // Run the action; the friendship notice reloads the panel and the search
+  // Runs a friend action; the user's row stays disabled until the panel has reloaded
   async function act(action: (userId: string) => Promise<FriendState | null>, userId: string) {
-    await action(userId)
+    if (busyIds.has(userId)) return
+    setBusyIds((prev) => new Set(prev).add(userId))
+    try {
+      await action(userId)
+      await load()
+      if (searching) await runSearch(trimmed)
+    } finally {
+      setBusyIds((prev) => {
+        const next = new Set(prev)
+        next.delete(userId)
+        return next
+      })
+    }
   }
 
   const friends = withPresence(data?.friends ?? [], onlineIds)
@@ -112,6 +126,7 @@ export default function FriendsPanel() {
                   onAdd={() => void act(sendRequest, user.id)}
                   onAccept={() => void act(acceptRequest, user.id)}
                   onRemove={() => void act(removeFriendship, user.id)}
+                  busy={busyIds.has(user.id)}
                 />
               ))}
             </section>
@@ -130,6 +145,7 @@ export default function FriendsPanel() {
                     variant="received"
                     onAccept={() => void act(acceptRequest, user.id)}
                     onRemove={() => void act(removeFriendship, user.id)}
+                    busy={busyIds.has(user.id)}
                   />
                 ))}
               </section>
@@ -166,6 +182,7 @@ export default function FriendsPanel() {
                     user={user}
                     variant="sent"
                     onRemove={() => void act(removeFriendship, user.id)}
+                    busy={busyIds.has(user.id)}
                   />
                 ))}
               </section>

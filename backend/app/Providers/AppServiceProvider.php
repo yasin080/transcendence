@@ -10,20 +10,8 @@ use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        
         RateLimiter::for('login', function (Request $request) {
             $email = Str::lower((string) $request->input('email'));
 
@@ -31,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('register', function (Request $request) {
-            return Limit::perMinute(3)->by($request->ip());
+            return Limit::perMinute(10)->by($request->ip());
         });
     }
 }

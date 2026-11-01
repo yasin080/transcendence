@@ -49,7 +49,6 @@ return [
     | "expires_at" attribute, but first-party sessions are not affected.
     |
     */
-    # RETOMAR si implementamos api pública
     'expiration' => null,
 
     /*

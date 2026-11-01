@@ -6,48 +6,62 @@ use App\Models\Friendship;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-// Cuentas con las que se puede entrar: las de .env y tester (solo en local)
+// Demo accounts with credentials from .env (also in production)
 class AccountsSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (config('seeding.accounts') as $account) {
-            if (! $account['username'] || ! $account['email'] || ! $account['password']) {
-                continue; // faltan datos en .env: no se crea
+        [$showcase, $clean] = config('seeding.accounts');
+
+        // USER1: full panel, with friends and pending requests
+        if ($user = $this->createAccount($showcase)) {
+            foreach (['Boomer_92', 'ex0', 'Mochi', 'Detonator'] as $username) {
+                $this->befriend($user, $this->player($username), 'accepted');
             }
-            User::firstOrCreate(
-                ['email' => $account['email']],
-                ['username' => $account['username'], 'name' => '', 'password' => $account['password']],
-            );
+            foreach (['Kiro_TNT', 'Tanuki'] as $username) {
+                $this->befriend($this->player($username), $user, 'pending'); // received
+            }
+            $this->befriend($user, $this->player('BoltX'), 'pending'); // sent
         }
 
-        if (app()->environment('local')) {
-            $this->seedTester();
+        // USER2: a few friends and no link to USER1, to test requests between the two
+        if ($user = $this->createAccount($clean)) {
+            foreach (['Mochi', 'zeroKelvin'] as $username) {
+                $this->befriend($user, $this->player($username), 'accepted');
+            }
         }
     }
 
-    // test@example.com / password, con amigos y solicitudes para probar el panel
-    private function seedTester(): void
+    // Returns the account only if it was just created; an existing one is left untouched
+    private function createAccount(array $account): ?User
     {
-        $tester = User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            ['username' => 'tester', 'name' => 'Test User', 'password' => 'password'],
-        );
+        if (! $account['username'] || ! $account['email'] || ! $account['password']) {
+            return null; // missing data in .env: not created
+        }
+        if (User::where('email', $account['email'])->exists()) {
+            return null;
+        }
+        if (User::where('username', $account['username'])->exists()) {
+            $this->command?->warn("Username {$account['username']} already taken: account skipped");
 
-        $player = fn (string $username) => User::where('username', $username)->firstOrFail();
-        $link = fn (User $from, User $to, string $status) => Friendship::firstOrCreate(
-            ['requester_id' => $from->id, 'addressee_id' => $to->id],
-            ['status' => $status],
-        );
+            return null;
+        }
 
-        foreach (['Boomer_92', 'ex0', 'Mochi', 'Detonator'] as $username) {
-            $link($tester, $player($username), 'accepted');
-        }
-        foreach (['Kiro_TNT', 'Tanuki'] as $username) {
-            $link($player($username), $tester, 'pending'); // solicitudes recibidas
-        }
-        foreach (['BoltX', 'Wasabi'] as $username) {
-            $link($tester, $player($username), 'pending'); // solicitudes enviadas
-        }
+        return User::create([
+            'username' => $account['username'],
+            'name' => '',
+            'email' => $account['email'],
+            'password' => $account['password'],
+        ]);
+    }
+
+    private function player(string $username): User
+    {
+        return User::where('username', $username)->firstOrFail();
+    }
+
+    private function befriend(User $from, User $to, string $status): void
+    {
+        Friendship::create(['requester_id' => $from->id, 'addressee_id' => $to->id, 'status' => $status]);
     }
 }
