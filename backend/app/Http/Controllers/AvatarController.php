@@ -16,7 +16,7 @@ class AvatarController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'avatar' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:2048'],
+            'avatar' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:2048', 'dimensions:max_width=4096,max_height=4096'],
         ]);
 
         $file = $request->file('avatar');

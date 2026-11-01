@@ -15,7 +15,7 @@ interface SectionHeaderProps {
 const SIZES: Record<Size, { gap: string; title: string }> = {
   sm: { gap: 'gap-2.5', title: 'text-micro-label text-fg-muted' }, // Friends panel
   md: { gap: 'gap-3.5', title: 'text-section-title' }, // Profile
-  lg: { gap: 'gap-3.5', title: 'text-sm font-bold uppercase tracking-[.16em] text-white/60' }, // Lobby
+  lg: { gap: 'gap-3.5', title: 'text-sm font-bold uppercase tracking-[.16em] text-fg-secondary' }, // Lobby
 }
 
 // Section title + divider line + count. className is for placement.

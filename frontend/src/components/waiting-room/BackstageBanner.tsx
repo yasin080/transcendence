@@ -13,7 +13,7 @@ export default function BackstageBanner({ children }: BackstageBannerProps) {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#07061a_0%,rgba(7,6,26,.55)_34%,rgba(7,6,26,.18)_66%,rgba(7,6,26,.5)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,var(--color-void),color-mix(in_srgb,var(--color-void)_55%,transparent)_34%,color-mix(in_srgb,var(--color-void)_18%,transparent)_66%,color-mix(in_srgb,var(--color-void)_50%,transparent)_100%)]"
       />
 
       <div className="pointer-events-none absolute bottom-8 left-4 max-w-105 md:left-7">

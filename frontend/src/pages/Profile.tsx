@@ -14,7 +14,7 @@ import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import SectionHeader from '../components/ui/SectionHeader'
 import { onFriendsChanged } from '../components/friends/events'
-import LegalLinks from '../components/LegalLinks'
+import LegalLinks from '../components/ui/LegalLinks'
 import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
 import { useOnlineIds, withPresence } from '../components/friends/presence'
 

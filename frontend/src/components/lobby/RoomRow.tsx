@@ -31,8 +31,8 @@ export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) 
         <span
           className={`size-2.5 flex-none rounded-full ${
             playing
-              ? 'bg-ember-600 shadow-[0_0_10px_2px_rgba(255,155,47,.5)]'
-              : 'bg-signal-500 shadow-[0_0_10px_2px_rgba(69,224,122,.45)]'
+              ? 'bg-ember-600 shadow-[0_0_10px_2px] shadow-ember-600/50'
+              : 'bg-signal-500 shadow-[0_0_10px_2px] shadow-signal-500/45'
           }`}
         />
         <div className="min-w-0">
