@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, Outlet } from 'react-router'
 
 import AuthModal from './components/AuthModal'
-import LegalLinks from './components/LegalLinks'
+import LegalLinks from './components/ui/LegalLinks'
 import UserMenu from './components/UserMenu'
 import Button from './components/ui/Button'
 import { useAuth } from './auth/useAuth'

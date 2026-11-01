@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router'
 
 import AnimatedWorm from '../components/AnimatedWorm'
 import AuthModal from '../components/AuthModal'
-import LegalLinks from '../components/LegalLinks'
+import LegalLinks from '../components/ui/LegalLinks'
 import Button from '../components/ui/Button'
 import { useAuth } from '../auth/useAuth'
 import './landing.css'

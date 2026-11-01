@@ -13,6 +13,7 @@ import { echo, onReconnect } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
 import duel from '../assets/duel.webp'
 import RoomRow from '../components/lobby/RoomRow.tsx'
+import LegalLinks from '../components/ui/LegalLinks.tsx'
 
 
 type CurrentRoom = { code: string | null }
@@ -101,7 +102,7 @@ export default function Lobby() {
 
 
   return (
-    <section className="flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 md:px-7">
+    <section className="flex-1 min-w-0 overflow-y-auto px-4 pt-6 pb-8 md:px-7 flex flex-col *:shrink-0">
 
       <div className="mb-[22px]">
         <h1 className="font-display text-[26px] tracking-[0.01em]">Lobby</h1>
@@ -166,7 +167,9 @@ export default function Lobby() {
           />
         ))}
       </div>
-
+      <div className="mt-auto pt-8 flex justify-center" >
+        <LegalLinks/>
+      </div>
 
       </section>
   )

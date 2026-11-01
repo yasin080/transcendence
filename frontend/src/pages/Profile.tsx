@@ -14,7 +14,7 @@ import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import SectionHeader from '../components/ui/SectionHeader'
 import { onFriendsChanged } from '../components/friends/events'
-import LegalLinks from '../components/LegalLinks'
+import LegalLinks from '../components/ui/LegalLinks'
 import LogoutButton from '../components/left-sidebar/auth/LogoutButton'
 import { useOnlineIds, withPresence } from '../components/friends/presence'
 
@@ -121,7 +121,7 @@ export default function Profile() {
       )}
 
       {isOwn && (
-        <div className="mt-auto flex flex-col items-center gap-2 xl:hidden">
+        <div className="mt-auto flex flex-col items-center gap-2">
           <div className="w-full md:hidden">
             <LogoutButton />
           </div>

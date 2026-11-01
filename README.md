@@ -471,10 +471,10 @@ repeating styles in every screen. **How:** design tokens in `frontend/src/theme.
 warm accents (`ember`, `gold`) and colors with a fixed meaning (`online`, `mint` for
 bots); text, border and fill greys; typography with Bungee for display and Space
 Grotesk for body, plus an extra small size and caps tracking; custom animations.
-Hand-drawn SVG icons, all in `frontend/src/components/ui/icons.tsx`. Ten reusable
+Hand-drawn SVG icons, all in `frontend/src/components/ui/icons.tsx`. Eleven reusable
 components in `frontend/src/components/ui`:
 `Button`, `Avatar`, `Modal`, `MessageModal`, `FormField`, `SearchInput`, `ToggleChip`,
-`SectionHeader`, `EmptyState` and `Sidebar`, each used in two or more places.
+`SectionHeader`, `EmptyState`, `LegalLinks` and `Sidebar`, each used in two or more places.
 
 ### 5. Support for additional browsers — Minor
 **Why:** [RETOMAR]. **How:** [RETOMAR]
@@ -624,7 +624,7 @@ meeting so that they stayed focused and useful.
 ### ybahri — Developer
 
 - **Visual identity:** look and feel of the website and the game.
-- **Design system:** 10 reusable components with a shared palette and typography.
+- **Design system:** 11 reusable components with a shared palette and typography.
 - **Layout:** dashboard layout, first versions of the lobby and the social panel.
 - **Responsive design:** landing page and app adapted to mobile and desktop.
 - **Lobby:** search rooms by name or code.

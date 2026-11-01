@@ -14,6 +14,7 @@ import { apiGet, apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { echo, onReconnect } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
+import LegalLinks from '../components/ui/LegalLinks.tsx'
 
 
 function settingChips(s: Settings): MatchSetting[] {
@@ -174,6 +175,9 @@ export default function WaitingRoom() {
       <BackstageBanner>
          <img src={backstage} alt="" className="size-full object-cover object-[center_70%]" />
       </BackstageBanner>
+      <div className="flex justify-center">
+        <LegalLinks/>
+      </div>
 
       {(phase === 'closed' || (room.status === 'closed' && !isOwner)) && (
         <MessageModal
