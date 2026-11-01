@@ -7,11 +7,13 @@ use App\Models\User;
 use App\Events\FriendshipChanged;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\DB;
 
 
 class FriendController extends Controller
 {
-    // GET /api/friends — el panel del usuario autenticado
+    // GET /api/friends — authenticated user panel
     public function index(Request $request): JsonResponse
     {
         $me = $request->user();
@@ -41,7 +43,7 @@ class FriendController extends Controller
         return response()->json(compact('friends', 'received', 'sent'));
     }
 
-    // GET /api/users/search?q=bo — jugadores por username, con mi relación con cada uno
+    // GET /api/users/search?q=bo — players by username, relationship with each one
     public function search(Request $request): JsonResponse
     {
         $request->validate(['q' => ['nullable', 'string', 'max:20']]);
@@ -58,7 +60,7 @@ class FriendController extends Controller
             ->limit(20)
             ->get();
 
-        // Mis amistades con esos usuarios, en una sola consulta
+        // Relationships with this users (one request)
         $ids = $users->pluck('id');
         $friendships = Friendship::where(fn ($q) => $q->where('requester_id', $me->id)->whereIn('addressee_id', $ids))
             ->orWhere(fn ($q) => $q->where('addressee_id', $me->id)->whereIn('requester_id', $ids))
@@ -77,7 +79,7 @@ class FriendController extends Controller
         ]));
     }
 
-    // POST /api/friends/{user} — enviar solicitud
+    // POST /api/friends/{user} — send request
     public function store(Request $request, User $user): JsonResponse
     {
         $me = $request->user();
@@ -86,20 +88,35 @@ class FriendController extends Controller
             return response()->json(['message' => "You can't add yourself."], 422);
         }
 
-        $friendship = Friendship::between($me, $user);
+        // Lock both users (lower id first, to avoid deadlocks),
+        // so concurrent requests for the same pair run one at a time.
+        // The catch is a safety net that turns a duplicate insert into a 409 instead of a 500.
+        try {
+            $friendship = DB::transaction(function () use ($me, $user) {
+                User::whereIn('id', [$me->id, $user->id])->orderBy('id')->lockForUpdate()->get();
 
-        if (! $friendship) {
-            $friendship = Friendship::create(['requester_id' => $me->id, 'addressee_id' => $user->id]);
-        } elseif ($friendship->status === 'pending' && $friendship->addressee_id == $me->id) {
-            // Él ya me la había enviado: añadirle equivale a aceptar
-            $friendship->update(['status' => 'accepted']);
+                $friendship = Friendship::between($me, $user);
+
+                if (! $friendship) {
+                    return Friendship::create(['requester_id' => $me->id, 'addressee_id' => $user->id]);
+                }
+                if ($friendship->status === 'pending' && $friendship->addressee_id == $me->id) {
+                    // They already sent me a request: adding them means accepting it
+                    $friendship->update(['status' => 'accepted']);
+                }
+
+                return $friendship;
+            });
+        } catch (UniqueConstraintViolationException) {
+            return response()->json(['message' => 'Friend request already exists.'], 409);
         }
+
         FriendshipChanged::dispatch($user->id);
 
         return response()->json(['friend_state' => Friendship::stateFor($friendship, $me)]);
     }
 
-    // POST /api/friends/{user}/accept — aceptar su solicitud
+    // POST /api/friends/{user}/accept - accept request
     public function accept(Request $request, User $user): JsonResponse
     {
         $friendship = Friendship::where('requester_id', $user->id)
@@ -113,7 +130,7 @@ class FriendController extends Controller
         return response()->json(['friend_state' => 'friends']);
     }
 
-    // DELETE /api/friends/{user} — rechazar, cancelar o eliminar
+    // DELETE /api/friends/{user} — decline, cancel or delete
     public function destroy(Request $request, User $user): JsonResponse
     {
         Friendship::between($request->user(), $user)?->delete();

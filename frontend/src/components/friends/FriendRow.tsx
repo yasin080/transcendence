@@ -13,10 +13,11 @@ interface FriendRowProps {
   onAdd?: () => void
   onAccept?: () => void
   onRemove?: () => void // rechazar, cancelar o eliminar
+  busy?: boolean
 }
 
 // Fila del panel de amigos: avatar + nombre (enlace a su perfil) + acciones de icono
-export default function FriendRow({ user, variant, friendState = 'none', onAdd, onAccept, onRemove }: FriendRowProps) {
+export default function FriendRow({ user, variant, friendState = 'none', onAdd, onAccept, onRemove, busy = false }: FriendRowProps) {
   const isSearch = variant === 'search'
   const received = variant === 'received' || (isSearch && friendState === 'received')
   const sent = variant === 'sent' || (isSearch && friendState === 'sent')
@@ -38,23 +39,23 @@ export default function FriendRow({ user, variant, friendState = 'none', onAdd, 
 
       {received && (
         <div className="flex flex-none gap-1.5">
-          <Button variant="primary" size="icon" aria-label={`Accept ${user.username}`} onClick={onAccept}>
+          <Button variant="primary" size="icon" aria-label={`Accept ${user.username}`} onClick={onAccept} disabled={busy}>
             <CheckIcon />
           </Button>
-          <Button variant="ghost" size="icon" aria-label={`Decline ${user.username}`} onClick={onRemove}>
+          <Button variant="ghost" size="icon" aria-label={`Decline ${user.username}`} onClick={onRemove} disabled={busy}>
             <XIcon />
           </Button>
         </div>
       )}
 
       {sent && (
-        <Button variant="ghost" size="icon" aria-label={`Cancel request to ${user.username}`} onClick={onRemove}>
+        <Button variant="ghost" size="icon" aria-label={`Cancel request to ${user.username}`} onClick={onRemove} disabled={busy}>
           <XIcon />
         </Button>
       )}
 
       {isSearch && friendState === 'none' && (
-        <Button variant="primary" size="icon" aria-label={`Add ${user.username}`} onClick={onAdd}>
+        <Button variant="primary" size="icon" aria-label={`Add ${user.username}`} onClick={onAdd} disabled={busy}>
           <PlusIcon />
         </Button>
       )}
