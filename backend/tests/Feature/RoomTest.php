@@ -114,6 +114,16 @@ class RoomTest extends TestCase
             ->assertJsonValidationErrors(['settings.width']);
     }
 
+    // Con ancho y alto distintos los gusanos podían nacer fuera del tablero
+    public function test_the_board_must_be_square(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->postJson('/api/rooms', ['name' => 'Wide', 'settings' => ['width' => 75, 'height' => 11, 'startLength' => 22] + self::SNAKE])
+            ->assertFails(422)
+            ->assertJsonValidationErrors(['settings.height']);
+    }
+
     public function test_pillars_and_deadly_walls_do_not_go_together(): void
     {
         $this->actingAs(User::factory()->create());

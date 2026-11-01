@@ -23,7 +23,8 @@ class StoreRoomRequest extends FormRequest
             'settings' => ['required', 'array:width,height,pillars,softWalls,wrap,tickMs,players,startLength,food,bombs,wallHit,bodyHit,controls,camera,botMistakes'],
             // Lado impar: con uno par el asiento 2 nace con un pilar delante (pilares en x e y pares)
             'settings.width' => ['required', 'integer', 'between:11,75', fn ($attribute, $value, $fail) => $value % 2 === 1 || $fail('The board side must be odd.')],
-            'settings.height' => ['required', 'integer', 'between:10,75'],
+            // Tablero cuadrado: el largo inicial se limita por el ancho y los gusanos nacen en las cuatro esquinas
+            'settings.height' => ['required', 'integer', 'same:settings.width'],
             'settings.pillars' => ['required', 'boolean'],
             // Con pilares no hay muros aleatorios
             'settings.softWalls' => ['required', 'numeric', 'between:0,'.($this->boolean('settings.pillars') ? 0 : 0.5)],
