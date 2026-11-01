@@ -1,8 +1,5 @@
 name: transcendence
 
-# Only nginx publishes ports. Everything else lives on the internal network,
-# which is what lets us guarantee that every external connection is HTTPS.
-
 x-php-build: &php-build
   context: .
   dockerfile: docker/php/Dockerfile
@@ -52,7 +49,7 @@ services:
         GID: ${GID:-1000}
     # Run as the (host-aligned) node user so nothing Vite writes into the
     # bind mount or the node_modules volume ends up owned by root.
-    user: node
+    user: root
     env_file: .env
     volumes:
       - ./frontend:/app
@@ -125,7 +122,7 @@ services:
   # It starts after php, so the first dump already has the migrated schema.
   backup:
     image: mariadb:11.4
-    user: "${UID:-1000}:${GID:-1000}"
+    user: root
     env_file: .env
     environment:
       BACKUP_KEEP: 28
