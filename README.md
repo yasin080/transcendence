@@ -172,6 +172,30 @@ the app are kept. `make fresh` resets the database to this initial state.
 | `make restore FILE=backups/<date>.sql.gz` | Load a dump into the database. |
 | `make fclean` | Remove containers, volumes and images. **Wipes the database and the certificate.** The dumps in `./backups` survive. |
 
+### Backups and disaster recovery
+
+The `backup` service dumps the MariaDB database every 6 hours into `./backups`, a
+folder on the host, outside Docker, so the dumps survive `make fclean`. The newest 28
+are kept (one week). Each dump is written to a temporary file and only kept if it ends
+with `Dump completed`, so a dump cut in half never replaces a good one. `/health`
+marks the backup as failing when the newest dump is more than 7 hours old.
+
+To recover the database after a disaster (run `make backup` first to try it with the
+current data):
+
+1. `make fclean`: the disaster. Containers and volumes are removed, and the database
+   with them.
+2. `make up`: start a fresh stack.
+3. `make restore FILE=backups/<date>.sql.gz`: load the last dump taken **before** the
+   disaster. File names are dates. The newest file is not that one: the `backup`
+   service dumps the new database (demo data only) as soon as it starts.
+4. Open `/health` and check that everything is green. The users, friends and match
+   history from the dump are back.
+
+Redis is not backed up: it only holds sessions, cache, the job queue and the state of
+the matches being played. After a recovery everyone has to log in again, and the
+matches that were in progress are lost.
+
 ## Resources
 
 ### Documentation
@@ -516,7 +540,8 @@ the database after a disaster. **How:** `GET /api/health` checks the database, R
 the game loop, the queue and the last backup, and answers 503 if any fails; the
 `/health` status page shows it every 5 seconds, plus the WebSocket connection. The
 `backup` service dumps the database every 6 hours into `./backups` (outside Docker),
-and `make restore FILE=…` loads a dump into a fresh stack.
+and `make restore FILE=…` loads a dump into a fresh stack. See
+[Backups and disaster recovery](#backups-and-disaster-recovery).
 
 ### 10. Complete web-based game — Major
 **Why:** the core of the project. **How:** a worm game for 1 to 4 players, played
