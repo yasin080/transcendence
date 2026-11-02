@@ -64,10 +64,11 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game, you: numb
   const sun = new DirectionalLight('sun', new Vector3(-0.6, -0.45, 0.35), scene)
   sun.intensity = 0.95
   sun.diffuse = new Color3(0.75, 0.9, 1)
-  // Everything but the floor casts a shadow; the floor receives them (floor.ts)
+
   sun.autoCalcShadowZBounds = true
   const shadows = new ShadowGenerator(1024, sun)
   shadows.usePercentageCloserFiltering = true
+  shadows.transparencyShadow = true
   scene.onNewMeshAddedObservable.add((mesh) => mesh.name !== 'floor' && shadows.addShadowCaster(mesh))
 
   const post = new DefaultRenderingPipeline('post', true, scene, [cam])
