@@ -402,7 +402,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Responsive design | Layout adapted to mobile and desktop. | ybahri |
 | Privacy Policy and Terms of Service | Legal pages accessible from the application. | ybahri |
 | **Rooms and lobby** | | |
-| Lobby | List of open rooms, updated in real time, with search by name or code. | beiglesi, ybahri |
+| Lobby | List of open rooms, updated in real time, with search by name. | beiglesi, ybahri |
 | Waiting room | Players and bots in the room, updated in real time; the host starts the match. | beiglesi, aolabarr |
 | **Game** | | |
 | 3D game | Board rendered with Babylon.js, with three cameras: whole board, follow and behind the head. | ivromero |
@@ -472,8 +472,9 @@ repeating styles in every screen. **How:** design tokens in `frontend/src/theme.
 warm accents (`ember`, `gold`) and colors with a fixed meaning (`online`, `mint` for
 bots); text, border and fill greys; typography with Bungee for display and Space
 Grotesk for body, plus an extra small size and caps tracking; custom animations.
-Hand-drawn SVG icons, all in `frontend/src/components/ui/icons.tsx`. Eleven reusable
-components in `frontend/src/components/ui`:
+SVG icons as React components in `frontend/src/components/ui/icons.tsx`, all sharing
+one 24×24 stroke style (some adapted from Lucide and Feather, credited in the Terms).
+Eleven reusable components in `frontend/src/components/ui`:
 `Button`, `Avatar`, `Modal`, `MessageModal`, `FormField`, `SearchInput`, `ToggleChip`,
 `SectionHeader`, `EmptyState`, `LegalLinks` and `Sidebar`, each used in two or more places.
 
@@ -630,11 +631,16 @@ meeting so that they stayed focused and useful.
 - **Design system:** 11 reusable components with a shared palette and typography.
 - **Layout:** dashboard layout, first versions of the lobby and the social panel.
 - **Responsive design:** landing page and app adapted to mobile and desktop.
-- **Lobby:** search rooms by name or code.
+- **Lobby:** search rooms by name.
 - **Game UI:** in-game scoreboard and end-of-match screen.
 - **Spectator mode:** watch a match in progress from the lobby.
 - **Legal pages:** Privacy Policy and Terms of Service.
 
-**Challenges:** [RETOMAR]
+**Challenges:** Before this project, my only experience was the 42 common core: mostly
+backend work in C and C++. Frontend, React and Laravel were all new to me, and the
+biggest challenge was changing the way I think, from programs that run step by step to
+screens that update themselves when something changes. Spectator mode was the first
+feature I built on both sides, from the lobby to the server. I also learned to build on
+code that my teammates were changing at the same time.
 
 
