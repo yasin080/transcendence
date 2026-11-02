@@ -31,10 +31,11 @@ export const CAMERA_OPTIONS: Option<Camera>[] = [
   { label: 'Behind the head', value: 'head' },
 ]
 
+// Lado impar: con uno par el asiento 2 nace con un pilar delante (pilares en x e y pares)
 export const BOARD_OPTIONS: Option<number>[] = [
-  { label: 'Small', value: 20 },
+  { label: 'Small', value: 21 },
   { label: 'Medium', value: 35 },
-  { label: 'Large', value: 50 },
+  { label: 'Large', value: 51 },
 ]
 
 // tickMs: menos milisegundos por paso = gusano más rápido, por eso va de 300 a 100
@@ -51,7 +52,7 @@ export const BOT_MISTAKE_OPTIONS = range(20, 80, 5, (n) => `${n}%`)
 // Proporción de muros aleatorios: de 0 a 0.05
 export const SOFT_WALL_OPTIONS = range(0, 5, 1, (n) => `${n}%`).map(({ label, value }) => ({ label, value: value / 100 }))
 
-// El largo inicial crece con el tablero: el 30 % del lado (20 → 6, 35 → 10, 50 → 15)
+// El largo inicial crece con el tablero: el 30 % del lado (21 → 6, 35 → 10, 51 → 15)
 export const maxStartLength = (boardSize: number) => Math.floor((boardSize * 3) / 10)
 export const startLengthOptions = (boardSize: number) => range(1, maxStartLength(boardSize))
 

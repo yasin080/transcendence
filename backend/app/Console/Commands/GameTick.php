@@ -10,6 +10,7 @@ use App\Game\LiveGames;
 use App\Game\Presence;
 use App\Models\Game;
 use Illuminate\Console\Command;
+use Throwable;
 
 class GameTick extends Command
 {
@@ -24,7 +25,13 @@ class GameTick extends Command
         while (true) {
             LiveGames::heartbeat();
             foreach (LiveGames::active() as $id) {
-                $this->advance($id);
+                // Una partida rota no puede parar a las demás: se apunta el error y se cierra solo esa
+                try {
+                    $this->advance($id);
+                } catch (Throwable $e) {
+                    report($e);
+                    $this->end($id);
+                }
             }
             usleep(10_000);
         }

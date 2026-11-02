@@ -28,4 +28,5 @@ export function createFloor(scene: Scene, width: number, height: number) {
 
   const floor = CreateGround('floor', { width, height }, scene)
   floor.material = material
+  floor.receiveShadows = true
 }

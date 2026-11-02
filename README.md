@@ -297,8 +297,8 @@ Clients only send their moves. This keeps all players in sync, prevents cheating
 the browser and lets bots play exactly like humans.
 
 **Redis for live matches.** A match changes state several times per second. Keeping it
-in Redis avoids writing to the database on every tick; only durable data (who played,
-when it ended) is stored in MariaDB.
+in Redis avoids writing to the database on every tick; only durable data (the room,
+its seats, and when each match started and ended) is stored in MariaDB.
 
 **nginx as single entry point.** Only nginx publishes ports. Every external connection,
 HTTP or WebSocket, goes through it over HTTPS, as the subject requires, while traffic
@@ -454,7 +454,8 @@ injection. **How:** Eloquent models for users, OAuth accounts, rooms, room playe
 games and friendships, with their relationships and casts (room settings are stored as
 JSON). The schema is versioned with migrations, with foreign keys and unique
 constraints; seeders create test accounts. Joining a room runs in a transaction with
-row locks. The only raw SQL is the health check's `select 1`.
+row locks. The only raw SQL is the health check's `select 1` and two `DB::raw`
+column copies inside migrations.
 
 ### 3. Frontend framework — Minor
 **Why:** the team already knew it, and its component model fits a UI that updates with
@@ -525,10 +526,12 @@ conditions are in [Game Rules](#game-rules).
 ### 11. Advanced 3D graphics — Major
 **Why:** a 3D board makes the arena readable and alive, and lets the camera follow
 your worm. **How:** Babylon.js, loaded only on the game page. glTF models for worms,
-food, bombs, walls and explosions, with instancing for repeated meshes; sky and sun
-lights, emissive materials and a post-processing pipeline (bloom, FXAA). Worms glide
-smoothly between ticks by interpolating their positions every frame. Three cameras:
-whole board, follow and behind the head.
+food, bombs, walls and explosions; walls, food, bombs and blasts are instances of a
+single mesh each, worm segments are clones. Sky and sun lights, with the sun casting
+real-time shadows (shadow map with PCF filtering); a floor that mirrors the worms in
+real time (MirrorTexture); emissive materials and a post-processing pipeline (bloom,
+FXAA). Worms glide smoothly between ticks by interpolating their positions every frame.
+Three cameras: whole board, follow and behind the head.
 
 ### 12. Game customization — Minor
 **Why:** one game that becomes many. **How:** the host starts from a preset (Classic,

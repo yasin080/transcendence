@@ -69,7 +69,9 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
-      start_period: 60s
+      # On a clean clone the entrypoint runs composer install, migrations and
+      # seeders before php-fpm listens; a slow machine needs more than 60 s.
+      start_period: 180s
 
   reverb:
     build: *php-build
