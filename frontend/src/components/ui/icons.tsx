@@ -1,6 +1,5 @@
 import type { SVGProps } from 'react'
 
-// Iconos SVG propios del design system: todos de 24x24, trazo con currentColor.
 
 const stroke: SVGProps<SVGSVGElement> = {
   fill: 'none',

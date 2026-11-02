@@ -172,6 +172,30 @@ the app are kept. `make fresh` resets the database to this initial state.
 | `make restore FILE=backups/<date>.sql.gz` | Load a dump into the database. |
 | `make fclean` | Remove containers, volumes and images. **Wipes the database and the certificate.** The dumps in `./backups` survive. |
 
+### Backups and disaster recovery
+
+The `backup` service dumps the MariaDB database every 6 hours into `./backups`, a
+folder on the host, outside Docker, so the dumps survive `make fclean`. The newest 28
+are kept (one week). Each dump is written to a temporary file and only kept if it ends
+with `Dump completed`, so a dump cut in half never replaces a good one. `/health`
+marks the backup as failing when the newest dump is more than 7 hours old.
+
+To recover the database after a disaster (run `make backup` first to try it with the
+current data):
+
+1. `make fclean`: the disaster. Containers and volumes are removed, and the database
+   with them.
+2. `make up`: start a fresh stack.
+3. `make restore FILE=backups/<date>.sql.gz`: load the last dump taken **before** the
+   disaster. File names are dates. The newest file is not that one: the `backup`
+   service dumps the new database (demo data only) as soon as it starts.
+4. Open `/health` and check that everything is green. The users, friends and match
+   history from the dump are back.
+
+Redis is not backed up: it only holds sessions, cache, the job queue and the state of
+the matches being played. After a recovery everyone has to log in again, and the
+matches that were in progress are lost.
+
 ## Resources
 
 ### Documentation
@@ -402,7 +426,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Responsive design | Layout adapted to mobile and desktop. | ybahri |
 | Privacy Policy and Terms of Service | Legal pages accessible from the application. | ybahri |
 | **Rooms and lobby** | | |
-| Lobby | List of open rooms, updated in real time, with search by name or code. | beiglesi, ybahri |
+| Lobby | List of open rooms, updated in real time, with search by name. | beiglesi, ybahri |
 | Waiting room | Players and bots in the room, updated in real time; the host starts the match. | beiglesi, aolabarr |
 | **Game** | | |
 | 3D game | Board rendered with Babylon.js, with three cameras: whole board, follow and behind the head. | ivromero |
@@ -472,8 +496,9 @@ repeating styles in every screen. **How:** design tokens in `frontend/src/theme.
 warm accents (`ember`, `gold`) and colors with a fixed meaning (`online`, `mint` for
 bots); text, border and fill greys; typography with Bungee for display and Space
 Grotesk for body, plus an extra small size and caps tracking; custom animations.
-Hand-drawn SVG icons, all in `frontend/src/components/ui/icons.tsx`. Eleven reusable
-components in `frontend/src/components/ui`:
+SVG icons as React components in `frontend/src/components/ui/icons.tsx`, all sharing
+one 24×24 stroke style (some adapted from Lucide and Feather, credited in the Terms).
+Eleven reusable components in `frontend/src/components/ui`:
 `Button`, `Avatar`, `Modal`, `MessageModal`, `FormField`, `SearchInput`, `ToggleChip`,
 `SectionHeader`, `EmptyState`, `LegalLinks` and `Sidebar`, each used in two or more places.
 
@@ -515,7 +540,8 @@ the database after a disaster. **How:** `GET /api/health` checks the database, R
 the game loop, the queue and the last backup, and answers 503 if any fails; the
 `/health` status page shows it every 5 seconds, plus the WebSocket connection. The
 `backup` service dumps the database every 6 hours into `./backups` (outside Docker),
-and `make restore FILE=…` loads a dump into a fresh stack.
+and `make restore FILE=…` loads a dump into a fresh stack. See
+[Backups and disaster recovery](#backups-and-disaster-recovery).
 
 ### 10. Complete web-based game — Major
 **Why:** the core of the project. **How:** a worm game for 1 to 4 players, played
@@ -630,11 +656,16 @@ meeting so that they stayed focused and useful.
 - **Design system:** 11 reusable components with a shared palette and typography.
 - **Layout:** dashboard layout, first versions of the lobby and the social panel.
 - **Responsive design:** landing page and app adapted to mobile and desktop.
-- **Lobby:** search rooms by name or code.
+- **Lobby:** search rooms by name.
 - **Game UI:** in-game scoreboard and end-of-match screen.
 - **Spectator mode:** watch a match in progress from the lobby.
 - **Legal pages:** Privacy Policy and Terms of Service.
 
-**Challenges:** [RETOMAR]
+**Challenges:** Before this project, my only experience was the 42 common core: mostly
+backend work in C and C++. Frontend, React and Laravel were all new to me, and the
+biggest challenge was changing the way I think, from programs that run step by step to
+screens that update themselves when something changes. Spectator mode was the first
+feature I built on both sides, from the lobby to the server. I also learned to build on
+code that my teammates were changing at the same time.
 
 
