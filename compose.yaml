@@ -44,11 +44,9 @@ services:
     build:
       context: .
       dockerfile: docker/node/Dockerfile
-      args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
-    # Run as the (host-aligned) node user so nothing Vite writes into the
-    # bind mount or the node_modules volume ends up owned by root.
+    # Runs as root: the node_modules named volume is seeded as root, and a
+    # remapped node user could not install into it on a clean clone (EACCES).
+    # Everything it writes on the host (dist, node_modules) is only ever read.
     user: root
     env_file: .env
     volumes:

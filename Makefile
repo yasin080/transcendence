@@ -1,5 +1,11 @@
 COMPOSE := docker compose
 
+# php-fpm runs as the host user so it can write to the bind-mounted backend
+# (logs). Taken from the shell, never typed into .env: a wrong value there only
+# shows up on Linux, as "Permission denied" on the first error to be logged.
+export UID := $(shell id -u)
+export GID := $(shell id -g)
+
 # Port HTTPS published (from .env; 1443 if not set)
 HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2),1443)
 

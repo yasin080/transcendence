@@ -111,7 +111,6 @@ Edit `.env` and set at least:
 
 | Variable | What to put |
 |---|---|
-| `UID`, `GID` | Your host user, from `id -u` and `id -g`. Keeps generated files owned by you. |
 | `DB_PASSWORD`, `DB_ROOT_PASSWORD` | Two passwords of your choice. |
 | `REVERB_APP_KEY`, `REVERB_APP_SECRET` | Random strings (e.g. `openssl rand -hex 16`). |
 | `VITE_REVERB_APP_KEY` | **The same value** as `REVERB_APP_KEY`. |
