@@ -13,8 +13,10 @@ use Throwable;
 /**
  * Liveness probe for the whole stack.
  *
- * Deliberately touches the real dependencies instead of just returning 200:
- * a health endpoint that cannot fail tells you nothing.
+ * Deliberately touches the real dependencies instead of just saying "ok":
+ * a health endpoint that cannot fail tells you nothing. The verdict travels
+ * in the body (`status`), always with HTTP 200: Chrome paints any 5xx red in
+ * the console, and a degraded stack is a report, not an error of this request.
  */
 class HealthController extends Controller
 {
@@ -28,13 +30,11 @@ class HealthController extends Controller
             'backup' => $this->lastBackup(...),
         ]);
 
-        $healthy = collect($checks)->every('ok');
-
         return response()->json([
-            'status' => $healthy ? 'ok' : 'degraded',
+            'status' => collect($checks)->every('ok') ? 'ok' : 'degraded',
             'checks' => $checks,
             'laravel' => app()->version(),
-        ], $healthy ? 200 : 503);
+        ]);
     }
 
     private function run(callable $check): array

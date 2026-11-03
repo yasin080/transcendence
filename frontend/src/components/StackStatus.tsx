@@ -33,8 +33,8 @@ export default function StackStatus() {
     const check = () =>
       fetch('/api/health')
         .then((res) => {
-          // 503 still carries the report: it just says something is down.
-          if (!res.ok && res.status !== 503) throw new Error(`HTTP ${res.status}`)
+          // The verdict is in the body: a degraded stack still answers 200
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
           return res.json() as Promise<Health>
         })
         .then((health) => {
