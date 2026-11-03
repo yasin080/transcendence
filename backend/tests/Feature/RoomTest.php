@@ -307,14 +307,20 @@ class RoomTest extends TestCase
     {
         $host = User::factory()->create();
         $this->actingAs($host);
-        $this->getJson('/api/rooms/current')->assertOk()->assertExactJson(['code' => null]);
+        $this->getJson('/api/rooms/current')->assertOk()->assertJson(['code' => null, 'status' => null]);
 
         $room = $this->createRoom($host);
-        $this->getJson('/api/rooms/current')->assertExactJson(['code' => $room->code]);
+        $this->getJson('/api/rooms/current')
+            ->assertJson(['code' => $room->code, 'name' => 'Snake night', 'status' => 'open', 'game_id' => null]);
 
-        // El host sale: la sala se cierra y deja de contar
+        // Once the match starts, the lobby needs the game to offer a way back to it
+        $gameId = $this->postJson("/api/rooms/{$room->code}/games")->json('id');
+        $this->getJson('/api/rooms/current')->assertJson(['status' => 'playing', 'game_id' => $gameId]);
+
+        // Once the match is over the host leaves: the room closes and no longer counts
+        $room->fresh()->update(['status' => 'open']);
         $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
-        $this->getJson('/api/rooms/current')->assertExactJson(['code' => null]);
+        $this->getJson('/api/rooms/current')->assertJson(['code' => null]);
     }
 
     public function test_starting_a_match_puts_its_live_state_in_redis(): void
@@ -552,7 +558,7 @@ class RoomTest extends TestCase
         $this->assertSame($guest->id, $room->fresh()->host_id);
     }
 
-    public function test_the_host_alone_with_bots_keeps_the_seat_mid_match(): void
+    public function test_the_host_alone_with_bots_leaving_mid_match_closes_the_room(): void
     {
         $host = User::factory()->create();
         $room = $this->createRoom($host, players: 2);
@@ -561,11 +567,13 @@ class RoomTest extends TestCase
 
         $this->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
 
-        $this->assertSame($host->id, $room->fresh()->host_id);
-        $this->assertTrue($room->players()->where('user_id', $host->id)->exists());
+        // Nobody is left to start the next match, so the room must not linger in the lobby
+        $this->assertSame('closed', $room->fresh()->status);
+        $this->assertFalse($room->players()->where('user_id', $host->id)->exists());
+        $this->getJson('/api/rooms/current')->assertJson(['code' => null]);
     }
 
-    public function test_leaving_mid_match_keeps_the_seat(): void
+    public function test_leaving_mid_match_gives_up_the_seat(): void
     {
         $room = $this->createRoom(User::factory()->create(), players: 2);
         $guest = User::factory()->create();
@@ -574,6 +582,9 @@ class RoomTest extends TestCase
 
         $this->actingAs($guest)->postJson("/api/rooms/{$room->code}/leave")->assertNoContent();
 
-        $this->actingAs($guest)->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', 1);
+        // From now on they can only watch, and they are free to join another room
+        $this->getJson("/api/games/{$gameId}")->assertOk()->assertJsonPath('seat', null);
+        $this->getJson('/api/rooms/current')->assertJson(['code' => null]);
+        $this->assertSame('playing', $room->fresh()->status);
     }
 }

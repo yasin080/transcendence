@@ -32,7 +32,14 @@ class RoomController extends Controller
     // Código de la sala en la que está el usuario, o null si no está en ninguna
     public function current(Request $request): JsonResponse
     {
-        return response()->json(['code' => $request->user()->currentRoom()?->code]);
+        $room = $request->user()->currentRoom();
+
+        return response()->json([
+            'code' => $room?->code,
+            'name' => $room?->name,
+            'status' => $room?->status,
+            'game_id' => $room?->status === 'playing' ? $room->latestGame?->id : null,
+        ]);
     }
 
     public function store(StoreRoomRequest $request): JsonResponse
@@ -139,17 +146,17 @@ class RoomController extends Controller
             $room = Room::whereKey($room->id)->lockForUpdate()->first();
             
             if ($room->status === 'playing') {
-                // El host que se va a mitad de partida pasa el mando al siguiente jugador
-                // y pierde su asiento; puede volver a entrar como jugador cuando acabe.
-                $heir = $room->players()->whereNotNull('user_id')->where('user_id', '!=', $userId)->orderBy('seat')->first();
-                if ($room->host_id !== $userId || ! $heir) {
-                    // Mid-match you keep your seat, so you can still go back to the game.
-                    return null;
-                }
-                
-                $room->update(['host_id' => $heir->user_id]);
+                // Leaving mid-match is explicit (the lobby asks first), so the seat goes.
+                // The worm stays on the board and Presence takes it out when the pings stop.
                 $room->players()->where('user_id', $userId)->delete();
-                return $room;    
+                if ($room->host_id === $userId) {
+                    // The host hands the room to the next human; with none left, the room
+                    // closes so it does not linger in the lobby with nobody able to start it.
+                    $heir = $room->players()->whereNotNull('user_id')->orderBy('seat')->first();
+                    $room->update($heir ? ['host_id' => $heir->user_id] : ['status' => 'closed']);
+                }
+
+                return $room;
             }
 
             if ($room->host_id === $userId) {

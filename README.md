@@ -579,8 +579,9 @@ of ticks set by the host (bot mistakes, 20–80 %) it does not look at all.
 runs the match and broadcasts each tick; clients only send their moves and draw the
 worms gliding between ticks, so latency doesn't make them jump. The countdown is synced
 to the server clock. A page that stops pinging leaves its worm still and grey after
-2.5 s; reloading the page or pressing "Enter" on the room in the lobby brings the player
-back within 10 s, otherwise the worm is out.
+2.5 s; reloading the page brings the player back within 10 s, otherwise the worm is out.
+A player who still has a seat and opens the lobby is asked whether to go back to the
+match or leave it: nothing is decided for them, and only leaving gives up the seat.
 
 ### 15. Multiplayer (3+ players) — Major
 **Why:** the game is designed for up to four players. **How:** up to four seats per
