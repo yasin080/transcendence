@@ -9,6 +9,7 @@ use App\Game\Game as GameLogic;
 use App\Game\LiveGames;
 use App\Game\Presence;
 use App\Models\Game;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Console\Command;
 use Throwable;
 
@@ -69,7 +70,7 @@ class GameTick extends Command
         }
         GameLogic::tick($state);
         LiveGames::save($id, $state);
-        broadcast(new GameTicked($id, $state));
+        $this->emit(new GameTicked($id, $state));
 
         if (GameLogic::isOver($state)) {
             $this->end($id);
@@ -84,7 +85,18 @@ class GameTick extends Command
         $game?->update(['ended_at' => now()]);
         $game?->room()->where('status', 'playing')->update(['status' => 'open']);
         if ($game) {
-            LobbyRoomUpdated::dispatch($game->room);
+            $this->emit(new LobbyRoomUpdated($game->room));
+        }
+    }
+
+    // Reverb being unreachable must not end the match: the state is already saved,
+    // so the clients miss this message and catch up with the next tick.
+    private function emit(object $event): void
+    {
+        try {
+            broadcast($event);
+        } catch (BroadcastException $e) {
+            report($e);
         }
     }
 }

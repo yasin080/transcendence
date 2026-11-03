@@ -531,7 +531,9 @@ presence channel `online` shows who is connected. Events are broadcast immediate
 (`ShouldBroadcastNow`), with no queue in between. The server runs each match
 (`game:tick`) and broadcasts its state on every tick; a client that drops and
 reconnects is back in sync with the next tick, and the lobby and waiting room fetch
-their data again on reconnect. The connection is closed and reopened
+their data again on reconnect. If Reverb itself is unreachable for a moment, the loop
+logs it and skips that broadcast: the state is already saved, so the next tick
+carries it and no match is lost. The connection is closed and reopened
 when the page goes into or comes back from the browser's back/forward cache.
 
 ### 9. Health check and status page — Minor
