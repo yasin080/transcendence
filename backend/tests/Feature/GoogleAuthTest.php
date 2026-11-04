@@ -47,7 +47,7 @@ class GoogleAuthTest extends TestCase
 
     public function test_a_returning_google_user_logs_into_the_linked_account(): void
     {
-        // Email distinto en Google: se le encuentra por el vínculo, no por email
+        // Different email on Google: the user is found through the link, not by email
         $user = User::factory()->create(['email' => 'old@example.com']);
         $user->oauthAccounts()->create(['provider' => 'google', 'provider_id' => 'google-123']);
         $this->googleReturns('new@example.com', verified: true);

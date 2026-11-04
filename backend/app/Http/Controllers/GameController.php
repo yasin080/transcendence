@@ -62,12 +62,12 @@ class GameController extends Controller
         $seat = $this->seatOf($request, $game);
         $input = $request->validate([
             'side' => ['required_without:dir', 'in:left,right'],
-            // Solo las cuatro direcciones: ni diagonal ni quieto
+            // Only the four directions: no diagonals, no standing still
             'dir' => ['required_without:side', 'array:x,y', fn ($attribute, $dir, $fail) => in_array($dir, self::DIRECTIONS) || $fail('The direction must be up, down, left or right.')],
         ]);
         abort_if($game->ended_at !== null, 409, 'This match has already ended.');
 
-        // El bucle compara la dirección con ===, así que no puede llegar como cadena
+        // The game loop compares the direction with ===, so it cannot arrive as a string
         if (isset($input['dir'])) {
             $input['dir'] = array_map(intval(...), $input['dir']);
         }

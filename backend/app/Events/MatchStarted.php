@@ -8,7 +8,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 
-// Avisa a la sala de espera de que la partida ha empezado
+// Tells the waiting room that the match has started
 class MatchStarted implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets;

@@ -40,7 +40,7 @@ class RoomTest extends TestCase
         'botMistakes' => 50,
     ];
 
-    // El nombre tiene que ser único entre las salas activas
+    // The name must be unique among active rooms
     private function createRoom(User $host, int $players = 1, string $name = 'Snake night'): Room
     {
         $this->actingAs($host);
@@ -95,7 +95,7 @@ class RoomTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        // 31 de ancho: hasta 9 casillas de largo
+        // 31 wide: up to 9 cells long
         $this->postJson('/api/rooms', ['name' => 'Long', 'settings' => ['startLength' => 10] + self::SNAKE])
             ->assertFails(422)
             ->assertJsonValidationErrors(['settings.startLength']);
@@ -114,7 +114,7 @@ class RoomTest extends TestCase
             ->assertJsonValidationErrors(['settings.width']);
     }
 
-    // Con ancho y alto distintos los gusanos podían nacer fuera del tablero
+    // With an even side, seat 2 spawns facing a pillar (pillars sit on even x and y)
     public function test_the_board_must_be_square(): void
     {
         $this->actingAs(User::factory()->create());
@@ -347,7 +347,7 @@ class RoomTest extends TestCase
         $this->assertSame([0 => ['side' => 'right']], LiveGames::takeInputs($gameId));
         $this->assertSame([], LiveGames::takeInputs($gameId));
 
-        // Una dirección llega como enteros aunque el cliente mande cadenas: el bucle compara con ===
+        // A direction arrives as integers even if the client sends strings: the game loop compares with ===
         $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => '0', 'y' => '-1']])->assertNoContent();
         $this->assertSame([0 => ['dir' => ['x' => 0, 'y' => -1]]], LiveGames::takeInputs($gameId));
     }
@@ -359,7 +359,7 @@ class RoomTest extends TestCase
 
         $this->postJson("/api/games/{$gameId}/turn", ['side' => 'up'])->assertFails(422);
         $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 5, 'y' => 0]])->assertFails(422);
-        // Solo las cuatro direcciones: ni diagonal ni quieto
+        // Only the four directions: no diagonals, no standing still
         $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 1, 'y' => 1]])->assertFails(422);
         $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 0, 'y' => 0]])->assertFails(422);
         $this->postJson("/api/games/{$gameId}/turn", ['dir' => ['x' => 'up', 'y' => 0]])->assertFails(422);
@@ -496,7 +496,7 @@ class RoomTest extends TestCase
         $this->actingAs($host)->postJson("/api/rooms/{$room->code}/kick/{$player->id}")->assertNoContent();
 
         $this->assertFalse($room->players()->where('user_id', $guest->id)->exists());
-        // El asiento queda libre para otro jugador
+        // The seat is free for another player
         $this->actingAs(User::factory()->create())->postJson("/api/rooms/{$room->code}/join")->assertOk();
     }
 
