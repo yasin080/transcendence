@@ -111,7 +111,6 @@ Edit `.env` and set at least:
 
 | Variable | What to put |
 |---|---|
-| `UID`, `GID` | Your host user, from `id -u` and `id -g`. Keeps generated files owned by you. |
 | `DB_PASSWORD`, `DB_ROOT_PASSWORD` | Two passwords of your choice. |
 | `REVERB_APP_KEY`, `REVERB_APP_SECRET` | Random strings (e.g. `openssl rand -hex 16`). |
 | `VITE_REVERB_APP_KEY` | **The same value** as `REVERB_APP_KEY`. |
@@ -531,14 +530,17 @@ presence channel `online` shows who is connected. Events are broadcast immediate
 (`ShouldBroadcastNow`), with no queue in between. The server runs each match
 (`game:tick`) and broadcasts its state on every tick; a client that drops and
 reconnects is back in sync with the next tick, and the lobby and waiting room fetch
-their data again on reconnect. The connection is closed and reopened
+their data again on reconnect. If Reverb itself is unreachable for a moment, the loop
+logs it and skips that broadcast: the state is already saved, so the next tick
+carries it and no match is lost. The connection is closed and reopened
 when the page goes into or comes back from the browser's back/forward cache.
 
 ### 9. Health check and status page — Minor
 **Why:** to see at a glance that the whole stack is alive, and to be able to rebuild
 the database after a disaster. **How:** `GET /api/health` checks the database, Redis,
-the game loop, the queue and the last backup, and answers 503 if any fails; the
-`/health` status page shows it every 5 seconds, plus the WebSocket connection. The
+the game loop, the queue and the last backup, and reports `ok` or `degraded` in the
+body (always with HTTP 200, so a degraded stack never paints the browser console red);
+the `/health` status page shows it every 5 seconds, plus the WebSocket connection. The
 `backup` service dumps the database every 6 hours into `./backups` (outside Docker),
 and `make restore FILE=…` loads a dump into a fresh stack. See
 [Backups and disaster recovery](#backups-and-disaster-recovery).
@@ -579,8 +581,9 @@ of ticks set by the host (bot mistakes, 20–80 %) it does not look at all.
 runs the match and broadcasts each tick; clients only send their moves and draw the
 worms gliding between ticks, so latency doesn't make them jump. The countdown is synced
 to the server clock. A page that stops pinging leaves its worm still and grey after
-2.5 s; reloading the page or pressing "Enter" on the room in the lobby brings the player
-back within 10 s, otherwise the worm is out.
+2.5 s; reloading the page brings the player back within 10 s, otherwise the worm is out.
+A player who still has a seat and opens the lobby is asked whether to go back to the
+match or leave it: nothing is decided for them, and only leaving gives up the seat.
 
 ### 15. Multiplayer (3+ players) — Major
 **Why:** the game is designed for up to four players. **How:** up to four seats per

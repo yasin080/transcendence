@@ -11,19 +11,18 @@ import { PRESETS, quickMatchSettings } from '../components/lobby/roomOptions.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { echo, onReconnect } from '../lib/echo'
 import Button from '../components/ui/Button.tsx'
+import Modal from '../components/ui/Modal.tsx'
 import duel from '../assets/duel.webp'
 import RoomRow from '../components/lobby/RoomRow.tsx'
 import LegalLinks from '../components/ui/LegalLinks.tsx'
 
 
-type CurrentRoom = { code: string | null }
-
-async function leaveCurrentRoom(): Promise<string | null> {
-  const current = await apiGet<CurrentRoom>('/api/rooms/current')
-  if (!current.ok || !current.data.code) return null
-  await apiPost(`/api/rooms/${current.data.code}/leave`)
-  const after = await apiGet<CurrentRoom>('/api/rooms/current')
-  return after.ok ? after.data.code : null
+// The room the player still has a seat in, if any (GET /api/rooms/current)
+type CurrentRoom = {
+  code: string | null
+  name: string | null
+  status: 'open' | 'playing' | null
+  game_id: number | null
 }
 
 export default function Lobby() {
@@ -43,7 +42,23 @@ export default function Lobby() {
 
   const [rooms, setRooms] = useState<RoomSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [myRoomCode, setMyRoomCode] = useState<string | null>(null)
+  // A player who still has a seat is asked whether to go back or leave; nothing is decided for them
+  const [current, setCurrent] = useState<CurrentRoom | null>(null)
+  const [asking, setAsking] = useState(false)
+  const myRoomCode = current?.code ?? null
+
+  function backToRoom() {
+    if (!current?.code) return
+    const playing = current.status === 'playing' && current.game_id !== null
+    navigate(playing ? `/game/${current.game_id}` : `/waiting-room/${current.code}`)
+  }
+
+  async function leaveRoom() {
+    if (!current?.code) return
+    await apiPost(`/api/rooms/${current.code}/leave`)
+    setCurrent(null)
+    setAsking(false)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -57,13 +72,15 @@ export default function Lobby() {
     loadRooms()
     const stopReconnect = onReconnect(loadRooms)
 
-    void leaveCurrentRoom().then((code) => {
-      if (!cancelled) setMyRoomCode(code)
+    void apiGet<CurrentRoom>('/api/rooms/current').then((result) => {
+      if (cancelled || !result.ok) return
+      setCurrent(result.data)
+      setAsking(result.data.code !== null)
     })
 
     echo.private('lobby').listen('.room.updated', ({ room }: { room: RoomSummary }) => {
       if (room.status === 'closed') {
-        setMyRoomCode((prev) => (prev === room.code ? null : prev))
+        setCurrent((prev) => (prev?.code === room.code ? null : prev))
       }
       setRooms((prev) => {
         const list = prev ?? []
@@ -148,6 +165,22 @@ export default function Lobby() {
       </div>
 
       {creatingRoom && <CreateRoomModal onClose={() => setCreatingRoom(false)} />}
+
+      {asking && current?.code && (
+        <Modal onClose={() => setAsking(false)}>
+          <div className="text-eyebrow">{current.status === 'playing' ? 'Match in progress' : 'Waiting room'}</div>
+          <h3 className="mt-2.5 display-heading">You are still in {current.name}</h3>
+          <p className="mt-3 text-body-muted">Go back to it, or leave it to play somewhere else.</p>
+          <div className="mt-5.5 flex gap-3">
+            <Button variant="secondary" size="md" className="flex-1" onClick={() => void leaveRoom()}>
+              Leave room
+            </Button>
+            <Button size="md" className="flex-1" onClick={backToRoom}>
+              {current.status === 'playing' ? 'Back to the match' : 'Back to the room'}
+            </Button>
+          </div>
+        </Modal>
+      )}
 
       <div className="flex flex-col gap-2">
         {error && <p className="text-sm text-fuse-600">{error}</p>}
