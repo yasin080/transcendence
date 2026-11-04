@@ -13,7 +13,6 @@ import type { Settings } from '../game/logic/settings.ts'
 import { apiGet, apiPost } from '../lib/api.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { echo, onReconnect } from '../lib/echo'
-import Button from '../components/ui/Button.tsx'
 import LegalLinks from '../components/ui/LegalLinks.tsx'
 
 
@@ -113,14 +112,13 @@ export default function WaitingRoom() {
 
   if (error) {
     return (
-      <div className="h-full flex-1 min-w-0 px-4 pt-6 pb-8 font-body md:px-7">
-        <div className="flex flex-col items-start gap-3">
-          <p className="text-sm text-fuse-600">{error}</p>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/lobby')}>
-            Back to lobby
-          </Button>
-        </div>
-      </div>
+      <MessageModal
+        kicker="Can't join"
+        title={error}
+        message="Pick an open room from the lobby or create your own."
+        buttonLabel="Back to lobby"
+        onAction={() => navigate('/lobby')}
+      />
     )
   }
   if (!room) {
