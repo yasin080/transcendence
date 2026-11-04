@@ -64,9 +64,14 @@ export default function Profile() {
 
   if (notFound) {
     return (
-      <section className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 px-7 text-center">
-        <h1 className="display-heading">Player not found</h1>
-        <p className="text-body-muted">This player doesn't exist or has deleted their account.</p>
+      <section className="flex min-w-0 flex-1 flex-col px-4 pt-6 pb-8 md:px-7">
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+          <h1 className="display-heading">Player not found</h1>
+          <p className="text-body-muted">This player doesn't exist or has deleted their account.</p>
+        </div>
+        <div className="flex justify-center">
+          <LegalLinks />
+        </div>
       </section>
     )
   }
