@@ -7,7 +7,7 @@
 **Worms** is an online multiplayer worm game for up to four players, rendered in 3D in
 the browser. There is only one game, but every match is defined by a set of rules, and those rules change its nature completely: an open board with food and deadly walls plays like a classic **Snake**; add pillars, random walls and bombs and it turns into a
 **Bomberman**-style arena where worms swallow bombs and drop them from their tail to
-blow up walls and trap their rivals.
+cut down and trap their rivals.
 
 
 ## Game Rules
@@ -50,6 +50,7 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 - **Pillars and random walls** count as walls and follow the same setting. With
   pillars on, every wall blocks: pillars never kill.
 - **Head-on:** if two worms move into the same cell, or into each other's cell, both die.
+- **Dead worms** stay on the board and count as bodies until the match ends.
 
 ### Bombs
 - Bombs lie on the board like food. A worm that swallows one **drops it at once from
@@ -93,7 +94,7 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 
 - **Docker** with the **Compose v2** plugin (`docker compose`, not `docker-compose`).
 - **GNU Make**.
-- **Google Chrome**, latest stable version.
+- **Google Chrome**, latest stable version. <!-- [RETOMAR] Update with the module 5 browsers. -->
 - Ports **8080** and **1443** free on the host (both configurable in `.env`).
 - *Optional:* a Google Cloud OAuth client, only needed for "Sign in with Google".
 
@@ -114,7 +115,7 @@ Edit `.env` and set at least:
 | `DB_PASSWORD`, `DB_ROOT_PASSWORD` | Two passwords of your choice. |
 | `REVERB_APP_KEY`, `REVERB_APP_SECRET` | Random strings (e.g. `openssl rand -hex 16`). |
 | `VITE_REVERB_APP_KEY` | **The same value** as `REVERB_APP_KEY`. |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Your OAuth credentials. Add `GOOGLE_REDIRECT_URI` as an authorized redirect URI in the Google console. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | *Optional, only for "Sign in with Google".* Your OAuth credentials. Add `GOOGLE_REDIRECT_URI` as an authorized redirect URI in the Google console. |
 | `SEED_USER*` | Two demo accounts, preset in `.env.example` so the app is usable right away. **Change the passwords in any shared deployment.** Leave any field empty to skip that account. |
 
 `.env` is ignored by Git; never commit it.
@@ -217,23 +218,18 @@ matches that were in progress are lost.
 - [MariaDB](https://mariadb.com/kb/en/documentation/)
 - [Redis](https://redis.io/docs/)
 
-### Articles and tutorials
-
-<!-- [RETOMAR]  -->
 
 ### Use of AI
 
-<!-- [RETOMAR] Each member fills in their own part. -->
-
-AI assistants ([RETOMAR: qué asistentes hemos usado?]) were used as a support tool, never as a replacement
+AI assistants were used as a support tool, never as a replacement
 for understanding: every piece of generated content was reviewed, tested and
 discussed within the team before being merged.
 
 | Task | Parts of the project | How it was used |
 |---|---|---|
 | Documentation | `README.md` | Structuring the sections from the subject requirements and reviewing the wording. |
-| Learning | [RETOMAR] | Explaining concepts (e.g. Docker bind mounts and file ownership, Laravel tooling). |
-| Visual design | UI look and feel, all images | Exploring the visual style of the project. All images in the project were generated with AI ChatGPT (OpenAI). |
+| Learning | Whole project | Explaining concepts (e.g. Docker bind mounts and file ownership, Laravel tooling). |
+| Visual design | UI look and feel, all images | Exploring the visual style of the project. All images in the project were generated with ChatGPT (OpenAI). |
 | Rubber duck debugging | Whole project | Explaining problems and our own reasoning out loud to spot mistakes. |
 
 
@@ -272,6 +268,7 @@ before it was merged into `main`.
 - **Google Sheets** — task tracking and weekly goals.
 - **GitHub** — repository, branches and pull requests / code reviews.
 - **WhatsApp** — day-to-day team communication.
+
 ## Technical Stack
 
 ### Frontend
@@ -298,7 +295,7 @@ before it was merged into `main`.
 
 ### Justification of the main choices
 
-**Laravel.** Chosen because of the team's previous experience with it. Its official
+**Laravel.** Chosen because of the Technical Lead's previous experience with it. Its official
 packages also cover most of what the project needs (authentication, OAuth, WebSockets,
 queues, ORM) and integrate with each other, which kept the number of external
 dependencies low.
@@ -351,7 +348,6 @@ erDiagram
         longtext avatar "nullable"
         varchar bio "max 160, nullable"
         varchar password "hashed, nullable"
-        timestamp created_at
     }
     oauth_accounts {
         bigint id PK
@@ -402,11 +398,10 @@ erDiagram
 All foreign keys cascade on delete.
 
 Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
-`personal_access_tokens`, `migrations`…), not shown above.
+`personal_access_tokens`, `migrations`…), not shown above. Laravel's automatic columns
+(`created_at`, `updated_at`, `remember_token`) are not shown either.
 
 ## Features List
-
-<!-- [RETOMAR] Completar una vez esté acabado el código. -->
 
 | Feature | Description | Member(s) |
 |---|---|---|
@@ -441,14 +436,12 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 
 ## Modules
 
-<!-- [RETOMAR]  -->
-
 | # | Module | Type | Points | Member(s) |
 |---|---|---|---|---|
 | 1 | Backend framework (Laravel) | Minor | 1 | All |
 | 2 | ORM (Eloquent) | Minor | 1 | All |
 | 3 | Frontend framework (React) | Minor | 1 | All |
-| 4 | Custom design system | Minor | 1 | ybahri |
+| 4 | Custom design system | Minor | 1 | ybahri (lead), aolabarr, beiglesi |
 | 5 | Support for additional browsers | Minor | 1 | [RETOMAR] |
 | 6 | Standard user management | Major | 2 | aolabarr |
 | 7 | Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
@@ -464,7 +457,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | | **Total** | | **23** | |
 
 ### 1. Backend framework — Minor
-**Why:** the team already knew it, and it brings what the project needs out of the box:
+**Why:** the Technical Lead already knew it, and it brings what the project needs out of the box:
 session auth (Sanctum), OAuth (Socialite), WebSockets (Reverb), queues and an ORM
 (Eloquent). **How:** Laravel 13 on PHP 8.4, serving a JSON API under `/api`. Routes are
 grouped behind `auth:sanctum`, input is validated with Form Requests, login and
@@ -477,8 +470,8 @@ injection. **How:** Eloquent models for users, OAuth accounts, rooms, room playe
 games and friendships, with their relationships and casts (room settings are stored as
 JSON). The schema is versioned with migrations, with foreign keys and unique
 constraints; seeders create test accounts. Joining a room runs in a transaction with
-row locks. The only raw SQL is the health check's `select 1` and two `DB::raw`
-column copies inside migrations.
+row locks. The only raw SQL is the health check's `select 1` and three `DB::raw`
+expressions inside migrations.
 
 ### 3. Frontend framework — Minor
 **Why:** the team already knew it, and its component model fits a UI that updates with
@@ -604,8 +597,6 @@ lobby.
 
 ## Individual Contributions
 
-<!-- [RETOMAR] Challenges de cada uno. -->
-
 ### ivromero — Technical Lead, Developer
 
 - **Architecture and infrastructure:** Docker stack, nginx with HTTPS, base structure of
@@ -642,7 +633,7 @@ meeting so that they stayed focused and useful.
 
 ### beiglesi — Product Owner, Developer
 
-- **Authentication:** login frontend and Google sign-in. [RETOMAR: confirm scope.]
+- **Authentication:** login frontend and Google sign-in.
 - **Rooms:** real rooms with a live lobby and waiting room, connected to the backend.
 - **Navigation:** left sidebar, navigation, route guard and route refactor.
 - **Landing page:** restyle with the curved worm, sprites and shared theme.
@@ -651,7 +642,10 @@ meeting so that they stayed focused and useful.
 - **Product ownership:** game rules, backlog and priorities, validation of finished
   work, and the README.
 
-**Challenges:** [RETOMAR]
+**Challenges:** I had never worked with Laravel or PHP before, so I had to learn
+the framework while building on it. The most interesting part was real-time
+communication: understanding how Laravel broadcasting, Reverb and Echo work
+together to keep the lobby and waiting room in sync.
 
 ### ybahri — Developer
 
