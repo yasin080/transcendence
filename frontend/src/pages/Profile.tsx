@@ -120,14 +120,14 @@ export default function Profile() {
         </div>
       )}
 
-      {isOwn && (
-        <div className="mt-auto flex flex-col items-center gap-2">
+      <div className="mt-auto flex flex-col items-center gap-2">
+        {isOwn && (
           <div className="w-full md:hidden">
             <LogoutButton />
           </div>
-          <LegalLinks />
-        </div>
-      )}
+        )}
+        <LegalLinks />
+      </div>
 
       {editOpen && (
         <EditProfileModal
