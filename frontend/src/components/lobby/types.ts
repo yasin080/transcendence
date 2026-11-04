@@ -1,6 +1,6 @@
 import type { Settings } from '../../game/logic/settings.ts'
 
-// Sala tal como la devuelve POST /api/rooms (con sus players cargados)
+// Room as returned by POST /api/rooms (with its players loaded)
 export interface Room {
   id: number
   code: string
@@ -10,10 +10,10 @@ export interface Room {
   quick: boolean
   settings: Settings
   players: RoomPlayer[]
-  games?: { id: number }[] // solo en GET /api/rooms/{code}
+  games?: { id: number }[] // only in GET /api/rooms/{code}
 }
 
-// Sala tal como la devuelve GET /api/rooms
+// Room as returned by GET /api/rooms
 export type RoomSummary = Omit<Room, 'players'> & {
   host: { id: number; username: string }
   players_count: number

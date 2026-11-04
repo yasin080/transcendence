@@ -10,15 +10,15 @@ import { apiPost } from '../lib/api'
 
 export default function MainLayout() {
   const { pathname } = useLocation()
-  // Por debajo de xl los amigos no caben como columna: se abren en un cajón
+  // Below xl, friends don't fit as a column: they open in a drawer
   const [friendsOpen, setFriendsOpen] = useState(false)
 
   useEffect(() => {
     setFriendsOpen(false)
   }, [pathname])
 
-  // Salir de la sala de espera a otra página es dejar la sala (el host la cierra).
-  // Ir a la partida no cuenta: la partida no vive en este layout.
+  // Going from the waiting room to another page means leaving the room (the host closes it).
+  // Going to the match doesn't count: the match doesn't live in this layout.
   const previousPath = useRef(pathname)
   useEffect(() => {
     const room = previousPath.current.match(/^\/waiting-room\/([^/]+)/)?.[1]

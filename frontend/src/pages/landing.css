@@ -28,7 +28,7 @@
     linear-gradient(0deg, color-mix(in srgb, var(--color-void) 30%, transparent) 0%, transparent 40%);
 }
 
-/* El azul de la atmósfera y del aura no tiene token: solo se usa en esta pantalla. */
+/* The atmosphere and aura blue has no token: it's only used on this screen. */
 .landing__atmosphere {
   background: radial-gradient(ellipse 32% 38% at 70% 53%, rgba(86, 152, 255, .12), transparent 73%);
   transform: translate3d(calc(var(--pointer-x) * .09), calc(var(--pointer-y) * .06), 0);

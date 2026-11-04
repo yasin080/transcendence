@@ -12,7 +12,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const base =
   'inline-flex cursor-pointer items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-40'
 
-// La tipografía va en cada variante: arcade usa la fuente display.
+// Typography lives in each variant: arcade uses the display font.
 const variants: Record<Variant, string> = {
   primary: 'text-button-label bg-fuse-600 text-white enabled:hover:bg-fuse-650',
   secondary: 'text-button-label border border-white/40 bg-white/30 text-white enabled:hover:bg-white/50',
@@ -32,7 +32,7 @@ const sizes: Record<Size, string> = {
   iconLg: 'size-11 rounded-xl',
 }
 
-// Por fuera, className solo para colocación (margen, ancho). Nunca colores ni padding.
+// From outside, className is only for placement (margin, width). Never colors or padding.
 export default function Button({
   variant = 'primary',
   size = 'lg',

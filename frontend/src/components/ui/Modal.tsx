@@ -2,10 +2,10 @@ import { useEffect, type ReactNode } from 'react'
 
 interface ModalProps {
   children: ReactNode
-  // Sin onClose el modal es bloqueante (solo se sale con su propio botón)
+  // Without onClose the modal is blocking (it can only be left through its own button)
   onClose?: () => void
   size?: 'sm' | 'lg'
-  // id del título, para que los lectores de pantalla anuncien el modal
+  // Title id, so screen readers announce the modal
   labelledBy?: string
 }
 
@@ -15,7 +15,7 @@ const SIZES = {
 }
 
 export default function Modal({ children, onClose, size = 'sm', labelledBy }: ModalProps) {
-  // Cerrar con Esc
+  // Close with Esc
   useEffect(() => {
     if (!onClose) return
     const onKeyDown = (e: KeyboardEvent) => {
@@ -31,7 +31,7 @@ export default function Modal({ children, onClose, size = 'sm', labelledBy }: Mo
       aria-modal="true"
       aria-labelledby={labelledBy}
       className="fixed inset-0 z-50 grid place-items-center bg-void/72 p-4 backdrop-blur-sm"
-      // Cerrar al pulsar el fondo, pero no al pulsar dentro de la tarjeta
+      // Close when clicking the backdrop, but not when clicking inside the card
       onMouseDown={(e) => {
         if (onClose && e.target === e.currentTarget) onClose()
       }}

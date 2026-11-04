@@ -12,9 +12,7 @@ type MainLayoutSidebarProps = {
   onOpenFriends: () => void
 }
 
-/**
- * Sidebar izquierdo del lobby: compone las piezas dentro de la carcasa genérica.
- */
+// Left sidebar of the lobby: assembles the pieces inside the generic shell.
 export default function DashboardSidebar({ onOpenFriends }: MainLayoutSidebarProps) {
   return (
     <Sidebar

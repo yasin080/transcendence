@@ -41,15 +41,15 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
 
   const choose = <K extends keyof RoomChoices>(key: K, value: RoomChoices[K]) => setChoices({ ...choices, [key]: value })
 
-  // Pilares y muros que matan no van juntos: encender uno apaga el otro
+  // Pillars and deadly walls don't go together: turning one on turns the other off
   const toggleWallHit = () =>
     setChoices(choices.wallHit === 'die' ? { ...choices, wallHit: 'block' } : { ...choices, wallHit: 'die', pillars: false })
 
-  // Con pilares no hay muros aleatorios ni muros que maten
+  // With pillars there are no random walls and no deadly walls
   const togglePillars = () =>
     setChoices(choices.pillars ? { ...choices, pillars: false } : { ...choices, pillars: true, wallHit: 'block', softWalls: 0 })
 
-  // Un tablero más pequeño recorta el largo inicial a su nuevo máximo
+  // A smaller board trims the start length to its new maximum
   const chooseBoard = (boardSize: number) =>
     setChoices({ ...choices, boardSize, startLength: Math.min(choices.startLength, maxStartLength(boardSize)) })
 
@@ -95,7 +95,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           />
         </div>
 
-        <div className="mt-[18px]">
+        <div className="mt-4.5">
           <span className={FIELD_LABEL}>Preset</span>
           <div className="flex flex-wrap gap-2">
             {PRESETS.map((preset) => (
@@ -110,7 +110,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 mt-[18px]">
+        <div className="flex flex-col gap-4 mt-4.5">
           <Slider label="Players" options={PLAYER_OPTIONS} value={choices.players} onChange={(v) => choose('players', v)} />
           <Slider label="Board size" options={BOARD_OPTIONS} value={choices.boardSize} onChange={chooseBoard} />
           <Slider
@@ -127,7 +127,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           )}
         </div>
 
-        <div className="mt-[18px]">
+        <div className="mt-4.5">
           <span className={FIELD_LABEL}>Camera</span>
           <div className="flex flex-wrap gap-2">
             {CAMERA_OPTIONS.map((option) => (
@@ -138,7 +138,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           </div>
         </div>
 
-        <div className="mt-[18px]">
+        <div className="mt-4.5">
           <span className={FIELD_LABEL}>Map</span>
           <div className="flex flex-wrap gap-2.5">
             <Switch on={choices.pillars} onClick={togglePillars}>
@@ -147,7 +147,7 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
           </div>
         </div>
 
-        <div className="mt-[18px]">
+        <div className="mt-4.5">
           <span className={FIELD_LABEL}>Ways to die</span>
           <div className="flex flex-wrap gap-2.5">
             <Switch on={choices.wallHit === 'die'} onClick={toggleWallHit}>
@@ -194,7 +194,7 @@ interface SliderProps<T> {
   onChange: (value: T) => void
 }
 
-// Slider que recorre las opciones en orden; la etiqueta muestra la elegida
+// Slider that steps through the options in order; the label shows the selected one
 function Slider<T>({ label, options, value, onChange }: SliderProps<T>) {
   const index = Math.max(0, options.findIndex((option) => option.value === value))
   return (
@@ -220,19 +220,19 @@ interface SwitchProps {
   children: ReactNode
 }
 
-// Píldora con interruptor: el botón se desliza y se enciende al activarla
+// Pill with a toggle: the knob slides and lights up when switched on
 function Switch({ on, onClick, children }: SwitchProps) {
   return (
     <button
       type="button"
       aria-pressed={on}
       onClick={onClick}
-      className={`inline-flex items-center gap-[9px] px-4 py-2.5 rounded-full border text-[13px] font-semibold cursor-pointer ${
+      className={`inline-flex items-center gap-2.25 px-4 py-2.5 rounded-full border text-[13px] font-semibold cursor-pointer ${
         on ? 'border-fuse-600/50 bg-fuse-600/16 text-white' : 'border-white/12 bg-white/5 text-white/60'
       }`}
     >
-      <span className={`relative w-[30px] h-[17px] flex-none rounded-full transition-colors ${on ? 'bg-fuse-600' : 'bg-white/20'}`}>
-        <span className={`absolute top-0.5 size-[13px] rounded-full bg-white transition-all ${on ? 'left-[15px]' : 'left-0.5'}`} />
+      <span className={`relative w-7.5 h-4.25 flex-none rounded-full transition-colors ${on ? 'bg-fuse-600' : 'bg-white/20'}`}>
+        <span className={`absolute top-0.5 size-3.25 rounded-full bg-white transition-all ${on ? 'left-[15px]' : 'left-0.5'}`} />
       </span>
       {children}
     </button>

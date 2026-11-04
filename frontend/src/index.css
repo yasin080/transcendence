@@ -5,7 +5,7 @@ body {
 	background: var(--color-void);
 }
 
-/* scroll oscuro*/
+/* Dark scrollbar */
 :root {
 	scrollbar-width: thin;
 	scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
