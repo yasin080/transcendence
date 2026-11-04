@@ -113,12 +113,15 @@ export default function WaitingRoom() {
 
   if (error) {
     return (
-      <div className="h-full flex-1 min-w-0 px-4 pt-6 pb-8 font-body md:px-7">
-        <div className="flex flex-col items-start gap-3">
+      <div className="flex flex-col h-full flex-1 min-w-0 px-4 pt-6 pb-8 font-body md:px-7">
+        <div className="flex flex-col flex-1 items-start gap-3">
           <p className="text-sm text-fuse-600">{error}</p>
           <Button variant="ghost" size="sm" onClick={() => navigate('/lobby')}>
             Back to lobby
           </Button>
+        </div>
+        <div className="flex justify-center">
+            <LegalLinks/>
         </div>
       </div>
     )
