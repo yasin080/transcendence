@@ -4,7 +4,7 @@ interface ToggleChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
   selected: boolean
 }
 
-// Píldora seleccionable (modos, filtros). Por fuera, className solo para colocación.
+// Selectable pill (modes, filters). From outside, className is only for placement.
 export default function ToggleChip({ selected, className = '', ...rest }: ToggleChipProps) {
   return (
     <button

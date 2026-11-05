@@ -28,7 +28,7 @@ createRoot(root).render(
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* MARCO 1 — landing, login, legal */}
+          {/* LAYOUT 1 — landing, login, legal */}
           <Route index element={<Landing />} />
           <Route element={<App />}>
             <Route path="health" element={<Health />} />
@@ -38,7 +38,7 @@ createRoot(root).render(
           </Route>
 
           <Route element={<RequireAuth />}>
-            {/* MARCO 2 — app con sidebar (lobby, perfil, sala)*/}
+            {/* LAYOUT 2 — app with sidebar (lobby, perfil, sala)*/}
             <Route element={<MainLayout />}>
               <Route path="lobby" element={<Lobby />} />
               <Route path="profile" element={<Profile />} />
@@ -46,7 +46,7 @@ createRoot(root).render(
               <Route path="waiting-room/:roomId" element={<WaitingRoom />} />
             </Route>
 
-            {/* MARCO 3 — juego a pantalla completa */}
+            {/* LAYOUT 3 — full-screen game */}
             <Route
               path="game/:gameId"
               element={

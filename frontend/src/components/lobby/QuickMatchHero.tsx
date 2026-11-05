@@ -16,7 +16,7 @@ export default function QuickMatchHero<M extends string>({
 }: QuickMatchHeroProps<M>) {
   return (
     <section className="relative overflow-hidden rounded-[20px] border border-line bg-surface">
-      {/* Capas de fondo: la imagen y un degradado para que el texto se lea */}
+      {/* Background layers: the image and a gradient so the text stays readable */}
       <div aria-hidden="true" className="absolute inset-0 bg-[url(/assets/background.png)] bg-cover bg-center opacity-55" />
       <div aria-hidden="true" className="absolute inset-0 bg-linear-180 from-void/70 to-void/90 sm:bg-linear-95 sm:from-void/96 sm:via-void/80 sm:via-44% sm:to-void/15" />
 

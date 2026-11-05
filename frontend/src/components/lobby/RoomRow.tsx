@@ -5,22 +5,22 @@ import type { RoomSummary } from './types.ts'
 interface RoomRowProps {
   room: RoomSummary
   onJoin: (room: RoomSummary) => void
-  // Ya tengo asiento en esta sala: "Enter" en vez de "Join", aunque esté llena
+  // Already seated in this room: "Enter" instead of "Join", even if it's full
   isMine: boolean
-  // Tengo asiento en otra sala: no puedo unirme a esta
+  // Seated in another room: can't join this one
   locked: boolean
 }
 
-// Cabecera y filas comparten columnas y relleno para quedar alineadas.
-// La última columna tiene ancho fijo: con auto, cada fila la mediría según su
-// contenido (botón Join o enlace Spectate) y las demás columnas se moverían.
-// En móvil solo nombre, plazas y botón; desde sm, también comida y velocidad.
+// Header and rows share columns and padding so they stay aligned.
+// The last column has a fixed width: with auto, each row would size it by its
+// content (Join button or Spectate link) and the other columns would shift.
+// On mobile only name, seats and button; from sm up, food and speed too.
 
 const ROW_LAYOUT =
   'grid grid-cols-[minmax(0,1fr)_auto_6.5rem] items-center gap-3 px-4 sm:grid-cols-[minmax(0,1.6fr)_.9fr_.9fr_.7fr_6.5rem] sm:gap-4 sm:px-[18px]'
 
-// Fila: nombre · tablero · velocidad · plazas + botón.
-// Punto verde = sala abierta (Join), naranja = en partida (Spectate, o Enter si es la propia).
+// Row: name · board · speed · seats + button.
+// Green dot = open room (Join), orange = match in progress (Spectate, or Enter if it's your own).
 export default function RoomRow({ room, onJoin, isMine, locked }: RoomRowProps) {
   const playing = room.status === 'playing'
   const full = room.players_count >= room.settings.players

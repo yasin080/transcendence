@@ -29,7 +29,7 @@ class RoomController extends Controller
         return response()->json($rooms);
     }
 
-    // Código de la sala en la que está el usuario, o null si no está en ninguna
+    // Code of the room the user is in, or null if they are in none
     public function current(Request $request): JsonResponse
     {
         $room = $request->user()->currentRoom();
@@ -45,8 +45,8 @@ class RoomController extends Controller
     public function store(StoreRoomRequest $request): JsonResponse
     {
         $room = DB::transaction(function () use ($request) {
-            // Un usuario solo puede estar en una
-            // sala a la vez, aunque lleguen varias peticiones a la vez.
+            // A user can only be in one room at a time,
+            // even when several requests arrive at once.
             User::whereKey($request->user()->id)->lockForUpdate()->first();
             if ($request->user()->currentRoom()) {
                 return null;
@@ -85,7 +85,7 @@ class RoomController extends Controller
 
     public function show(Room $room): JsonResponse
     {
-        // DevMatch usa games para saber a qué partida ir
+        // DevMatch uses games to know which match to go to
         return response()->json($this->withPlayers($room)->load('games:id,room_id'));
     }
 
@@ -96,12 +96,12 @@ class RoomController extends Controller
 
         try {
             $error = DB::transaction(function () use ($room, $user, $userId) {
-                // Bloquea al usuario: dos joins simultáneos a salas distintas
-                // no pueden sentarle en ambas.
+                // Locks the user: two simultaneous joins to different rooms
+                // cannot seat them in both.
                 User::whereKey($userId)->lockForUpdate()->first();
                 $room = Room::whereKey($room->id)->lockForUpdate()->first();
 
-                // Ya tiene asiento aquí: vuelve a entrar aunque la sala esté llena
+                // Already seated here: they get back in even if the room is full
                 if ($room->players()->where('user_id', $userId)->exists()) {
                     return null;
                 }
@@ -135,8 +135,8 @@ class RoomController extends Controller
         return response()->json($this->withPlayers($room));
     }
 
-    // Si sale el host la sala se cierra para todos;
-    // si sale un invitado solo libera su asiento.
+    // If the host leaves, the room closes for everyone;
+    // if a guest leaves, only their seat is freed.
     public function leave(Request $request, Room $room): JsonResponse
     {
         $userId = $request->user()->id;

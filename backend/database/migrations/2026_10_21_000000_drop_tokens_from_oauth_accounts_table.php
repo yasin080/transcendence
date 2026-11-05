@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// Los tokens de Google no se usan: el login solo necesita provider y provider_id
+// Google tokens are not used: login only needs provider and provider_id
 return new class extends Migration
 {
     public function up(): void
