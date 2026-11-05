@@ -32,4 +32,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 WORKDIR /var/www/html
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["php-fpm", "-F"]
+CMD ["php-fpm", "-F", "-R"]
