@@ -79,10 +79,13 @@ export default function Terms() {
       <section className="space-y-2">
         <h2 className="text-xl font-semibold">Credits</h2>
         <p className="text-fg-secondary">
-          The game’s code and artwork (worms, 3D models, textures and backgrounds) were created by
-          the team, except:
+          The game's code was created by the team, except:
         </p>
         <ul className="list-disc space-y-1 pl-5 text-fg-secondary">
+          <li>
+            The artwork (worms, 3D models, textures and backgrounds) and all other images, generated
+            with ChatGPT (OpenAI) from the team's prompts.
+          </li>
           <li>
             Some interface icons, from{' '}
             <a href="https://lucide.dev" target="_blank" rel="noreferrer" className={linkClass}>Lucide</a>{' '}
