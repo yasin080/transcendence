@@ -11,7 +11,7 @@ export default function AnimatedWorm({ variant = 'compact' }: AnimatedWormProps)
     <div
       className={`animated-worm animated-worm--${variant}`}
       role="img"
-      aria-label="Gusano animado, el personaje del juego"
+      aria-label="Animated worm, the game's character"
     >
       <img
         className="animated-worm__head"

@@ -10,9 +10,9 @@ type TabBarProps = {
 
 const TAB = 'flex flex-col items-center justify-center gap-1 text-2xs font-bold'
 
-// Navegación en móvil: sustituye a las dos barras laterales por debajo de md
+// Mobile navigation: replaces both sidebars below md
 export default function TabBar({ friendsOpen, onFriendsOpenChange }: TabBarProps) {
-  // Pulsar una pestaña cierra Amigos, aunque la URL no cambie (ya estás en esa página)
+  // Tapping a tab closes Friends, even if the URL doesn't change (you're already on that page)
   const closeFriends = () => onFriendsOpenChange(false)
 
   return (
@@ -47,7 +47,7 @@ function TabLink({ to, end, label, icon, friendsOpen, onClick }: TabLinkProps) {
       to={to}
       end={end}
       onClick={onClick}
-      // Con Amigos abierto, la pestaña activa es Friends aunque la URL sea otra
+      // With Friends open, the active tab is Friends even if the URL points elsewhere
       className={({ isActive }) => `${TAB} ${isActive && !friendsOpen ? 'text-fuse-600' : 'text-fg-muted'}`}
     >
       {icon}

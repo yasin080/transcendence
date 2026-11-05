@@ -18,12 +18,12 @@ import { createFood, type FoodUpdate } from './food'
 import { createWalls } from './walls'
 import { createWorms, type WormUpdate } from './worms'
 
-// Ángulo más corto para ir de `from` a `to`, para girar la cámara sin dar la vuelta larga
+// Shortest angle from `from` to `to`, so the camera turns without going the long way round
 const turn = (from: number, to: number) => Math.atan2(Math.sin(to - from), Math.cos(to - from))
 
 export function createGameScene(canvas: HTMLCanvasElement, game: Game, you: number | null) {
   const { board, worms } = game
-  // Un espectador no tiene gusano que seguir: ve siempre el tablero entero
+  // A spectator has no worm to follow: they always see the whole board
   const view = you === null ? 'board' : game.settings.camera
   const seat = you ?? 0
 
@@ -33,7 +33,7 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game, you: numb
   const scene = new Scene(engine)
   scene.clearColor = new Color4(0.045, 0.04, 0.085, 1)
 
-  // Detrás de la cabeza: la cámara mira hacia donde va el gusano
+  // Behind the head: the camera looks where the worm is heading
   const behindHead = () => Math.atan2(-worms[seat].dir.y, -worms[seat].dir.x)
   const head = view === 'head'
   const cam = new ArcRotateCamera('cam', head ? behindHead() : -Math.PI / 2, head ? 1.15 : 0.62, 1, Vector3.Zero(), scene)
@@ -42,7 +42,7 @@ export function createGameScene(canvas: HTMLCanvasElement, game: Game, you: numb
   function fitBoard() {
     const narrow = Math.min(1, engine.getAspectRatio(cam))
     const wholeBoard = (Math.max(board.width, board.height) * 0.6) / (Math.tan(cam.fov / 2) * narrow)
-    // Siguiendo al gusano se ve al menos el 20 % del tablero: el 45 % de cada lado
+    // Following the worm shows at least 20% of the board: 45% of each side
     cam.radius = view === 'board' ? wholeBoard : wholeBoard * 0.45
     cam.lowerRadiusLimit = view === 'board' ? cam.radius / 2 : cam.radius
     cam.upperRadiusLimit = cam.radius * 1.5

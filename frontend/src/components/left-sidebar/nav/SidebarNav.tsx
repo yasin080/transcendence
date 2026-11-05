@@ -10,7 +10,7 @@ type NavItem = {
   icon?: ReactNode
 }
 
-// Para añadir una sección: una línea aquí y su ruta en main.tsx
+// To add a section: one line here and its route in main.tsx
 const items: NavItem[] = [
   { to: '/lobby', label: 'Lobby', icon: <LobbyIcon /> },
   { to: '/profile', label: 'Profile', end:true, icon: <UserIcon /> },

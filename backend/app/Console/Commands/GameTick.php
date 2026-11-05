@@ -26,7 +26,7 @@ class GameTick extends Command
         while (true) {
             LiveGames::heartbeat();
             foreach (LiveGames::active() as $id) {
-                // Una partida rota no puede parar a las demás: se apunta el error y se cierra solo esa
+                // A broken match must not stop the others: the error is logged and only that match is closed
                 try {
                     $this->advance($id);
                 } catch (Throwable $e) {

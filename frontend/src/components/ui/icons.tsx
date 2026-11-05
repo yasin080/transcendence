@@ -12,7 +12,7 @@ interface IconProps {
   className?: string
 }
 
-export function BotIcon({ className = 'size-[17px] text-mint' }: IconProps) {
+export function BotIcon({ className = 'size-4.25 text-mint' }: IconProps) {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" {...stroke} className={className}>
       <rect x="4" y="8" width="16" height="12" rx="3" />
@@ -144,7 +144,7 @@ export function CalendarIcon({ className = 'size-3.5' }: IconProps) {
   )
 }
 
-// Logo de Google: lleva los colores oficiales de la marca, no los tokens.
+// Google logo: uses the brand's official colors, not the theme tokens.
 export function GoogleIcon() {
   return (
     <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
