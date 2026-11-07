@@ -1,13 +1,28 @@
 *This project has been created as part of the 42 curriculum by ivromero, aolabarr, beiglesi, ybahri.*
 
-# Worms — ft_transcendence
+# SlitherBomb — ft_transcendence
 
 ## Description
 
-**Worms** is an online multiplayer worm game for up to four players, rendered in 3D in
+**SlitherBomb** is an online multiplayer worm game for up to four players, rendered in 3D in
 the browser. There is only one game, but every match is defined by a set of rules, and those rules change its nature completely: an open board with food and deadly walls plays like a classic **Snake**; add pillars, random walls and bombs and it turns into a
 **Bomberman**-style arena where worms swallow bombs and drop them from their tail to
 cut down and trap their rivals.
+
+## Key features
+
+- **One game, many modes**: board size, speed, food, starting length, pillars,
+  random walls, bombs, and whether hitting a wall or a body kills or just blocks.
+- **Bombs**: eat one and it drops from your tail; when the fuse runs out it blasts a
+  3×3 area, killing any worm head it catches and cutting any body it hits.
+- **Up to 4 players** per match, mixing humans on different computers and AI bots.
+- **Real-time lobby**: rooms, waiting room and match updates pushed over WebSockets.
+- **Server-authoritative gameplay**: the backend runs the game loop; clients only send
+  their moves.
+- **3D board** rendered with Babylon.js, with three cameras: whole board, follow and
+  behind the head.
+- **Accounts**: email/password or Google sign-in, profiles, avatars and friends with
+  online status.
 
 
 ## Game Rules
@@ -50,7 +65,7 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 - **Pillars and random walls** count as walls and follow the same setting. With
   pillars on, every wall blocks: pillars never kill.
 - **Head-on:** if two worms move into the same cell, or into each other's cell, both die.
-- **Dead worms** stay on the board and count as bodies until the match ends.
+- **Dead worms** stay on the board, in grey, and count as bodies until the match ends.
 
 ### Bombs
 - Bombs lie on the board like food. A worm that swallows one **drops it at once from
@@ -68,33 +83,28 @@ A tick lasts between 100 ms and 300 ms, depending on the speed chosen for the ma
 - The scoreboard ranks worms by survival first, then by how much they have grown.
 
 ### Disconnections
-- If a player's page stops responding for 2.5 s, their worm stops and turns grey.
-- If they come back within 10 s, they continue where they left off; otherwise the worm
-  is eliminated.
-
-
-### Key features
-
-- **One game, many modes**: board size, speed, food, starting length, pillars,
-  random walls, bombs, and whether hitting a wall or a body kills or just blocks.
-- **Bombs**: eat one and it drops from your tail; when the fuse runs out it blasts a
-  3×3 area, killing any worm head it catches and cutting any body it hits.
-- **Up to 4 players** per match, mixing humans on different computers and AI bots.
-- **Real-time lobby**: rooms, waiting room and match updates pushed over WebSockets.
-- **Server-authoritative gameplay**: the backend runs the game loop; clients only send
-  their moves.
-- **3D board** rendered with Babylon.js, with three cameras: whole board, follow and
-  behind the head.
-- **Accounts**: email/password or Google sign-in, profiles, avatars and friends with
-  online status.
+- If a player's page stops responding for 2.5 s, their worm stops and turns grey: it is
+  **away**, not dead. Closing or leaving the game page makes it away at once.
+- An away worm stays in place and counts as a body: other worms can crash into it, and
+  bombs still hit it. It still counts as alive, so the match goes on while it is away.
+- If the player comes back within 10 s, by reloading the game page or with *Back to the
+  match* in the lobby, they continue where they left off; otherwise the worm is
+  eliminated.
+- The *Leave* button of the match takes the player to the waiting room. Leaving the
+  waiting room for any other page gives up the seat: the worm stays away until it is
+  eliminated, and going back to the match only lets the player watch.
+- Dead worms are grey too; the scoreboard tells them apart: away players are dimmed,
+  dead ones crossed out.
 
 ## Instructions
 
 ### Prerequisites
 
-- **Docker** with the **Compose v2** plugin (`docker compose`, not `docker-compose`).
-- **GNU Make**.
-- **Google Chrome**, latest stable version. <!-- [RETOMAR] Update with the module 5 browsers. -->
+- **Docker** with the **Compose v2** plugin (`docker compose`, not `docker-compose`),
+  Compose 2.3.3 or later. Tested with Docker 28.1 and Compose 5.1. Rootless Docker is
+  also supported: the Makefile detects it.
+- **GNU Make** (tested with 4.3).
+- **Google Chrome**, **Firefox**, **Opera** or **Brave**, latest stable version.
 - Ports **8080** and **1443** free on the host (both configurable in `.env`).
 - *Optional:* a Google Cloud OAuth client, only needed for "Sign in with Google".
 
@@ -189,8 +199,8 @@ current data):
 3. `make restore FILE=backups/<date>.sql.gz`: load the last dump taken **before** the
    disaster. File names are dates. The newest file is not that one: the `backup`
    service dumps the new database (demo data only) as soon as it starts.
-4. Open `/health` and check that everything is green. The users, friends and match
-   history from the dump are back.
+4. Open `/health` and check that everything is green. The users, rooms and matches
+   from the dump are back.
 
 Redis is not backed up: it only holds sessions, cache, the job queue and the state of
 the matches being played. After a recovery everyone has to log in again, and the
@@ -276,26 +286,26 @@ before it was merged into `main`.
 ## Technical Stack
 
 ### Frontend
-- **React** with **TypeScript**, built with **Vite**.
-- **React Router** for client-side navigation.
-- **Tailwind CSS** as the styling solution.
-- **Babylon.js** to render the 3D board.
-- **Laravel Echo** (with `pusher-js`) as the WebSocket client.
+- **React 19** with **TypeScript 7**, built with **Vite 8** on **Node 22**.
+- **React Router 8** for client-side navigation.
+- **Tailwind CSS 4** as the styling solution.
+- **Babylon.js 9** to render the 3D board.
+- **Laravel Echo 2** (with `pusher-js` 8) as the WebSocket client.
 
 ### Backend
-- **Laravel** on **PHP**, with its ORM **Eloquent**.
-- **Laravel Sanctum** for cookie-based SPA authentication.
-- **Laravel Socialite** for Google sign-in (OAuth 2.0).
-- **Laravel Reverb** as the WebSocket server.
+- **Laravel 13** on **PHP 8.4**, with its ORM **Eloquent**.
+- **Laravel Sanctum 4** for cookie-based SPA authentication.
+- **Laravel Socialite 5** for Google sign-in (OAuth 2.0).
+- **Laravel Reverb 1** as the WebSocket server.
 
 ### Database and storage
-- **MariaDB** — persistent data: users, friendships, rooms, players and matches.
-- **Redis** — sessions, cache, queues and the state of live matches.
+- **MariaDB 11.4** — persistent data: users, friendships, rooms, players and matches.
+- **Redis 7** — sessions, cache, queues and the state of live matches.
 
 ### Infrastructure
 - **Docker Compose** — the whole stack starts with a single command.
-- **nginx** — the only entry point: terminates HTTPS and routes requests to the frontend,
-  the API and the WebSocket server.
+- **nginx 1.27** — the only entry point: terminates HTTPS and routes requests to the
+  frontend, the API and the WebSocket server.
 
 ### Justification of the main choices
 
@@ -411,11 +421,16 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 |---|---|---|
 | **Infrastructure** | | |
 | Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. | ivromero |
+| Health check and status page | `GET /api/health` checks the database, Redis, the game loop, the queue and the last backup; the `/health` page shows it live. | ivromero |
+| Backups and disaster recovery | Automatic database dump every 6 hours outside Docker, `make backup` and `make restore`. | ivromero |
+| Demo data | Seeders with sample players, friendships and two demo accounts, never overwriting existing data. | aolabarr |
 | **Accounts and authentication** | | |
 | Sign up and log in | Email and password authentication with hashed passwords, rate limited. | ivromero, beiglesi |
 | Google sign-in | Log in or create an account with Google (OAuth 2.0). | beiglesi |
 | **Profiles and social** | | |
 | User profile | Username, bio and avatar, chosen from a gallery or uploaded; default avatar if none is set. | aolabarr |
+| Edit profile | Change username, name, email, bio and password; changing email or password asks for the current one. | aolabarr |
+| Public profiles | Open any player's profile page from search or the friends panel. | aolabarr |
 | Friends | Send, accept and remove friend requests, updated live; friends' online status. | aolabarr, ybahri |
 | **Navigation and UI** | | |
 | Landing page | Public landing page, responsive. | beiglesi, ybahri |
@@ -425,6 +440,8 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Privacy Policy and Terms of Service | Legal pages accessible from the application. | ybahri |
 | **Rooms and lobby** | | |
 | Lobby | List of open rooms, updated in real time, with search by name. | beiglesi, ybahri |
+| Create a match | Start from a preset (Classic, Arena, Maze, Hardcore) or tune every setting; validated in the form and again on the server. | ivromero, beiglesi |
+| Quick match | Pick a preset and press "Play now" to start a match against three bots at once; these rooms are hidden from the lobby list. | ivromero, beiglesi |
 | Waiting room | Players and bots in the room, updated in real time; the host starts the match. | beiglesi, aolabarr |
 | **Game** | | |
 | 3D game | Board rendered with Babylon.js, with three cameras: whole board, follow and behind the head. | ivromero |
@@ -432,7 +449,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | Multiplayer | Up to 4 players on different computers. | ivromero |
 | Bots | AI players that skip looking ahead on a share of ticks chosen by the host (20–80 %), so they can be beaten. | ivromero |
 | Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. | ivromero |
-| Disconnections | Players who leave or lose connection are shown as away. | ivromero |
+| Disconnections | A player who goes quiet for 2.5 s or leaves the game page is shown as away, in grey; they have 10 s to come back, by reloading or from the lobby, before their worm is eliminated. | ivromero |
 | Touch controls | On mobile, tap the left or right half of the screen to turn, or swipe to head that way. | ivromero |
 | Scoreboard | In-game scoreboard and end-of-match screen. | ybahri |
 | Spectator mode | Watch a match in progress. | ybahri |
@@ -446,7 +463,7 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 | 2 | ORM (Eloquent) | Minor | 1 | All |
 | 3 | Frontend framework (React) | Minor | 1 | All |
 | 4 | Custom design system | Minor | 1 | ybahri (lead), aolabarr, beiglesi |
-| 5 | Support for additional browsers | Minor | 1 | [RETOMAR] |
+| 5 | Support for additional browsers | Minor | 1 | All |
 | 6 | Standard user management | Major | 2 | aolabarr |
 | 7 | Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
 | 8 | Real-time features with WebSockets | Major | 2 | ivromero, beiglesi, aolabarr |
@@ -499,7 +516,17 @@ Eleven reusable components in `frontend/src/components/ui`:
 `SectionHeader`, `EmptyState`, `LegalLinks` and `Sidebar`, each used in two or more places.
 
 ### 5. Support for additional browsers — Minor
-**Why:** [RETOMAR]. **How:** [RETOMAR]
+**Why:** players should not depend on one browser to join a match with friends.
+**How:** besides Google Chrome, the app was tested on the latest stable versions of
+Firefox, Opera and Brave, with all features checked on each one. Firefox uses its own
+engine, while Opera and Brave are based on Chromium like Chrome. The UI uses standard
+CSS and web APIs.
+**Limitations:** Tailwind CSS 4 requires modern browsers (Chrome 111, Firefox 128 or
+later), so older versions are not supported. Each browser shows its own warning for the
+self-signed certificate on first access. Firefox prints a few WebGL warnings from
+Babylon.js in the console (a deprecated debug extension and texture initialization
+notices). They are informational and do not affect the game; Chrome shows none. No
+other browser-specific limitations were found.
 
 ### 6. Standard user management — Major
 **Why:** players need an identity, a profile and friends. **How:** sign up and log in
@@ -577,10 +604,14 @@ of ticks set by the host (bot mistakes, 20–80 %) it does not look at all.
 **Why:** players must be able to play from different computers. **How:** the server
 runs the match and broadcasts each tick; clients only send their moves and draw the
 worms gliding between ticks, so latency doesn't make them jump. The countdown is synced
-to the server clock. A page that stops pinging leaves its worm still and grey after
-2.5 s; reloading the page brings the player back within 10 s, otherwise the worm is out.
-A player who still has a seat and opens the lobby is asked whether to go back to the
-match or leave it: nothing is decided for them, and only leaving gives up the seat.
+to the server clock. Every player's page pings the server once a second. A page that
+stops pinging leaves its worm still and grey (away, still alive) after 2.5 s, and a page
+that closes says so at once; the player has 10 s from then to come back, otherwise the
+worm is out. A player who still has a seat and opens the lobby is asked whether to go
+back to the match or leave the room. Leaving the room, from that prompt or by leaving
+the waiting room for another page, gives up the seat for good: from then on the match
+can only be watched. If the host leaves, the next human in the room becomes the host;
+with no humans left, the room closes.
 
 ### 15. Multiplayer (3+ players) — Major
 **Why:** the game is designed for up to four players. **How:** up to four seats per
