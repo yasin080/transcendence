@@ -4,7 +4,7 @@
 
 ## Description
 
-**SlitherBomb ** is an online multiplayer worm game for up to four players, rendered in 3D in
+**SlitherBomb** is an online multiplayer worm game for up to four players, rendered in 3D in
 the browser. There is only one game, but every match is defined by a set of rules, and those rules change its nature completely: an open board with food and deadly walls plays like a classic **Snake**; add pillars, random walls and bombs and it turns into a
 **Bomberman**-style arena where worms swallow bombs and drop them from their tail to
 cut down and trap their rivals.
