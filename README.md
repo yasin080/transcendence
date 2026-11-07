@@ -231,6 +231,10 @@ discussed within the team before being merged.
 | Learning | Whole project | Explaining concepts (e.g. Docker bind mounts and file ownership, Laravel tooling). |
 | Visual design | UI look and feel, all images | Exploring the visual style of the project. All images in the project were generated with ChatGPT (OpenAI). |
 | Rubber duck debugging | Whole project | Explaining problems and our own reasoning out loud to spot mistakes. |
+| Code review | Backend and frontend | Reviewing pull requests for bugs, edge cases and simplifications before merging; every finding was checked by hand. |
+| Tests | `backend/tests` | Proposing edge cases for the game tick (head-on collisions, blocked worms, bombs cutting a tail) and drafting the unit tests, then adjusting them to the real behaviour. |
+| Debugging | Infrastructure | Diagnosing configuration problems (root env overriding Laravel's `.env`, Sanctum stateful domains with a non-standard port, WebSockets over HTTP/2). |
+| Repetitive code | Backend and frontend | Code that repeats a known pattern: API response types on the client, form validation mirrored in frontend and backend, test setups and seed data. Each piece was adapted and checked by the developer. |
 
 
 AI was **not** used to generate code blindly: no code was added to the project unless
@@ -611,7 +615,15 @@ lobby.
 - **Code quality:** refactors (error handling middleware) and review of the team's
   pull requests.
 
-**Challenges:** [RETOMAR]
+**Challenges:** The hardest part was keeping the game authoritative on the server
+without race conditions: the loop is the only process that writes match state, key
+presses are just stored in Redis, and one match throwing must not stop the others.
+Running everything behind a single nginx also cost time in details that fail silently:
+Sanctum comparing host and port, root environment variables overriding Laravel's own,
+WebSockets needing HTTP/1.1. On the client, drawing a 10 Hz server state at 60 fps with
+Babylon.js meant learning 3D graphics and interpolation from scratch. As Technical
+Lead, reviewing every pull request meant keeping the whole codebase simple enough for
+any member to explain it in the evaluation.
 
 ### aolabarr — Project Manager, Developer
 
