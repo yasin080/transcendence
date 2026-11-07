@@ -17,7 +17,7 @@ export default function App() {
         <nav className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-2 font-display text-lg uppercase">
             <span>
-              Transcend<span className="text-fuse-600">ence</span>
+              Slither<span className="text-fuse-600">Bomb</span>
             </span>
           </Link>
           {status === 'authenticated' && user ? (
