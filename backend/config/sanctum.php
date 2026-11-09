@@ -18,12 +18,11 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
-    ))),
+    // Besides the domains in SANCTUM_STATEFUL_DOMAINS, the host that serves the
+    // request is always stateful. The SPA and the API share the same origin
+    // behind nginx, so this covers https://localhost:1443 and https://<LAN IP>:1443
+    // alike without writing the IP anywhere.
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost').Sanctum::currentRequestHost()),
 
     /*
     |--------------------------------------------------------------------------

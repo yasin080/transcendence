@@ -14,6 +14,9 @@ endif
 # Port HTTPS published (from .env; 1443 if not set)
 HTTPS_PORT := $(or $(shell grep -E '^HTTPS_PORT=' .env 2>/dev/null | cut -d= -f2),1443)
 
+# IP of the interface that reaches the network, for players on other machines
+LAN_IP := $(shell ip route get 1 2>/dev/null | awk '{for (i = 1; i < NF; i++) if ($$i == "src") { print $$(i + 1); exit }}')
+
 .DEFAULT_GOAL := all
 .PHONY: all up dev urls down build rebuild re logs ps shell-php shell-front shell-db \
         migrate fresh test backup restore clean fclean
@@ -36,8 +39,9 @@ dev: .env
 
 urls:
 	@echo ""
-	@echo "  https://localhost:$(HTTPS_PORT)              → app"
-	@echo "  https://localhost:$(HTTPS_PORT)/api/health   → backend health"
+	@echo "  https://localhost:$(HTTPS_PORT)		→ app"
+	@echo "  https://localhost:$(HTTPS_PORT)/api/health	→ backend health"
+	@if [ -n "$(LAN_IP)" ]; then echo "  https://$(LAN_IP):$(HTTPS_PORT)		→ other machines (LAN)"; fi
 	@echo ""
 	@echo "  The browser will warn about the self-signed certificate. Expected."
 
