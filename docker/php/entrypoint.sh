@@ -18,9 +18,10 @@ until php -r '
             getenv("DB_PASSWORD")
         );
     } catch (Throwable $e) {
+        fwrite(STDERR, "[entrypoint] " . $e->getMessage() . "\n");
         exit(1);
     }
-' 2>/dev/null; do
+'; do
     sleep 2
 done
 echo "[entrypoint] database is up"
