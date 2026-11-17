@@ -113,7 +113,7 @@ Everything else (PHP, Composer, Node, MariaDB, Redis, Reverb) runs inside the co
 ### 1. Configure the environment
 
 ```bash
-git clone https://github.com/imero-dev/transcendence.git
+git clone https://github.com/yasin080/transcendence.git
 cd transcendence
 cp .env.example .env
 ```
@@ -250,21 +250,15 @@ discussed within the team before being merged.
 AI was **not** used to generate code blindly: no code was added to the project unless
 the team member could understand it, explain it and take responsibility for it.
 
-## Team Information
+## Team
 
-| Member | Role(s) | Responsibilities |
-|---|---|---|
-| **aolabarr** | Project Manager, Developer | Organizes team meetings and planning, tracks progress and deadlines, keeps communication flowing and removes blockers. |
-| **beiglesi** | Product Owner, Developer | Defines the product vision and the game rules, maintains and prioritizes the backlog, decides which features and modules are built, and validates finished work. |
-| **ivromero** | Technical Lead, Developer | Defines the architecture and the technical stack, sets code quality standards and reviews critical changes. |
-| **ybahri** | Developer | Leads the visual and creative side of the project: the look and feel of the website, its layout and the visual identity of the game. |
-
-All members are developers: each one implements features, takes part in code reviews,
-tests their own work and documents it.
+Built by a team of four 42 students: ivromero, aolabarr, beiglesi and ybahri. Everyone
+worked as a developer: implementing features, reviewing each other's pull requests,
+testing and documenting their own work.
 
 ## Project Management
 
-**Work organization.** The Technical Lead first built the base architecture (Docker
+**Work organization.** The base architecture was built first (Docker
 stack, backend and frontend skeletons). From there, tasks were assigned as the project
 evolved: each member took ownership of specific modules depending on what the project
 needed at each stage.
@@ -274,7 +268,7 @@ since the last one and set the goals for the following week. The team worked ful
 remotely: there were no in-person meetings.
 
 **Git workflow.** Every change was developed on its own branch (features, fixes, etc.)
-and merged through a pull request. The Technical Lead reviewed every pull request
+and merged through a pull request. Every pull request was reviewed
 before it was merged into `main`.
 
 **Tools.**
@@ -309,7 +303,7 @@ before it was merged into `main`.
 
 ### Justification of the main choices
 
-**Laravel.** Chosen because of the Technical Lead's previous experience with it. Its official
+**Laravel.** Chosen because of previous experience with it in the team. Its official
 packages also cover most of what the project needs (authentication, OAuth, WebSockets,
 queues, ORM) and integrate with each other, which kept the number of external
 dependencies low.
@@ -417,68 +411,68 @@ Laravel also creates its own framework tables (`sessions`, `cache`, `jobs`,
 
 ## Features List
 
-| Feature | Description | Member(s) |
-|---|---|---|
-| **Infrastructure** | | |
-| Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. | ivromero |
-| Health check and status page | `GET /api/health` checks the database, Redis, the game loop, the queue and the last backup; the `/health` page shows it live. | ivromero |
-| Backups and disaster recovery | Automatic database dump every 6 hours outside Docker, `make backup` and `make restore`. | ivromero |
-| Demo data | Seeders with sample players, friendships and two demo accounts, never overwriting existing data. | aolabarr |
-| **Accounts and authentication** | | |
-| Sign up and log in | Email and password authentication with hashed passwords, rate limited. | ivromero, beiglesi |
-| Google sign-in | Log in or create an account with Google (OAuth 2.0). | beiglesi |
-| **Profiles and social** | | |
-| User profile | Username, bio and avatar, chosen from a gallery or uploaded; default avatar if none is set. | aolabarr |
-| Edit profile | Change username, name, email, bio and password; changing email or password asks for the current one. | aolabarr |
-| Public profiles | Open any player's profile page from search or the friends panel. | aolabarr |
-| Friends | Send, accept and remove friend requests, updated live; friends' online status. | aolabarr, ybahri |
-| **Navigation and UI** | | |
-| Landing page | Public landing page, responsive. | beiglesi, ybahri |
-| App layout | Dashboard layout, left sidebar with navigation and route guard, right sidebar with friends. | ybahri, beiglesi, aolabarr |
-| Design system | Reusable components, colour palette and typography. | ybahri |
-| Responsive design | Layout adapted to mobile and desktop. | ybahri |
-| Privacy Policy and Terms of Service | Legal pages accessible from the application. | ybahri |
-| **Rooms and lobby** | | |
-| Lobby | List of open rooms, updated in real time, with search by name. | beiglesi, ybahri |
-| Create a match | Start from a preset (Classic, Arena, Maze, Hardcore) or tune every setting; validated in the form and again on the server. | ivromero, beiglesi |
-| Quick match | Pick a preset and press "Play now" to start a match against three bots at once; these rooms are hidden from the lobby list. | ivromero, beiglesi |
-| Waiting room | Players and bots in the room, updated in real time; the host starts the match. | beiglesi, aolabarr |
-| **Game** | | |
-| 3D game | Board rendered with Babylon.js, with three cameras: whole board, follow and behind the head. | ivromero |
-| Server game loop | The server runs every match and broadcasts each tick. | ivromero |
-| Multiplayer | Up to 4 players on different computers. | ivromero |
-| Bots | AI players that skip looking ahead on a share of ticks chosen by the host (20–80 %), so they can be beaten. | ivromero |
-| Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. | ivromero |
-| Disconnections | A player who goes quiet for 2.5 s or leaves the game page is shown as away, in grey; they have 10 s to come back, by reloading or from the lobby, before their worm is eliminated. | ivromero |
-| Touch controls | On mobile, tap the left or right half of the screen to turn, or swipe to head that way. | ivromero |
-| Scoreboard | In-game scoreboard and end-of-match screen. | ybahri |
-| Spectator mode | Watch a match in progress. | ybahri |
+| Feature | Description |
+|---|---|
+| **Infrastructure** | |
+| Docker stack | Whole stack started with one command; nginx as the single HTTPS entry point. |
+| Health check and status page | `GET /api/health` checks the database, Redis, the game loop, the queue and the last backup; the `/health` page shows it live. |
+| Backups and disaster recovery | Automatic database dump every 6 hours outside Docker, `make backup` and `make restore`. |
+| Demo data | Seeders with sample players, friendships and two demo accounts, never overwriting existing data. |
+| **Accounts and authentication** | |
+| Sign up and log in | Email and password authentication with hashed passwords, rate limited. |
+| Google sign-in | Log in or create an account with Google (OAuth 2.0). |
+| **Profiles and social** | |
+| User profile | Username, bio and avatar, chosen from a gallery or uploaded; default avatar if none is set. |
+| Edit profile | Change username, name, email, bio and password; changing email or password asks for the current one. |
+| Public profiles | Open any player's profile page from search or the friends panel. |
+| Friends | Send, accept and remove friend requests, updated live; friends' online status. |
+| **Navigation and UI** | |
+| Landing page | Public landing page, responsive. |
+| App layout | Dashboard layout, left sidebar with navigation and route guard, right sidebar with friends. |
+| Design system | Reusable components, colour palette and typography. |
+| Responsive design | Layout adapted to mobile and desktop. |
+| Privacy Policy and Terms of Service | Legal pages accessible from the application. |
+| **Rooms and lobby** | |
+| Lobby | List of open rooms, updated in real time, with search by name. |
+| Create a match | Start from a preset (Classic, Arena, Maze, Hardcore) or tune every setting; validated in the form and again on the server. |
+| Quick match | Pick a preset and press "Play now" to start a match against three bots at once; these rooms are hidden from the lobby list. |
+| Waiting room | Players and bots in the room, updated in real time; the host starts the match. |
+| **Game** | |
+| 3D game | Board rendered with Babylon.js, with three cameras: whole board, follow and behind the head. |
+| Server game loop | The server runs every match and broadcasts each tick. |
+| Multiplayer | Up to 4 players on different computers. |
+| Bots | AI players that skip looking ahead on a share of ticks chosen by the host (20–80 %), so they can be beaten. |
+| Bombs | Eaten bombs drop from the tail and blast a 3×3 area after a fuse. |
+| Disconnections | A player who goes quiet for 2.5 s or leaves the game page is shown as away, in grey; they have 10 s to come back, by reloading or from the lobby, before their worm is eliminated. |
+| Touch controls | On mobile, tap the left or right half of the screen to turn, or swipe to head that way. |
+| Scoreboard | In-game scoreboard and end-of-match screen. |
+| Spectator mode | Watch a match in progress. |
 
 
 ## Modules
 
-| # | Module | Type | Points | Member(s) |
-|---|---|---|---|---|
-| 1 | Backend framework (Laravel) | Minor | 1 | All |
-| 2 | ORM (Eloquent) | Minor | 1 | All |
-| 3 | Frontend framework (React) | Minor | 1 | All |
-| 4 | Custom design system | Minor | 1 | ybahri (lead), aolabarr, beiglesi |
-| 5 | Support for additional browsers | Minor | 1 | All |
-| 6 | Standard user management | Major | 2 | aolabarr |
-| 7 | Remote authentication with OAuth 2.0 | Minor | 1 | beiglesi |
-| 8 | Real-time features with WebSockets | Major | 2 | ivromero, beiglesi, aolabarr |
-| 9 | Health check and status page | Minor | 1 | ivromero |
-| 10 | Complete web-based game | Major | 2 | ivromero |
-| 11 | Advanced 3D graphics | Major | 2 | ivromero |
-| 12 | Game customization options | Minor | 1 | ivromero |
-| 13 | AI opponent | Major | 2 | ivromero |
-| 14 | Remote players | Major | 2 | ivromero |
-| 15 | Multiplayer game (more than two players) | Major | 2 | ivromero |
-| 16 | Spectator mode | Minor | 1 | ybahri |
-| | **Total** | | **23** | |
+| # | Module | Type | Points |
+|---|---|---|---|
+| 1 | Backend framework (Laravel) | Minor | 1 |
+| 2 | ORM (Eloquent) | Minor | 1 |
+| 3 | Frontend framework (React) | Minor | 1 |
+| 4 | Custom design system | Minor | 1 |
+| 5 | Support for additional browsers | Minor | 1 |
+| 6 | Standard user management | Major | 2 |
+| 7 | Remote authentication with OAuth 2.0 | Minor | 1 |
+| 8 | Real-time features with WebSockets | Major | 2 |
+| 9 | Health check and status page | Minor | 1 |
+| 10 | Complete web-based game | Major | 2 |
+| 11 | Advanced 3D graphics | Major | 2 |
+| 12 | Game customization options | Minor | 1 |
+| 13 | AI opponent | Major | 2 |
+| 14 | Remote players | Major | 2 |
+| 15 | Multiplayer game (more than two players) | Major | 2 |
+| 16 | Spectator mode | Minor | 1 |
+| | **Total** | | **23** |
 
 ### 1. Backend framework — Minor
-**Why:** the Technical Lead already knew it, and it brings what the project needs out of the box:
+**Why:** part of the team already knew it, and it brings what the project needs out of the box:
 session auth (Sanctum), OAuth (Socialite), WebSockets (Reverb), queues and an ORM
 (Eloquent). **How:** Laravel 13 on PHP 8.4, serving a JSON API under `/api`. Routes are
 grouped behind `auth:sanctum`, input is validated with Form Requests, login and
@@ -628,84 +622,3 @@ game page with no seat: the server sends the same ticks over the game channel, t
 camera shows the whole board, there are no controls or pings, and the server refuses
 moves from anyone without a seat. At the end it shows who won and goes back to the
 lobby.
-
-
-## Individual Contributions
-
-### ivromero — Technical Lead, Developer
-
-- **Architecture and infrastructure:** Docker stack, nginx with HTTPS, base structure of
-  the backend and the frontend.
-- **Authentication:** sign-up and login API with Sanctum sessions and rate limiting.
-- **Game engine:** game models, the server game loop (`game:tick`), multiplayer
-  synchronization and the bomb mechanics.
-- **3D game:** rendering of the board with Babylon.js.
-- **AI opponent:** the bot and its tests.
-- **Remote play:** player presence, disconnection and reconnection.
-- **Touch controls** for mobile devices.
-- **Code quality:** refactors (error handling middleware) and review of the team's
-  pull requests.
-
-**Challenges:** The hardest part was keeping the game authoritative on the server
-without race conditions: the loop is the only process that writes match state, key
-presses are just stored in Redis, and one match throwing must not stop the others.
-Running everything behind a single nginx also cost time in details that fail silently:
-Sanctum comparing host and port, root environment variables overriding Laravel's own,
-WebSockets needing HTTP/1.1. On the client, drawing a 10 Hz server state at 60 fps with
-Babylon.js meant learning 3D graphics and interpolation from scratch. As Technical
-Lead, reviewing every pull request meant keeping the whole codebase simple enough for
-any member to explain it in the evaluation.
-
-### aolabarr — Project Manager, Developer
-
-- **Profiles:** profile page, edit profile modal and its API (username, bio, avatar
-  stored in the database).
-- **Friends:** right sidebar with the friends panel, live friend requests and online
-  status with Reverb presence channels.
-- **Waiting room:** first version of the waiting room in the frontend.
-- **Game:** player identity in rooms and matches.
-- **Data:** seeders with sample players, friendships and demo accounts.
-- **Validation and fixes:** form validation in frontend and backend, Makefile fixes.
-- **Project management:** weekly meetings, planning and progress tracking.
-
-**Challenges:** I had no previous experience in web development, so most of the work
-meant learning while building. The friends system was the most complete example: it
-covered the whole stack, from the migration and model to the API, the React panel and
-real-time updates with Reverb. As Project Manager, I prepared the agenda for each
-meeting so that they stayed focused and useful.
-
-### beiglesi — Product Owner, Developer
-
-- **Authentication:** login frontend and Google sign-in.
-- **Rooms:** real rooms with a live lobby and waiting room, connected to the backend.
-- **Navigation:** left sidebar, navigation, route guard and route refactor.
-- **Landing page:** restyle with the curved worm, sprites and shared theme.
-- **Game integration:** "Play now" moved to React and wired to the game.
-- **Fixes:** tokens and replacement of repeated images.
-- **Product ownership:** game rules, backlog and priorities, validation of finished
-  work, and the README.
-
-**Challenges:** I had never worked with Laravel or PHP before, so I had to learn
-the framework while building on it. The most interesting part was real-time
-communication: understanding how Laravel broadcasting, Reverb and Echo work
-together to keep the lobby and waiting room in sync.
-
-### ybahri — Developer
-
-- **Visual identity:** look and feel of the website and the game.
-- **Design system:** 11 reusable components with a shared palette and typography.
-- **Layout:** dashboard layout, first versions of the lobby and the social panel.
-- **Responsive design:** landing page and app adapted to mobile and desktop.
-- **Lobby:** search rooms by name.
-- **Game UI:** in-game scoreboard and end-of-match screen.
-- **Spectator mode:** watch a match in progress from the lobby.
-- **Legal pages:** Privacy Policy and Terms of Service.
-
-**Challenges:** Before this project, my only experience was the 42 common core: mostly
-backend work in C and C++. Frontend, React and Laravel were all new to me, and the
-biggest challenge was changing the way I think, from programs that run step by step to
-screens that update themselves when something changes. Spectator mode was the first
-feature I built on both sides, from the lobby to the server. I also learned to build on
-code that my teammates were changing at the same time.
-
-
